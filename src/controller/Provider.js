@@ -28,7 +28,7 @@ const Provider = {
     logger.info("Get Companies");
 
     const { type } = req.params;
-    
+
     const queryConsult = `SELECT cnpjAssociado AS cnpjForn, razaoAssociado AS razao, codAssociado AS codForn
     FROM associado
     WHERE ${type} = 1
@@ -41,7 +41,7 @@ const Provider = {
       if (error) {
         console.log("Error Select Companies Sells: ", error);
       } else {
-        return res.json(results[1]);
+        return res.json(results);
       }
     });
     // connection.end();
