@@ -61,6 +61,7 @@ router.get("/schedule", Notice.getAllSchedule);
 router.get("/providerclient/:codconsultor", Provider.getProviderClient);
 
 router.get("/suppliersinvoicing", Provider.getProviderSells);
+router.get("/companies/:type", Provider.getCompanies);
 router.get("/providerscategories/:codbuyer", Provider.getProvidersCategories);
 router.get("/providersconsult/:codconsultclient", Provider.getProvidersClient);
 router.get("/providerconsult/:codconsult", Provider.getProviderConsult);

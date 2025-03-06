@@ -24,6 +24,29 @@ const Provider = {
     // connection.end();
   },
 
+  async getCompanies(req, res) {
+    logger.info("Get Companies");
+
+    const { type } = req.params;
+    
+    const queryConsult = `SELECT cnpjAssociado AS cnpjForn, razaoAssociado AS razao, codAssociado AS codForn
+    FROM associado
+    WHERE ${type} = 1
+    UNION ALL
+    SELECT cnpjForn, razaoForn AS razao, codForn
+    FROM fornecedor
+    WHERE ${type} = 2;`;
+
+    connection.query(queryConsult, (error, results, fields) => {
+      if (error) {
+        console.log("Error Select Companies Sells: ", error);
+      } else {
+        return res.json(results[1]);
+      }
+    });
+    // connection.end();
+  },
+
   async getProviderSells(req, res) {
     logger.info("Get Provider Sells");
 
