@@ -31,11 +31,11 @@ const Provider = {
 
     const queryConsult = `SELECT cnpjAssociado AS cnpjForn, razaoAssociado AS razao, codAssociado AS codForn
     FROM associado
-    WHERE ${type} = 1
+    WHERE ${type} = 2
     UNION ALL
     SELECT cnpjForn, razaoForn AS razao, codForn
     FROM fornecedor
-    WHERE ${type} = 2;`;
+    WHERE ${type} = 1;`;
 
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {
