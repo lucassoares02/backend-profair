@@ -593,6 +593,10 @@ const Client = {
   insertRelationProvider(cod, empresas, type) {
     console.log("Insert Relation Provider");
 
+    console.log("\n---------------------------------------------------");
+    console.log(cod);
+    console.log("---------------------------------------------------\n");
+
     let dataAssociado = [];
     let dataConsultor = [];
 
@@ -664,13 +668,12 @@ const Client = {
     await connection.query(query, (error, results) => {
       if (error) {
         console.log("Error Insert Acesso: ", error);
-        result = false;
-        return;
+        return res.status(400).send(`message: Error Insert!`);
       } else {
         console.log("inserido acesso");
 
         if (type != 3) {
-          Client.insertRelationProvider(response, parseEmpresas, type);
+          Client.insertRelationProvider(results, parseEmpresas, type);
           return res.json({ "message": "saved" });
         } else {
           return res.status(400).send(`message: Nothing Result!`);
