@@ -646,48 +646,48 @@ const Client = {
     logger.info("Post Insert User");
 
     const { nome, email, empresas, tel, cpf, type, hash } = req.body;
-
     const parseEmpresas = JSON.parse(empresas);
 
-    const query = `START TRANSACTION;
-        INSERT INTO consultor 
-            (nomeConsult, cpfConsult, telConsult, codFornConsult, emailConsult) 
-        VALUES 
-            ('${nome}', '${cpf}', '${tel}', '${parseEmpresas[0].codForn}', '${email}');
+    try {
+        // Inicia a transação
+        await connection.beginTransaction();
 
-        INSERT INTO acesso 
-            (codAcesso, direcAcesso, codUsuario, codOrganization) 
-        VALUES 
-            (${hash}, ${type}, LAST_INSERT_ID(), 158);
-        COMMIT;
-        SELECT LAST_INSERT_ID() AS consultor;
-      `;
+        // Insere o consultor e captura o ID inserido
+        const [resultConsultor] = await connection.query(`
+            INSERT INTO consultor 
+                (nomeConsult, cpfConsult, telConsult, codFornConsult, emailConsult) 
+            VALUES (?, ?, ?, ?, ?);
+        `, [nome, cpf, tel, parseEmpresas[0].codForn, email]);
 
-    console.log("queryAccess");
-    console.log(query);
+        const consultorId = resultConsultor.insertId;  // Pega o ID inserido
 
-    await connection.query(query, (error, results) => {
-      if (error) {
-        console.log("Error Insert Acesso: ", error);
-        return res.status(400).send(`message: Error Insert!`);
-      } else {
+        // Insere o acesso usando o ID do consultor
+        await connection.query(`
+            INSERT INTO acesso 
+                (codAcesso, direcAcesso, codUsuario, codOrganization) 
+            VALUES (?, ?, ?, 158);
+        `, [hash, type, consultorId]);
+
+        // Confirma a transação
+        await connection.commit();
+
         console.log("inserido acesso");
 
         if (type != 3) {
-          Client.insertRelationProvider(results[0].consultor, parseEmpresas, type);
-          return res.json({ "message": "saved" });
+            // Chama a função para relacionar fornecedor
+            Client.insertRelationProvider(consultorId, parseEmpresas, type);
+            return res.json({ message: "saved", consultorId });
         } else {
-          return res.status(400).send(`message: Nothing Result!`);
+            return res.status(400).send({ message: "Nothing Result!" });
         }
-        return;
-      }
-    });
+    } catch (error) {
+        console.log("Error Insert Acesso:", error);
 
-    //=============================================================
-    //=============================================================
-    //=============================================================
-  },
-
+        // Desfaz a transação em caso de erro
+        if (connection) await connection.rollback();
+        return res.status(400).send({ message: "Error Insert!" });
+    }
+}
 
 };
 
