@@ -602,12 +602,12 @@ const Client = {
       if (type == 1) {
         dataConsultor.push({
           codConsultor: cod,
-          codFornecedor: empresa.codeProvider,
+          codFornecedor: empresa.codForn,
         })
       } else {
         dataAssociado.push({
           codAssocRelaciona: cod,
-          codConsultRelaciona: empresa.codeProvider,
+          codConsultRelaciona: empresa.codForn,
         });
       }
     }
@@ -643,15 +643,12 @@ const Client = {
 
     const { nome, email, empresas, tel, cpf, type, hash } = req.body;
 
-    console.log("\n99999999999999999999999999999999999999999999999999999")
-    console.log(empresas)
-    console.log("99999999999999999999999999999999999999999999999999999\n")
-    
+    const parseEmpresas = JSON.parse(empresas);
 
     const queryInsert = `INSERT INTO 
     consultor 
         (nomeConsult,	cpfConsult,	telConsult,	codFornConsult,	emailConsult) 
-    VALUES ('${nome}', '${cpf}', '${tel}', '${empresas[0].codForn}', '${email}'); SELECT LAST_INSERT_ID() AS consultor;`;
+    VALUES ('${nome}', '${cpf}', '${tel}', '${parseEmpresas[0].codForn}', '${email}'); SELECT LAST_INSERT_ID() AS consultor;`;
 
     console.log("queryInsert");
     console.log(queryInsert);
@@ -693,7 +690,7 @@ const Client = {
           console.log("inserido acesso");
 
           if (type != 3) {
-            Client.insertRelationProvider(response, empresas, type);
+            Client.insertRelationProvider(response, parseEmpresas, type);
             return res.json({ "message": "saved" });
           } else {
             return res.status(400).send(`message: Nothing Result!`);
