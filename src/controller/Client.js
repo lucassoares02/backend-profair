@@ -663,7 +663,7 @@ const Client = {
         return;
       } else {
         console.log("inserido consultor");
-        response = results[0];
+        response = results;
         return;
       }
     });
