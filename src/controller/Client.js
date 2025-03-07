@@ -432,71 +432,6 @@ const Client = {
     }
   },
 
-  async postInsertUser(req, res) {
-    logger.info("Post Insert User");
-
-    const { nome, email, empresa, tel, cpf, type, hash } = req.body;
-
-    const queryInsert = `INSERT INTO 
-    consultor 
-        (codConsult, nomeConsult,	cpfConsult,	telConsult,	codFornConsult,	emailConsult) 
-    VALUES ((SELECT IFNULL(MAX(a.codConsult), 0) + 1 FROM consultor a),'${nome}', '${cpf}', '${tel}', '${empresa}', '${email}')`;
-
-    console.log("queryInsert");
-    console.log(queryInsert);
-
-    //=============================================================
-    //=============================================================
-    //=============================================================
-
-    let result = true;
-    let response = "";
-
-    connection.query(queryInsert, (error, results) => {
-      if (error) {
-        result = false;
-        console.log("Error Insert Person: ", error);
-        return;
-      } else {
-        console.log("inserido consultor");
-        response = results;
-        return;
-      }
-    });
-
-    //=============================================================
-    //=============================================================
-    //=====================
-    if (result) {
-      const queryAccess = `insert into acesso (codAcesso, direcAcesso, codUsuario, codOrganization) values(${hash}, ${type}, (SELECT IFNULL(MAX(a.codConsult), 0) FROM consultor a), 158); select * from consultor where codConsult = (SELECT IFNULL(MAX(a.codConsult), 0) FROM consultor a)`;
-
-      console.log("queryAccess");
-      console.log(queryAccess);
-
-      await connection.query(queryAccess, (error, results) => {
-        if (error) {
-          console.log("Error Insert Acesso: ", error);
-          result = false;
-          return;
-        } else {
-          console.log("inserido acesso");
-          if (type != 3) {
-            Client.insertRelationProvider(results[1][0]["codConsult"], empresa, type);
-            return res.json({ "message": "saved" });
-          } else {
-            return res.status(400).send(`message: Nothing Result!`);
-          }
-          return;
-        }
-      });
-    }
-
-    //=============================================================
-    //=============================================================
-    //=============================================================
-
-
-  },
 
   async insertRelationProviderClient(req, res) {
     logger.info("Post Update Provider Person");
@@ -509,47 +444,9 @@ const Client = {
     if (cod != null) {
       await Client.insertRelationProvider(cod, empresa, type);
       return res.json({ "message": "updated" });
-      
+
 
     }
-  },
-
-  insertRelationProvider(cod, empresa, type) {
-    console.log("Insert Relation Provider");
-
-    let dataAssociado = [{
-      codAssocRelaciona: cod,
-      codConsultRelaciona: empresa,
-    }];
-
-    let dataConsultor = [{
-      codConsultor: cod,
-      codFornecedor: empresa,
-    }];
-
-
-    let params = {
-      table: type == 1 ? "relacionafornecedor" : "relaciona",
-      data: type == 1 ? dataConsultor : dataAssociado,
-    };
-
-    console.log(params)
-
-
-    try {
-      return new Promise((resolve, reject) => {
-        return Insert(params)
-          .then(async (resp) => {
-            resolve(resp);
-          })
-          .catch((error) => {
-            res.status(400).send(error);
-          });
-      });
-    } catch (error) {
-      console.log(`Error Insert Negotiation: ${error}`)
-    }
-
   },
 
   async getAllStoresGraph(req, res) {
@@ -691,6 +588,122 @@ const Client = {
     });
     // connection.end();
   },
+
+
+  insertRelationProvider(cod, empresas, type) {
+    console.log("Insert Relation Provider");
+
+    let dataAssociado = [];
+    let dataConsultor = [];
+
+    for (let index = 0; index < empresas.length; index++) {
+      const empresa = array[index];
+
+      if (type == 1) {
+        dataConsultor.push({
+          codConsultor: cod,
+          codFornecedor: empresa.codeProvider,
+        })
+      } else {
+        dataAssociado.push({
+          codAssocRelaciona: cod,
+          codConsultRelaciona: empresa.codeProvider,
+        });
+      }
+    }
+
+
+
+    let params = {
+      table: type == 1 ? "relacionafornecedor" : "relaciona",
+      data: type == 1 ? dataConsultor : dataAssociado,
+    };
+
+    console.log(params)
+
+
+    try {
+      return new Promise((resolve, reject) => {
+        return Insert(params)
+          .then(async (resp) => {
+            resolve(resp);
+          })
+          .catch((error) => {
+            res.status(400).send(error);
+          });
+      });
+    } catch (error) {
+      console.log(`Error Insert Negotiation: ${error}`)
+    }
+
+  },
+
+  async postInsertUser(req, res) {
+    logger.info("Post Insert User");
+
+    const { nome, email, empresas, tel, cpf, type, hash } = req.body;
+
+    const queryInsert = `INSERT INTO 
+    consultor 
+        (nomeConsult,	cpfConsult,	telConsult,	codFornConsult,	emailConsult) 
+    VALUES ('${nome}', '${cpf}', '${tel}', '${empresas[0].codeProvider}', '${email}'); SELECT LAST_INSERT_ID() AS consultor;`;
+
+    console.log("queryInsert");
+    console.log(queryInsert);
+
+    let result = true;
+    let response = "";
+
+    connection.query(queryInsert, (error, results) => {
+      if (error) {
+        result = false;
+        console.log("Error Insert Person: ", error);
+        return;
+      } else {
+        console.log("inserido consultor");
+        response = results[0];
+        return;
+      }
+    });
+
+    //=============================================================
+    //=============================================================
+    //=====================
+
+    console.log("Result Insert Consultor");
+    console.log(response);
+
+    if (result) {
+      const queryAccess = `insert into acesso (codAcesso, direcAcesso, codUsuario, codOrganization) values(${hash}, ${type}, ${response}, 158);`;
+
+      console.log("queryAccess");
+      console.log(queryAccess);
+
+      await connection.query(queryAccess, (error, results) => {
+        if (error) {
+          console.log("Error Insert Acesso: ", error);
+          result = false;
+          return;
+        } else {
+          console.log("inserido acesso");
+
+          if (type != 3) {
+            Client.insertRelationProvider(response, empresas, type);
+            return res.json({ "message": "saved" });
+          } else {
+            return res.status(400).send(`message: Nothing Result!`);
+          }
+          return;
+        }
+      });
+    }
+
+    //=============================================================
+    //=============================================================
+    //=============================================================
+  },
+
+
 };
 
 module.exports = Client;
