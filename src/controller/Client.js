@@ -677,7 +677,7 @@ const Client = {
         console.log(results);
 
         if (type != 3) {
-          Client.insertRelationProvider(results[4][0].consultor, parseEmpresas, type);
+          Client.insertRelationProvider(results[5][0].consultor, parseEmpresas, type);
           return res.json({ "message": "saved" });
         } else {
           return res.status(400).send(`message: Nothing Result!`);
