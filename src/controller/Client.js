@@ -660,6 +660,7 @@ const Client = {
         VALUES 
             (${hash}, ${type}, LAST_INSERT_ID(), 158);
         COMMIT;
+        SELECT LAST_INSERT_ID() AS consultor;
       `;
 
     console.log("queryAccess");
