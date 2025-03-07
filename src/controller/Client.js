@@ -601,7 +601,7 @@ const Client = {
     let dataConsultor = [];
 
     for (let index = 0; index < empresas.length; index++) {
-      const empresa = array[index];
+      const empresa = empresas[index];
 
       if (type == 1) {
         dataConsultor.push({
