@@ -647,21 +647,43 @@ const Client = {
 
     const { nome, email, empresas, tel, cpf, type, hash } = req.body;
 
-    const parseEmpresas = JSON.parse(empresas);
+    let query = "";
 
-    const query = `START TRANSACTION;
-        INSERT INTO consultor 
-            (nomeConsult, cpfConsult, telConsult, codFornConsult, emailConsult) 
-        VALUES 
-            ('${nome}', '${cpf}', '${tel}', '${parseEmpresas[0].codForn}', '${email}');SET @consultorId = LAST_INSERT_ID();
+    if (type == 3) {
 
-        INSERT INTO acesso 
-            (codAcesso, direcAcesso, codUsuario, codOrganization) 
-        VALUES 
-            (${hash}, ${type}, LAST_INSERT_ID(), 158);
-        COMMIT;
-        SELECT @consultorId AS consultor;
-      `;
+
+      query = `START TRANSACTION;
+          INSERT INTO consultor 
+              (nomeConsult, cpfConsult, telConsult, codFornConsult, emailConsult) 
+          VALUES 
+              ('${nome}', '${cpf}', '${tel}', '158', '${email}');SET @consultorId = LAST_INSERT_ID();
+  
+          INSERT INTO acesso 
+              (codAcesso, direcAcesso, codUsuario, codOrganization) 
+          VALUES 
+              (${hash}, ${type}, LAST_INSERT_ID(), 158);
+          COMMIT;
+        `;
+
+    } else {
+      const parseEmpresas = JSON.parse(empresas);
+
+      query = `START TRANSACTION;
+          INSERT INTO consultor 
+              (nomeConsult, cpfConsult, telConsult, codFornConsult, emailConsult) 
+          VALUES 
+              ('${nome}', '${cpf}', '${tel}', '${parseEmpresas[0].codForn}', '${email}');SET @consultorId = LAST_INSERT_ID();
+  
+          INSERT INTO acesso 
+              (codAcesso, direcAcesso, codUsuario, codOrganization) 
+          VALUES 
+              (${hash}, ${type}, LAST_INSERT_ID(), 158);
+          COMMIT;
+          SELECT @consultorId AS consultor;
+        `;
+
+    }
+
 
     console.log("queryAccess");
     console.log(query);
@@ -680,7 +702,8 @@ const Client = {
           Client.insertRelationProvider(results[5][0].consultor, parseEmpresas, type);
           return res.json({ "message": "saved" });
         } else {
-          return res.status(400).send(`message: Nothing Result!`);
+          return res.json({ "message": "saved" });
+
         }
         return;
       }
