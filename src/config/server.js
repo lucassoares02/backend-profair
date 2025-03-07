@@ -31,7 +31,7 @@ if (process.env.DATABASE == "POSTGRESQL") {
     // insecureAuth: true,
     // connectionLimit: 10,
     multipleStatements: true
-  });
+  }).promise();
 
   var connectionMultishow = mysql.createConnection({
     port: process.env.MYSQL_PORT_MULTISHOW,

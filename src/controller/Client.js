@@ -649,52 +649,45 @@ const Client = {
     const parseEmpresas = JSON.parse(empresas);
 
     try {
-        // Inicia a transação
-        await connection.beginTransaction();
+      // Inicia a transação
+      await connection.beginTransaction();
 
-        // Insere o consultor e captura o ID inserido
-        const [resultConsultor] = await connection.query(`
+      // Insere o consultor e captura o ID inserido
+      const [resultConsultor] = await connection.query(`
             INSERT INTO consultor 
                 (nomeConsult, cpfConsult, telConsult, codFornConsult, emailConsult) 
             VALUES (?, ?, ?, ?, ?);
         `, [nome, cpf, tel, parseEmpresas[0].codForn, email]);
 
-        console.log("inserido consultor");
-        console.log(resultConsultor);
-        
-        const consultorId = resultConsultor.insertId;  // Pega o ID inserido
+      const consultorId = resultConsultor.insertId;  // Pega o ID inserido
 
-        console.log("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[");
-        console.log(consultorId);
-
-        // Insere o acesso usando o ID do consultor
-        await connection.query(`
+      // Insere o acesso usando o ID do consultor
+      await connection.query(`
             INSERT INTO acesso 
                 (codAcesso, direcAcesso, codUsuario, codOrganization) 
             VALUES (?, ?, ?, 158);
         `, [hash, type, consultorId]);
 
-        // Confirma a transação
-        await connection.commit();
+      // Confirma a transação
+      await connection.commit();
 
-        console.log("inserido acesso");
-        console.log(consultorId);
+      console.log("inserido acesso");
 
-        if (type != 3) {
-            // Chama a função para relacionar fornecedor
-            await Client.insertRelationProvider(consultorId, parseEmpresas, type);
-            return res.json({ message: "saved" });
-        } else {
-            return res.status(400).send({ message: "Nothing Result!" });
-        }
+      if (type != 3) {
+        Client.insertRelationProvider(consultorId, parseEmpresas, type);
+        return res.json({ message: "saved", consultorId });
+      } else {
+        return res.status(400).send({ message: "Nothing Result!" });
+      }
     } catch (error) {
-        console.log("Error Insert Acesso:", error);
+      console.log("Error Insert Acesso:", error);
 
-        // Desfaz a transação em caso de erro
-        if (connection) await connection.rollback();
-        return res.status(400).send({ message: "Error Insert!" });
+      // Desfaz a transação em caso de erro
+      await connection.rollback();
+      return res.status(400).send({ message: "Error Insert!" });
     }
-}
+  }
+
 
 };
 
