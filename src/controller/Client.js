@@ -643,6 +643,11 @@ const Client = {
 
     const { nome, email, empresas, tel, cpf, type, hash } = req.body;
 
+    console.log("\n99999999999999999999999999999999999999999999999999999")
+    console.log(empresas)
+    console.log("99999999999999999999999999999999999999999999999999999\n")
+    
+
     const queryInsert = `INSERT INTO 
     consultor 
         (nomeConsult,	cpfConsult,	telConsult,	codFornConsult,	emailConsult) 
