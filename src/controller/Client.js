@@ -649,9 +649,7 @@ const Client = {
     const parseEmpresas = JSON.parse(empresas);
 
     try {
-      // Inicia a transação
-      await connection.beginTransaction();
-
+      
       // Insere o consultor e captura o ID inserido
       const [resultConsultor] = await connection.query(`
             INSERT INTO consultor 
