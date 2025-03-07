@@ -659,7 +659,13 @@ const Client = {
             VALUES (?, ?, ?, ?, ?);
         `, [nome, cpf, tel, parseEmpresas[0].codForn, email]);
 
+        console.log("inserido consultor");
+        console.log(resultConsultor);
+        
         const consultorId = resultConsultor.insertId;  // Pega o ID inserido
+
+        console.log("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[");
+        console.log(consultorId);
 
         // Insere o acesso usando o ID do consultor
         await connection.query(`
@@ -672,6 +678,7 @@ const Client = {
         await connection.commit();
 
         console.log("inserido acesso");
+        console.log(consultorId);
 
         if (type != 3) {
             // Chama a função para relacionar fornecedor
