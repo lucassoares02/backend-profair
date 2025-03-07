@@ -645,60 +645,39 @@ const Client = {
 
     const parseEmpresas = JSON.parse(empresas);
 
-    const queryInsert = `INSERT INTO 
-    consultor 
-        (nomeConsult,	cpfConsult,	telConsult,	codFornConsult,	emailConsult) 
-    VALUES ('${nome}', '${cpf}', '${tel}', '${parseEmpresas[0].codForn}', '${email}'); SELECT LAST_INSERT_ID() AS consultor;`;
+    const query = `START TRANSACTION;
+        INSERT INTO consultor 
+            (nomeConsult, cpfConsult, telConsult, codFornConsult, emailConsult) 
+        VALUES 
+            ('${nome}', '${cpf}', '${tel}', '${parseEmpresas[0].codForn}', '${email}');
 
-    console.log("queryInsert");
-    console.log(queryInsert);
+        INSERT INTO acesso 
+            (codAcesso, direcAcesso, codUsuario, codOrganization) 
+        VALUES 
+            (${hash}, ${type}, LAST_INSERT_ID(), 158);
+        COMMIT;
+      `;
 
-    let result = true;
-    let response = "";
+    console.log("queryAccess");
+    console.log(query);
 
-    connection.query(queryInsert, (error, results) => {
+    await connection.query(query, (error, results) => {
       if (error) {
+        console.log("Error Insert Acesso: ", error);
         result = false;
-        console.log("Error Insert Person: ", error);
         return;
       } else {
-        console.log("inserido consultor");
-        response = results;
+        console.log("inserido acesso");
+
+        if (type != 3) {
+          Client.insertRelationProvider(response, parseEmpresas, type);
+          return res.json({ "message": "saved" });
+        } else {
+          return res.status(400).send(`message: Nothing Result!`);
+        }
         return;
       }
     });
-
-    //=============================================================
-    //=============================================================
-    //=====================
-
-    console.log("Result Insert Consultor");
-    console.log(response);
-
-    if (result) {
-      const queryAccess = `insert into acesso (codAcesso, direcAcesso, codUsuario, codOrganization) values(${hash}, ${type}, ${response}, 158);`;
-
-      console.log("queryAccess");
-      console.log(queryAccess);
-
-      await connection.query(queryAccess, (error, results) => {
-        if (error) {
-          console.log("Error Insert Acesso: ", error);
-          result = false;
-          return;
-        } else {
-          console.log("inserido acesso");
-
-          if (type != 3) {
-            Client.insertRelationProvider(response, parseEmpresas, type);
-            return res.json({ "message": "saved" });
-          } else {
-            return res.status(400).send(`message: Nothing Result!`);
-          }
-          return;
-        }
-      });
-    }
 
     //=============================================================
     //=============================================================
