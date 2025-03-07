@@ -653,14 +653,14 @@ const Client = {
         INSERT INTO consultor 
             (nomeConsult, cpfConsult, telConsult, codFornConsult, emailConsult) 
         VALUES 
-            ('${nome}', '${cpf}', '${tel}', '${parseEmpresas[0].codForn}', '${email}');
+            ('${nome}', '${cpf}', '${tel}', '${parseEmpresas[0].codForn}', '${email}');SET @consultorId = LAST_INSERT_ID();
 
         INSERT INTO acesso 
             (codAcesso, direcAcesso, codUsuario, codOrganization) 
         VALUES 
             (${hash}, ${type}, LAST_INSERT_ID(), 158);
         COMMIT;
-        SELECT LAST_INSERT_ID() AS consultor;
+        SELECT @consultorId AS consultor;
       `;
 
     console.log("queryAccess");
