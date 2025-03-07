@@ -651,7 +651,7 @@ const Client = {
     const queryInsert = `INSERT INTO 
     consultor 
         (nomeConsult,	cpfConsult,	telConsult,	codFornConsult,	emailConsult) 
-    VALUES ('${nome}', '${cpf}', '${tel}', '${empresas[0].codeProvider}', '${email}'); SELECT LAST_INSERT_ID() AS consultor;`;
+    VALUES ('${nome}', '${cpf}', '${tel}', '${empresas[0].codForn}', '${email}'); SELECT LAST_INSERT_ID() AS consultor;`;
 
     console.log("queryInsert");
     console.log(queryInsert);
