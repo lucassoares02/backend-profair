@@ -359,7 +359,7 @@ const User = {
   async getAllUsersProvider(req, res) {
     logger.info("Get All Users Fair");
 
-    const queryConsult = `SET sql_mode = ''; select acesso.codAcesso, acesso.direcAcesso, fornecedor.nomeForn, fornecedor.cnpjForn, acesso.codUsuario, fornecedor.codForn, consultor.nomeConsult, consultor.cpfConsult, FORMAT(IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0), 2, 'de_DE') as 'valorPedido' from acesso join consultor on acesso.codUsuario = consultor.codConsult join relacionafornecedor on consultor.codConsult = relacionafornecedor.codConsultor	join fornecedor on relacionafornecedor.codFornecedor = fornecedor.codForn left join pedido on pedido.codFornPedido = fornecedor.codForn left join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido group by consultor.codConsult`;
+    const queryConsult = `SET sql_mode = ''; select acesso.codAcesso, acesso.direcAcesso, fornecedor.nomeForn, fornecedor.cnpjForn, acesso.codUsuario, fornecedor.codForn, consultor.nomeConsult, consultor.cpfConsult from acesso join consultor on acesso.codUsuario = consultor.codConsult join relacionafornecedor on consultor.codConsult = relacionafornecedor.codConsultor	join fornecedor on relacionafornecedor.codFornecedor = fornecedor.codForn left join pedido on pedido.codFornPedido = fornecedor.codForn left join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido group by consultor.codConsult`;
 
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {
@@ -370,6 +370,74 @@ const User = {
     });
     // connection.end();
   },
+
+  async getConsultantsWithSuppliers(req, res) {
+    logger.info("Get All Users Fair");
+
+    // Consulta para buscar todos os usuários
+    const queryUsers = `
+        SELECT 
+            acesso.codAcesso,
+            acesso.direcAcesso,
+            consultor.codConsult AS codUsuario,
+            consultor.nomeConsult,
+            consultor.cpfConsult
+        FROM acesso
+        JOIN consultor ON acesso.codUsuario = consultor.codConsult
+        GROUP BY consultor.codConsult
+    `;
+
+    // Executa a primeira consulta para obter os usuários
+    connection.query(queryUsers, (error, users) => {
+      if (error) {
+        return res.status(400).send(error);
+      }
+
+      // Se não houver usuários, retorna uma lista vazia
+      if (users.length === 0) {
+        return res.json([]);
+      }
+
+      // Consulta para buscar fornecedores associados aos usuários
+      const queryProviders = `
+            SELECT 
+                consultor.codConsult AS codUsuario,
+                fornecedor.codForn,
+                fornecedor.nomeForn,
+                fornecedor.cnpjForn
+            FROM consultor
+            JOIN relacionafornecedor ON consultor.codConsult = relacionafornecedor.codConsultor
+            JOIN fornecedor ON relacionafornecedor.codFornecedor = fornecedor.codForn
+        `;
+
+      // Executa a consulta para obter os fornecedores
+      connection.query(queryProviders, (error, providers) => {
+        if (error) {
+          return res.status(400).send(error);
+        }
+
+        // Mapeia os fornecedores para cada usuário
+        const usersWithProviders = users.map(user => {
+          const userProviders = providers
+            .filter(provider => provider.codUsuario === user.codUsuario)
+            .map(provider => ({
+              codForn: provider.codForn,
+              nomeForn: provider.nomeForn,
+              cnpjForn: provider.cnpjForn
+            }));
+
+          return {
+            ...user,
+            fornecedores: userProviders
+          };
+        });
+
+        // Retorna a lista de usuários com fornecedores como objetos
+        return res.json(usersWithProviders);
+      });
+    });
+  }
+  ,
 
   async getUsersProviderNotInList(req, res) {
     logger.info("Get Users Provider Not in List Fair");
