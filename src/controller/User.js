@@ -374,7 +374,7 @@ const User = {
   async getProviderUser(req, res) {
     logger.info("Get Provier User");
 
-    const { code } = req.body;
+    const { code } = req.params;
 
     const queryConsult = `select *
       from fornecedor f
