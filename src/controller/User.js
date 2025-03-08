@@ -376,7 +376,7 @@ const User = {
 
     // Consulta para buscar todos os usuários
     const queryUsers = `
-        SELECT 
+        SET sql_mode = ''; SELECT 
             acesso.codAcesso,
             acesso.direcAcesso,
             consultor.codConsult AS codUsuario,
