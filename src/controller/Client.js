@@ -688,18 +688,13 @@ const Client = {
     console.log("queryAccess");
     console.log(query);
 
-    await connection.query(query, (error, results) => {
+    await connection.query(query, async (error, results, fields) => {
       if (error) {
         console.log("Error Insert Acesso: ", error);
         return res.status(400).send(`message: Error Insert!`);
       } else {
-        console.log("inserido acesso");
-
-        console.log("8888888888888888888888888888888");
-        console.log(results);
-
         if (type != 3) {
-          Client.insertRelationProvider(results[5][0].consultor, parseEmpresas, type);
+          Client.insertRelationProvider(results[results.length - 1][0].consultor, parseEmpresas, type);
           return res.json({ "message": "saved" });
         } else {
           return res.json({ "message": "saved" });
