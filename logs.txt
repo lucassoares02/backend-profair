@@ -300,3 +300,5 @@
 20:12:09 - Error: getaddrinfo ENOTFOUND db-mysql-nyc3-17606-do-user-16317462-0.c.db.ondigitalocean.com
 09:58:21 - Error: getaddrinfo ENOTFOUND db-mysql-nyc3-17606-do-user-16317462-0.c.db.ondigitalocean.com
 09:58:57 - Error: Cannot enqueue Query after fatal error.
+17:40:00 - Error: ER_TRUNCATED_WRONG_VALUE_FOR_FIELD: Incorrect integer value: '[object Object],[object Object],[object Object],[object Object],[object Object],,[object Object]' for column 'codConsultor' at row 1
+17:40:28 - Error: ER_TRUNCATED_WRONG_VALUE_FOR_FIELD: Incorrect integer value: 'undefined' for column 'codConsultor' at row 1

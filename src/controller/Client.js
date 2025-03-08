@@ -648,6 +648,7 @@ const Client = {
     const { nome, email, empresas, tel, cpf, type, hash } = req.body;
 
     let query = "";
+    let parseEmpresas = [];
 
     if (type == 3) {
 
@@ -666,7 +667,7 @@ const Client = {
         `;
 
     } else {
-      const parseEmpresas = JSON.parse(empresas);
+      parseEmpresas = JSON.parse(empresas);
 
       query = `START TRANSACTION;
           INSERT INTO consultor 
@@ -678,8 +679,8 @@ const Client = {
               (codAcesso, direcAcesso, codUsuario, codOrganization) 
           VALUES 
               (${hash}, ${type}, LAST_INSERT_ID(), 158);
-          COMMIT;
-          SELECT @consultorId AS consultor;
+          COMMIT; SHOW WARNINGS;
+          SELECT @consultorId AS consultor; 
         `;
 
     }
@@ -688,21 +689,32 @@ const Client = {
     console.log("queryAccess");
     console.log(query);
 
-    await connection.query(query, async (error, results, fields) => {
-      if (error) {
-        console.log("Error Insert Acesso: ", error);
-        return res.status(400).send(`message: Error Insert!`);
-      } else {
-        if (type != 3) {
-          Client.insertRelationProvider(results[results.length - 1][0].consultor, parseEmpresas, type);
-          return res.json({ "message": "saved" });
-        } else {
-          return res.json({ "message": "saved" });
+    console.log("asf")
 
+    try {
+      await connection.query(query, async (error, results, fields) => {
+        if (error) {
+          console.log("Error Insert Acesso: ", error);
+          return res.status(400).send(`message: Error Insert!`);
+        } else {
+          if (type != 3) {
+            
+            await Client.insertRelationProvider(results[results.length -1][0].consultor, parseEmpresas, type);
+            return res.json({ "message": "saved" });
+            
+            
+          } else {
+            return res.json({ "message": "saved" });
+
+          }
+          return;
         }
-        return;
-      }
-    });
+      });
+    } catch (error) {
+      console.log(`Error Insert User: ${error}`)
+    }
+
+
   },
 
 
