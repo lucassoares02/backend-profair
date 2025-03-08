@@ -385,7 +385,7 @@ const User = {
       if (error) {
         return res.status(400).send(error);
       } else {
-        return res.json(results[1]);
+        return res.json(results);
       }
     });
     // connection.end();
