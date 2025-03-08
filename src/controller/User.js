@@ -376,7 +376,7 @@ const User = {
 
     const { code } = req.params;
 
-    const queryConsult = `select *
+    const queryConsult = `select f.codForn, f.nomeForn as 'razao', f.cnpjForn
       from fornecedor f
       join relacionafornecedor r on r.codFornecedor = f.codForn
       where r.codConsultor = ${code}`;
