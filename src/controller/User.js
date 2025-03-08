@@ -374,12 +374,12 @@ const User = {
   async getProviderUser(req, res) {
     logger.info("Get Provier User");
 
-    const { codUser } = req.body;
+    const { code } = req.body;
 
     const queryConsult = `select *
       from fornecedor f
       join relacionafornecedor r on r.codFornecedor = f.codForn
-      where r.codConsultor = ${codUser}`;
+      where r.codConsultor = ${code}`;
 
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {
