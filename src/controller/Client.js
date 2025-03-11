@@ -310,17 +310,30 @@ const Client = {
 
   async updateUsers(req, res) {
     logger.info("Post Update Users");
-    const { cod, name, company, document } = req.body;
+    const { cod, hash, name, document, phone, email } = req.body;
 
     if (cod != null) {
 
-      const queryUpdate = `update consultor set 
-      nomeConsult = '${name}',
-      cpfConsult = '${document}',
-      telConsult = '${document}',
-      emailConsult = '${document}',
-      codFornConsult = '${company}'
-      where codConsult = ${cod}`;
+      const queryUpdate = `START TRANSACTION;
+        UPDATE consultor 
+        SET nomeConsult = '${name}',
+            cpfConsult = '${document}',
+            telConsult = '${phone}',
+            emailConsult = '${email}'
+        WHERE codConsult = ${cod};
+
+        UPDATE acesso 
+        SET codAcesso = ${hash} 
+        WHERE codUsuario = ${cod};
+        COMMIT;`;
+
+      // const queryUpdate = `update consultor set 
+      // nomeConsult = '${name}',
+      // cpfConsult = '${document}',
+      // telConsult = '${document}',
+      // emailConsult = '${document}',
+      // codFornConsult = '${company}'
+      // where codConsult = ${cod}`;
 
       console.log(queryUpdate);
 
@@ -340,6 +353,7 @@ const Client = {
   },
 
 
+  // Remover
   async updatePerson(req, res) {
     logger.info("Post Update Person");
     const { cod, type, hash, name, company, typeUser, document } = req.body;
@@ -698,11 +712,11 @@ const Client = {
           return res.status(400).send(`message: Error Insert!`);
         } else {
           if (type != 3) {
-            
-            await Client.insertRelationProvider(results[results.length -1][0].consultor, parseEmpresas, type);
+
+            await Client.insertRelationProvider(results[results.length - 1][0].consultor, parseEmpresas, type);
             return res.json({ "message": "saved" });
-            
-            
+
+
           } else {
             return res.json({ "message": "saved" });
 
