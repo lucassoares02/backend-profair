@@ -374,12 +374,28 @@ const User = {
   async getProviderUser(req, res) {
     logger.info("Get Provier User");
 
-    const { code } = req.params;
+    const { code, type } = req.params;
 
-    const queryConsult = `select f.codForn, f.nomeForn as 'razao', f.cnpjForn
-      from fornecedor f
-      join relacionafornecedor r on r.codFornecedor = f.codForn
-      where r.codConsultor = ${code}`;
+    let queryConsult = "";
+
+    if (type == 1) {
+      queryConsult = `SELECT f.codForn, f.nomeForn AS 'razao', f.cnpjForn
+      FROM fornecedor f
+      JOIN relacionafornecedor r ON r.codFornecedor = f.codForn
+      WHERE r.codConsultor = ${code}`;
+
+    } else if (type == 2) {
+      queryConsult = `    SELECT f.codAssociado as 'codForn', f.razaoAssociado AS 'razao', 
+        f.cnpjAssociado as 'cnpjForn'
+        FROM associado f
+        JOIN relaciona r ON r.codConsultRelaciona = f.codAssociado
+        WHERE r.codAssocRelaciona =  ${code}`;
+    }
+
+    // const queryConsult = `select f.codForn, f.nomeForn as 'razao', f.cnpjForn
+    //   from fornecedor f
+    //   join relacionafornecedor r on r.codFornecedor = f.codForn
+    //   where r.codConsultor = ${code}`;
 
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {
