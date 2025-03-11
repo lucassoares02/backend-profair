@@ -45,9 +45,9 @@ const Delete = {
 
     let queryKill = "";
 
-    if (type == 1) {
+    if (type == 2) {
       queryKill = `delete from relaciona where codAssocRelaciona = ${user} and codConsultRelaciona = ${company}`;
-    } else if (type == 2) {
+    } else if (type == 1) {
       queryKill = `delete from relacionafornecedor where codConsultor = ${user} and codFornecedor = ${company}`;
     }
 
