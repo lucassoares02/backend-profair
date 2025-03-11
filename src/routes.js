@@ -163,6 +163,7 @@ router.post("/multishow/negotiation", Multishow.getNegotiations);
 router.get("/multishow/merchandiserefresh/:product/:negotiation", Multishow.refreshMerchandise);
 
 router.get("/deleteallinformations", Delete.deleteAll);
+router.delete("/deletecompanytouser/:company/:user/:type", Delete.deleteCompanyToUser);
 
 
 router.get("/wedding/get", Wedding.get);

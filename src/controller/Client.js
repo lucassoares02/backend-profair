@@ -314,7 +314,7 @@ const Client = {
 
     if (cod != null) {
 
-      const queryUpdate = `START TRANSACTION;
+      const queryUpdate = `
         UPDATE consultor 
         SET nomeConsult = '${name}',
             cpfConsult = '${document}',
@@ -325,19 +325,13 @@ const Client = {
         UPDATE acesso 
         SET codAcesso = ${hash} 
         WHERE codUsuario = ${cod};
-        COMMIT;`;
+        
+        `;
 
-      // const queryUpdate = `update consultor set 
-      // nomeConsult = '${name}',
-      // cpfConsult = '${document}',
-      // telConsult = '${document}',
-      // emailConsult = '${document}',
-      // codFornConsult = '${company}'
-      // where codConsult = ${cod}`;
 
       console.log(queryUpdate);
 
-      connection.query(queryUpdate, (error, results) => {
+      connection.query(queryUpdate, (error, results, fields) => {
         if (error) {
           console.log("Error Update Users: ", error);
           return res.status(400).send(`message: ${error}`);
