@@ -314,7 +314,7 @@ const Client = {
 
     if (cod != null) {
 
-      const queryUpdate = `
+      const queryUpdate = `START TRANSACTION;
         UPDATE consultor 
         SET nomeConsult = '${name}',
             cpfConsult = '${document}',
@@ -325,7 +325,7 @@ const Client = {
         UPDATE acesso 
         SET codAcesso = ${hash} 
         WHERE codUsuario = ${cod};
-        
+        COMMIT; SHOW WARNINGS;
         `;
 
 
