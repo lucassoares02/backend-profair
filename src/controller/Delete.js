@@ -40,13 +40,18 @@ const Delete = {
 
     const { company, user, type } = req.params;
 
+    console.log(company, user, type);
+
+
     let queryKill = "";
 
-    if (type === 1) {
+    if (type == 1) {
       queryKill = `delete from relaciona where codAssocRelaciona = ${user} and codConsultRelaciona = ${company}`;
-    } else if (type === 2) {
-      queryKill = `delete from relaciona where codConsultor = ${user} and codFornecedor = ${company}`;
+    } else if (type == 2) {
+      queryKill = `delete from relacionafornecedor where codConsultor = ${user} and codFornecedor = ${company}`;
     }
+
+    console.log(queryKill);
 
     connection.query(queryKill, (error, results, fields) => {
       if (error) {

@@ -325,7 +325,7 @@ const Client = {
         UPDATE acesso 
         SET codAcesso = ${hash} 
         WHERE codUsuario = ${cod};
-        COMMIT; SHOW WARNINGS;
+        COMMIT; SHOW ERRORS;
         `;
 
 
