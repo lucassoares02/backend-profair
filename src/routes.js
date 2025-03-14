@@ -121,6 +121,7 @@ router.get("/merchandiseproviderifclient/:codclient/:codprovider/:codnegotiation
 router.get("/merchandiseproviderifclientlimitnegotiation/:codclient/:codprovider/:codnegotiation", Merchandise.getMerchandiseProviderIfClientLimitNegotiation);
 
 router.get("/merchandisenegotiationprovider/:codprovider/:codnegotiation", Merchandise.getMerchandiseNegotiationProvider);
+router.get("/merchandisenegotiationproviderifClient/:codprovider/:codnegotiation", Merchandise.getMerchandiseNegotiationProviderIfClient);
 
 router.get("/merchandisepercustomer/:codclient/:codeprovider", Merchandise.getMerchandisePerCustomer);
 
