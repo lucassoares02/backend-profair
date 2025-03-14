@@ -298,7 +298,7 @@ SET sql_mode = ''; SELECT
     // connection.end();
   },
 
-  async getMerchandiseNegotiationProvider(req, res) {
+  async getMerchandiseNegotiationProviderIfClient(req, res) {
     logger.info("Get Merchandise Provider If Client");
 
     const { codprovider, codnegotiation } = req.params;
