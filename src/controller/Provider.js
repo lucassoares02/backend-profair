@@ -273,7 +273,7 @@ const Provider = {
       return new Promise((resolve, reject) => {
         return Insert(params)
           .then(async (resp) => {
-            resolve(resp);
+            return res.json({ message: "Informations Inserted" });
           })
           .catch((error) => {
             res.status(400).send(error);
