@@ -165,7 +165,7 @@ router.get("/multishow/merchandiserefresh/:product/:negotiation", Multishow.refr
 
 router.get("/deleteallinformations", Delete.deleteAll);
 router.delete("/deletecompanytouser/:company/:user/:type", Delete.deleteCompanyToUser);
-router.delete("/insertcompanytouser/:company/:user/:type", Provider.insertCompanyToUser);
+router.get("/insertcompanytouser/:company/:user/:type", Provider.insertCompanyToUser);
 
 
 router.get("/wedding/get", Wedding.get);
