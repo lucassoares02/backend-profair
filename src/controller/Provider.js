@@ -232,6 +232,62 @@ const Provider = {
 
     // connection.end();
   },
+
+
+  insertCompanyToUser(req, res) {
+    logger.info("Insert Company to User");
+
+    const { company, user, type } = req.params;
+
+
+    let dataAssociado = [];
+    let dataConsultor = [];
+
+    if (type == 1) {
+      dataConsultor.push({
+        codConsultor: user,
+        codFornecedor: company,
+      })
+    } else {
+      dataAssociado.push({
+        codAssocRelaciona: user,
+        codConsultRelaciona: company,
+      });
+    }
+   
+
+    let params = {
+      table: type == 1 ? "relacionafornecedor" : "relaciona",
+      data: type == 1 ? dataConsultor : dataAssociado,
+    };
+
+
+    console.log("\n==========================================================")
+    console.log("Insert Company to User")
+    console.log("==========================================================")
+    console.log(params)
+    console.log("==========================================================\n")
+
+
+    try {
+      return new Promise((resolve, reject) => {
+        return Insert(params)
+          .then(async (resp) => {
+            resolve(resp);
+          })
+          .catch((error) => {
+            res.status(400).send(error);
+          });
+      });
+    } catch (error) {
+      console.log(`Error Insert Negotiation: ${error}`)
+    }
+
+  },
+
+
+
+
 };
 
 module.exports = Provider;

@@ -35,6 +35,8 @@ const Delete = {
     });
     // connection.end();
   },
+
+  
   async deleteCompanyToUser(req, res) {
     logger.info("Get Deletes Company to User");
 
