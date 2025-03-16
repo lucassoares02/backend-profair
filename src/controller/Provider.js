@@ -261,14 +261,6 @@ const Provider = {
       data: type == 1 ? dataConsultor : dataAssociado,
     };
 
-
-    console.log("\n==========================================================")
-    console.log("Insert Company to User")
-    console.log("==========================================================")
-    console.log(params)
-    console.log("==========================================================\n")
-
-
     try {
       return new Promise((resolve, reject) => {
         return Insert(params)

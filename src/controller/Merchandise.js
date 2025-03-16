@@ -4,10 +4,8 @@ const Select = require("@select");
 const Insert = require("@insert");
 
 const Merchandise = {
-
   async patchMerchandise(req, res) {
     logger.info("Patch Merchandise");
-
 
     const { codMercadoria } = req.params;
     const {
@@ -19,28 +17,69 @@ const Merchandise = {
       marca,
       nego,
       precoUnit,
-      precoMercadoria } = req.body;
+      precoMercadoria
+    } = req.body;
 
-
-    const queryUpdate = `
-      SET sql_mode = ''; 
+    const queryUpdateMercadoria = `
       UPDATE mercadoria 
-      SET nomeMercadoria = '${nomeMercadoria}', embMercadoria = '${embMercadoria}', fatorMerc = '${fatorMerc}', complemento = '${complemento}', barcode = '${barcode}', marca = '${marca}', nego = '${nego}', precoUnit = '${precoUnit}', precoMercadoria = '${precoMercadoria}'
-      WHERE codMercadoria = '${codMercadoria}';`;
+      SET nomeMercadoria = ?, embMercadoria = ?, fatorMerc = ?, complemento = ?, 
+          barcode = ?, marca = ?, nego = ?, precoUnit = ?, precoMercadoria = ? 
+      WHERE codMercadoria = ?;
+    `;
 
-    console.log(queryUpdate);
+    const queryUpdatePedido = `
+      UPDATE pedido
+      SET codMercPedido = ?, codNegoPedido = ?
+      WHERE codMercPedido = ? AND codNegoPedido = ?;
+    `;
 
-    connection.query(queryUpdate, (error, results, fields) => {
-      if (error) {
-        console.log("Error Updating Merchandise Negotiation to Provider: ", error);
-        return res.status(500).json({ error: 'Erro ao atualizar mercadoria' });
-      } else {
-        // O resultado da atualização será retornado como parte de results[1]
-        console.log(results[1]);
-        return res.json(results[1]);
+    connection.beginTransaction((err) => {
+      if (err) {
+        console.error("Erro ao iniciar transação:", err);
+        return res.status(500).json({ error: "Erro interno do servidor" });
       }
+
+      // Atualizar tabela mercadoria
+      connection.query(
+        queryUpdateMercadoria,
+        [nomeMercadoria, embMercadoria, fatorMerc, complemento, barcode, marca, nego, precoUnit, precoMercadoria, codMercadoria],
+        (error, results) => {
+          if (error) {
+            return connection.rollback(() => {
+              console.error("Erro ao atualizar mercadoria:", error);
+              res.status(500).json({ error: "Erro ao atualizar mercadoria" });
+            });
+          }
+
+          // Atualizar tabela pedido
+          connection.query(
+            queryUpdatePedido,
+            [codMercadoria, nego],
+            (error, results) => {
+              if (error) {
+                return connection.rollback(() => {
+                  console.error("Erro ao atualizar pedido:", error);
+                  res.status(500).json({ error: "Erro ao atualizar pedido" });
+                });
+              }
+
+              // Commit se tudo der certo
+              connection.commit((err) => {
+                if (err) {
+                  return connection.rollback(() => {
+                    console.error("Erro ao confirmar transação:", err);
+                    res.status(500).json({ error: "Erro ao salvar alterações" });
+                  });
+                }
+
+                res.json({ message: "Atualização bem-sucedida" });
+              });
+            }
+          );
+        }
+      );
     });
-  },
+  },  
 
   async getMerchandiseNegotiationProvider(req, res) {
     logger.info("Get Merchandise to Negotiation to Provider");
