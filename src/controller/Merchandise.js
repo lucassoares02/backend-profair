@@ -54,7 +54,7 @@ const Merchandise = {
           // Atualizar tabela pedido
           connection.query(
             queryUpdatePedido,
-            [codMercadoria, nego],
+            [codMercadoria, nego,codMercadoria, nego],
             (error, results) => {
               if (error) {
                 return connection.rollback(() => {
