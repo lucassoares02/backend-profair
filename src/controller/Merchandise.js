@@ -132,7 +132,7 @@ const Merchandise = {
       if (error) {
         console.log("Error Select Merchandise to Negotiation to Provider: ", error);
       } else {
-        return res.json(results[1]);
+        return res.json(results);
       }
     });
     // connection.end();
