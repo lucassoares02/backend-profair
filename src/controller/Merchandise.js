@@ -54,7 +54,7 @@ const Merchandise = {
           // Atualizar tabela pedido
           connection.query(
             queryUpdatePedido,
-            [codMercadoria, nego,codMercadoria, nego],
+            [codMercadoria, nego, codMercadoria, nego],
             (error, results) => {
               if (error) {
                 return connection.rollback(() => {
@@ -79,15 +79,14 @@ const Merchandise = {
         }
       );
     });
-  },  
+  },
 
   async getMerchandiseNegotiationProvider(req, res) {
     logger.info("Get Merchandise to Negotiation to Provider");
 
     const { codprovider, codnegotiation } = req.params;
 
-    const queryConsult = `
-    SET sql_mode = ''; select 
+    const queryConsult = `select 
     mercadoria.codMercadoria, 
     mercadoria.codFornMerc, 
     mercadoria.nomeMercadoria, 
@@ -96,17 +95,38 @@ const Merchandise = {
     mercadoria.marca, 
     mercadoria.fatorMerc,
     mercadoria.precoUnit,
+    mercadoria.nego,
     mercadoria.precoMercadoria as precoMercadoria, 
     IFNULL(SUM(pedido.quantMercPedido),  0) as quantMercadoria, 
     IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0) as 'valorTotal' 
     from mercadoria 
-    join fornecedor on mercadoria.codFornMerc = fornecedor.codForn 
-    left outer join pedido on mercadoria.codMercadoria = pedido.codMercPedido 
-    where codFornMerc = ${codprovider} and pedido.codNegoPedido = ${codnegotiation}
+    join pedido on mercadoria.codMercadoria = pedido.codMercPedido 
+    where mercadoria.nego = ${codnegotiation}
     group by mercadoria.codMercadoria
     order by sum(mercadoria.precoMercadoria*pedido.quantMercPedido) 
-    desc
-`;
+    desc`;
+
+//     const queryConsult = `
+//     SET sql_mode = ''; select 
+//     mercadoria.codMercadoria, 
+//     mercadoria.codFornMerc, 
+//     mercadoria.nomeMercadoria, 
+//     mercadoria.embMercadoria, 
+//     mercadoria.complemento, 
+//     mercadoria.marca, 
+//     mercadoria.fatorMerc,
+//     mercadoria.precoUnit,
+//     mercadoria.precoMercadoria as precoMercadoria, 
+//     IFNULL(SUM(pedido.quantMercPedido),  0) as quantMercadoria, 
+//     IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0) as 'valorTotal' 
+//     from mercadoria 
+//     join fornecedor on mercadoria.codFornMerc = fornecedor.codForn 
+//     left outer join pedido on mercadoria.codMercadoria = pedido.codMercPedido 
+//     where codFornMerc = ${codprovider} and pedido.codNegoPedido = ${codnegotiation}
+//     group by mercadoria.codMercadoria
+//     order by sum(mercadoria.precoMercadoria*pedido.quantMercPedido) 
+//     desc
+// `;
 
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {
