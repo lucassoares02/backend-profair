@@ -11,7 +11,7 @@ const Log = {
       userAgent: req.headers["user-agent"],
       method: req.method,
       route: req.originalUrl,
-      body: req.body,
+      body: req.method == 'GET' ? req.body : req.method == 'POST' ? req.body : req.method == 'PUT' ? req.body : req.method == 'DELETE' ? req.body : req.body,
       queryParams: req.query,
       timestamp: new Date().toISOString().slice(0, 19).replace("T", " "),
     };
