@@ -14,164 +14,165 @@ const Multishow = require("@controller/Multishow");
 const Delete = require("@controller/Delete");
 const Faceline = require("@controller/Faceline");
 const Wedding = require("@controller/Wedding");
+const Log = require("@controller/Log");
 
-router.post("/faceline-user", Faceline.insert);
-router.post("/faceline-user-update", Faceline.update);
+router.post("/faceline-user", Log.InsertLog, Faceline.insert);
+router.post("/faceline-user-update", Log.InsertLog, Faceline.update);
 
 // Router with the headers
-router.post("/getuser", User.getUser);
-router.post("/getusermore", User.getUserDoubleCompany);
-router.post("/getuserweb", User.getUserWeb);
+router.post("/getuser", Log.InsertLog,  User.getUser);
+router.post("/getusermore", Log.InsertLog, User.getUserDoubleCompany);
+router.post("/getuserweb", Log.InsertLog, User.getUserWeb);
 
-router.get("/getallusersorg", User.getAllUsersOrg);
-router.get("/getallusersprovider", User.getAllUsersProvider);
-router.get("/getprovideruser/:code/:type", User.getProviderUser);
-router.get("/getusersprovidernotinlist", User.getUsersProviderNotInList);
-router.get("/getallusersassociate", User.getAllUsersAssociate);
+router.get("/getallusersorg", Log.InsertLog, User.getAllUsersOrg);
+router.get("/getallusersprovider", Log.InsertLog, User.getAllUsersProvider);
+router.get("/getprovideruser/:code/:type", Log.InsertLog, User.getProviderUser);
+router.get("/getusersprovidernotinlist", Log.InsertLog, User.getUsersProviderNotInList);
+router.get("/getallusersassociate", Log.InsertLog, User.getAllUsersAssociate);
 
-router.get("/allclient", Client.getAllClient);
-router.get("/client/:codacesso", Client.getOneClient);
-router.get("/clientconsult/:codconsultor", Client.getClientConsult);
+router.get("/allclient", Log.InsertLog, Client.getAllClient);
+router.get("/client/:codacesso", Log.InsertLog, Client.getOneClient);
+router.get("/clientconsult/:codconsultor", Log.InsertLog, Client.getClientConsult);
 
-router.post("/insertperson", Client.postInsertPerson);
-router.post("/insertuser", Client.postInsertUser);
-router.post("/updateperson", Client.updatePerson);
-router.post("/updateusers", Client.updateUsers);
-router.post("/inserrelationprovider", Client.insertRelationProviderClient);
+router.post("/insertperson", Log.InsertLog, Client.postInsertPerson);
+router.post("/insertuser", Log.InsertLog, Client.postInsertUser);
+router.post("/updateperson", Log.InsertLog, Client.updatePerson);
+router.post("/updateusers", Log.InsertLog, Client.updateUsers);
+router.post("/inserrelationprovider", Log.InsertLog, Client.insertRelationProviderClient);
 
-router.get("/clientmerchandise/:codmercadoria", Client.getClientMerchandise);
-router.get("/clientmerchandisetrading/:codmercadoria/:codnegotiation", Client.getClientMerchandiseTrading);
-router.get("/stores/:codconsultor", Client.getStoreConsultant);
-router.get("/storescategory/:codprovider", Client.getStoresCategory);
-router.get("/stores", Client.getAllStores);
-router.get("/storesgraph", Client.getAllStoresGraph);
+router.get("/clientmerchandise/:codmercadoria", Log.InsertLog, Client.getClientMerchandise);
+router.get("/clientmerchandisetrading/:codmercadoria/:codnegotiation", Log.InsertLog, Client.getClientMerchandiseTrading);
+router.get("/stores/:codconsultor", Log.InsertLog, Client.getStoreConsultant);
+router.get("/storescategory/:codprovider", Log.InsertLog, Client.getStoresCategory);
+router.get("/stores", Log.InsertLog, Client.getAllStores);
+router.get("/storesgraph", Log.InsertLog, Client.getAllStoresGraph);
 
-router.get("/valueminutegraph", Client.getAllStoresGraphHour);
+router.get("/valueminutegraph", Log.InsertLog, Client.getAllStoresGraphHour);
 
-router.get("/valueminutegraphprovider/:codeprovider", Client.getSellGraphHourProvider);
+router.get("/valueminutegraphprovider/:codeprovider", Log.InsertLog, Client.getSellGraphHourProvider);
 
-router.get("/valuefair", Client.getValueTotalFair);
+router.get("/valuefair", Log.InsertLog, Client.getValueTotalFair);
 
-router.get("/storesbyprovider/:codprovider", Client.getStoresbyProvider);
+router.get("/storesbyprovider/:codprovider", Log.InsertLog, Client.getStoresbyProvider);
 
-router.get("/categoriesconsult/:codconsult", Category.getCategoryConsult);
+router.get("/categoriesconsult/:codconsult", Log.InsertLog, Category.getCategoryConsult);
 
-router.get("/notices", Notice.getAllNotice);
-router.get("/schedule", Notice.getAllSchedule);
+router.get("/notices", Log.InsertLog, Notice.getAllNotice);
+router.get("/schedule", Log.InsertLog, Notice.getAllSchedule);
 
-router.get("/providerclient/:codconsultor", Provider.getProviderClient);
+router.get("/providerclient/:codconsultor", Log.InsertLog, Provider.getProviderClient);
 
-router.get("/suppliersinvoicing", Provider.getProviderSells);
-router.get("/companies/:type", Provider.getCompanies);
-router.get("/providerscategories/:codbuyer", Provider.getProvidersCategories);
-router.get("/providersconsult/:codconsultclient", Provider.getProvidersClient);
-router.get("/providerconsult/:codconsult", Provider.getProviderConsult);
+router.get("/suppliersinvoicing", Log.InsertLog, Provider.getProviderSells);
+router.get("/companies/:type", Log.InsertLog, Provider.getCompanies);
+router.get("/providerscategories/:codbuyer", Log.InsertLog, Provider.getProvidersCategories);
+router.get("/providersconsult/:codconsultclient", Log.InsertLog, Provider.getProvidersClient);
+router.get("/providerconsult/:codconsult", Log.InsertLog, Provider.getProviderConsult);
 
-router.get("/providerdetails/:codforn", Provider.getProviderDetails);
+router.get("/providerdetails/:codforn", Log.InsertLog, Provider.getProviderDetails);
 
-router.post("/insertprovider", Provider.postInsertProvider);
+router.post("/insertprovider", Log.InsertLog, Provider.postInsertProvider);
 
-router.get("/negotiationprovider/:codforn", Negotiation.getNegotiationProvider);
-router.get("/negotiationclient/:codclient/:codforn", Negotiation.getNegotiationClient);
+router.get("/negotiationprovider/:codforn", Log.InsertLog, Negotiation.getNegotiationProvider);
+router.get("/negotiationclient/:codclient/:codforn", Log.InsertLog, Negotiation.getNegotiationClient);
 
-router.get("/negotiationproviderclient/:codclient/:codforn", Negotiation.getNegotiationsProviderWithMerchandisePerClient);
+router.get("/negotiationproviderclient/:codclient/:codforn", Log.InsertLog, Negotiation.getNegotiationsProviderWithMerchandisePerClient);
 
-router.get("/negotiationclientwithprice/:codclient/:codforn", Negotiation.getNegotiationClientWithPrice);
-router.get("/negotiationclientwithpricenotnull/:codclient/:codforn", Negotiation.getNegotiationClientsWithPriceNotNull);
+router.get("/negotiationclientwithprice/:codclient/:codforn", Log.InsertLog, Negotiation.getNegotiationClientWithPrice);
+router.get("/negotiationclientwithpricenotnull/:codclient/:codforn", Log.InsertLog, Negotiation.getNegotiationClientsWithPriceNotNull);
 
-router.post("/insertnegotiation", Negotiation.PostInsertNegotiation);
+router.post("/insertnegotiation", Log.InsertLog, Negotiation.PostInsertNegotiation);
 
-router.post("/insertnegotiationrelacionamercadoria", Negotiation.PostInsertNegotiationRelacionaMercadoria);
+router.post("/insertnegotiationrelacionamercadoria", Log.InsertLog, Negotiation.PostInsertNegotiationRelacionaMercadoria);
 
-router.get("/exportnegotiations", Negotiation.GetExportNegotiations);
+router.get("/exportnegotiations", Log.InsertLog, Negotiation.GetExportNegotiations);
 
-router.get("/exportnegotiationsprovider/:supplier/:buyer/:negotiation", Negotiation.GetExportNegotiationsProvider);
+router.get("/exportnegotiationsprovider/:supplier/:buyer/:negotiation", Log.InsertLog, Negotiation.GetExportNegotiationsProvider);
 
-router.get("/exportnegotiationsclient/:codeclient", Negotiation.GetExportNegotiationsClientTesteaaaaaaaaa);
+router.get("/exportnegotiationsclient/:codeclient", Log.InsertLog, Negotiation.GetExportNegotiationsClientTesteaaaaaaaaa);
 
-router.get("/exportnegotiationsclientprovider/:codeclient/:codeprovider", Negotiation.GetExportNegotiationsClientPerProvider);
-router.get("/exportnegotiationperclient/:codeclient/:codenegotiation", Negotiation.GetExportNegotiationsPerNegotiationClient);
-router.get("/exportnegotiationper/:codenegotiation", Negotiation.GetExportNegotiationsPerNegotiation);
-router.get("/exportnegotiationperprovider/:codeclient/:codenegotiation", Negotiation.GetExportNegotiationPerProvider);
-
-
-router.get("/ExportNegotiationsPerProvider/:provider", Negotiation.ExportNegotiationsPerProvider);
-
-router.get("/exportproductnegotiationperprovider/:provider", Negotiation.exportProductsPerNegotiationPerProvider);
+router.get("/exportnegotiationsclientprovider/:codeclient/:codeprovider", Log.InsertLog, Negotiation.GetExportNegotiationsClientPerProvider);
+router.get("/exportnegotiationperclient/:codeclient/:codenegotiation", Log.InsertLog, Negotiation.GetExportNegotiationsPerNegotiationClient);
+router.get("/exportnegotiationper/:codenegotiation", Log.InsertLog, Negotiation.GetExportNegotiationsPerNegotiation);
+router.get("/exportnegotiationperprovider/:codeclient/:codenegotiation", Log.InsertLog, Negotiation.GetExportNegotiationPerProvider);
 
 
+router.get("/ExportNegotiationsPerProvider/:provider", Log.InsertLog, Negotiation.ExportNegotiationsPerProvider);
+
+router.get("/exportproductnegotiationperprovider/:provider", Log.InsertLog, Negotiation.exportProductsPerNegotiationPerProvider);
 
 
 
 
-router.get("/buyersclient/:codconsultorclient", Buyer.getBuyersClient);
-
-router.get("/buyersprovider/:codprovider", Buyer.getBuyersProvider);
-
-router.get("/buyers", Buyer.getAllBuyers);
-
-router.get("/statusnegotiation", Negotiation.negotiationStatus);
-router.get("/statusnegotiation/:code", Negotiation.changeNegotiationStatus);
 
 
-router.patch("/merchandise/:codMercadoria", Merchandise.patchMerchandise);
-router.get("/merchandiseclientprovidernegotiation/:codclient/:codprovider/:codnegotiation", Merchandise.getMerchandiseClientProviderNegotiation);
-router.get("/merchandiseprovider/:codprovider", Merchandise.getMerchandiseProvider);
-router.get("/merchandiseproviderifclient/:codclient/:codprovider/:codnegotiation", Merchandise.getMerchandiseProviderIfClientLimitNegotiation);
-router.get("/merchandiseproviderifclientlimitnegotiation/:codclient/:codprovider/:codnegotiation", Merchandise.getMerchandiseProviderIfClientLimitNegotiation);
+router.get("/buyersclient/:codconsultorclient", Log.InsertLog, Buyer.getBuyersClient);
 
-router.get("/merchandisenegotiationprovider/:codprovider/:codnegotiation", Merchandise.getMerchandiseNegotiationProvider);
-router.get("/merchandisenegotiationproviderifClient/:codprovider/:codnegotiation", Merchandise.getMerchandiseNegotiationProviderIfClient);
+router.get("/buyersprovider/:codprovider", Log.InsertLog, Buyer.getBuyersProvider);
 
-router.get("/merchandisepercustomer/:codclient/:codeprovider", Merchandise.getMerchandisePerCustomer);
+router.get("/buyers", Log.InsertLog, Buyer.getAllBuyers);
 
-router.get("/merchandiseperclient/:codclient/:codeprovider/:codenegotiation", Merchandise.getMerchandisePerClient);
-
-router.post("/insertmerchandise", Merchandise.postInsertMerchandise);
-
-router.get("/requestproviderclient/:codclient", Request.getRequestProviderClient);
-router.get("/requesttopproviderclient/:codclient", Request.getRequestTopProviderClient);
-router.get("/requesttonegotiationclient/:codclient/:codprovider", Request.getRequestNegotiationProviderClient);
-router.get("/requesttonegotiationsperprovider/:codprovider", Request.getRequestNegotiationsPerProvider);
-
-router.get("/requestsprovider/:codprovider", Request.getRequestsProvider);
-router.get("/exportrequestsprovider/:provider", Request.ExportClientsPerProvider);
+router.get("/statusnegotiation", Log.InsertLog, Negotiation.negotiationStatus);
+router.get("/statusnegotiation/:code", Log.InsertLog, Negotiation.changeNegotiationStatus);
 
 
-router.get("/requestsprovidernegotiation/:codenegotiation", Request.getRequestsNegotiation);
+router.patch("/merchandise/:codMercadoria", Log.InsertLog, Merchandise.patchMerchandise);
+router.get("/merchandiseclientprovidernegotiation/:codclient/:codprovider/:codnegotiation", Log.InsertLog, Merchandise.getMerchandiseClientProviderNegotiation);
+router.get("/merchandiseprovider/:codprovider", Log.InsertLog, Merchandise.getMerchandiseProvider);
+router.get("/merchandiseproviderifclient/:codclient/:codprovider/:codnegotiation", Log.InsertLog, Merchandise.getMerchandiseProviderIfClientLimitNegotiation);
+router.get("/merchandiseproviderifclientlimitnegotiation/:codclient/:codprovider/:codnegotiation", Log.InsertLog, Merchandise.getMerchandiseProviderIfClientLimitNegotiation);
 
-router.get("/requestsnegotiationbyclient/:codebranch", Request.getRequestsClientsWithNegotiation);
+router.get("/merchandisenegotiationprovider/:codprovider/:codnegotiation", Log.InsertLog, Merchandise.getMerchandiseNegotiationProvider);
+router.get("/merchandisenegotiationproviderifClient/:codprovider/:codnegotiation", Log.InsertLog, Merchandise.getMerchandiseNegotiationProviderIfClient);
 
-router.get("/requestsclients/:codconsult", Request.getRequestsClients);
-router.post("/insertrequest", Request.postInsertRequest);
+router.get("/merchandisepercustomer/:codclient/:codeprovider", Log.InsertLog, Merchandise.getMerchandisePerCustomer);
 
-router.post("/insertrequestnew", Request.postInserRequestNew);
+router.get("/merchandiseperclient/:codclient/:codeprovider/:codenegotiation", Log.InsertLog, Merchandise.getMerchandisePerClient);
 
-router.get("/allrequestclients", Request.getAllRequests);
+router.post("/insertmerchandise", Log.InsertLog, Merchandise.postInsertMerchandise);
 
-router.get("/percentageclients/:codprovider", Graphs.getPercentageClients);
-router.get("/percentageproviderbyclients/:codbuyer", Graphs.getPercentagePovidersByClients);
-router.get("/percentageclientsorganization", Graphs.getPercentageClientsOrganization);
-router.get("/percentageprovidersorganization", Graphs.getPercentageProvidersOrganization);
-router.get("/totalvalueclients/:codprovider", Graphs.getTotalValueClients);
-router.get("/information", Graphs.getTotalInformations);
-router.get("/exportpdf/:supplier/:negotiation/:client", Graphs.getExportPdf);
+router.get("/requestproviderclient/:codclient", Log.InsertLog, Request.getRequestProviderClient);
+router.get("/requesttopproviderclient/:codclient", Log.InsertLog, Request.getRequestTopProviderClient);
+router.get("/requesttonegotiationclient/:codclient/:codprovider", Log.InsertLog, Request.getRequestNegotiationProviderClient);
+router.get("/requesttonegotiationsperprovider/:codprovider", Log.InsertLog, Request.getRequestNegotiationsPerProvider);
 
-router.get("getnegotiationmultishow/:category", Graphs.getExportPdf);
-
-router.post("/multishow/negotiation", Multishow.getNegotiations);
-
-router.get("/multishow/merchandiserefresh/:product/:negotiation", Multishow.refreshMerchandise);
-
-router.get("/deleteallinformations", Delete.deleteAll);
-router.delete("/deletecompanytouser/:company/:user/:type", Delete.deleteCompanyToUser);
-router.get("/insertcompanytouser/:company/:user/:type", Provider.insertCompanyToUser);
+router.get("/requestsprovider/:codprovider", Log.InsertLog, Request.getRequestsProvider);
+router.get("/exportrequestsprovider/:provider", Log.InsertLog, Request.ExportClientsPerProvider);
 
 
-router.get("/wedding/get", Wedding.get);
-router.get("/wedding/confirm", Wedding.confirm);
-router.get("/wedding/desconfirm", Wedding.disconfirm);
-router.get("/wedding/getallguests", Wedding.getAllGuests);
+router.get("/requestsprovidernegotiation/:codenegotiation", Log.InsertLog, Request.getRequestsNegotiation);
+
+router.get("/requestsnegotiationbyclient/:codebranch", Log.InsertLog, Request.getRequestsClientsWithNegotiation);
+
+router.get("/requestsclients/:codconsult", Log.InsertLog, Request.getRequestsClients);
+router.post("/insertrequest", Log.InsertLog, Request.postInsertRequest);
+
+router.post("/insertrequestnew", Log.InsertLog, Request.postInserRequestNew);
+
+router.get("/allrequestclients", Log.InsertLog, Request.getAllRequests);
+
+router.get("/percentageclients/:codprovider", Log.InsertLog, Graphs.getPercentageClients);
+router.get("/percentageproviderbyclients/:codbuyer", Log.InsertLog, Graphs.getPercentagePovidersByClients);
+router.get("/percentageclientsorganization", Log.InsertLog, Graphs.getPercentageClientsOrganization);
+router.get("/percentageprovidersorganization", Log.InsertLog, Graphs.getPercentageProvidersOrganization);
+router.get("/totalvalueclients/:codprovider", Log.InsertLog, Graphs.getTotalValueClients);
+router.get("/information", Log.InsertLog, Graphs.getTotalInformations);
+router.get("/exportpdf/:supplier/:negotiation/:client", Log.InsertLog, Graphs.getExportPdf);
+
+router.get("getnegotiationmultishow/:category", Log.InsertLog, Graphs.getExportPdf);
+
+router.post("/multishow/negotiation", Log.InsertLog, Multishow.getNegotiations);
+
+router.get("/multishow/merchandiserefresh/:product/:negotiation", Log.InsertLog, Multishow.refreshMerchandise);
+
+router.get("/deleteallinformations", Log.InsertLog, Delete.deleteAll);
+router.delete("/deletecompanytouser/:company/:user/:type", Log.InsertLog, Delete.deleteCompanyToUser);
+router.get("/insertcompanytouser/:company/:user/:type", Log.InsertLog, Provider.insertCompanyToUser);
+
+
+router.get("/wedding/get", Log.InsertLog, Wedding.get);
+router.get("/wedding/confirm", Log.InsertLog, Wedding.confirm);
+router.get("/wedding/desconfirm", Log.InsertLog, Wedding.disconfirm);
+router.get("/wedding/getallguests", Log.InsertLog, Wedding.getAllGuests);
 
 
 module.exports = router;
