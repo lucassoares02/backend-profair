@@ -15,7 +15,7 @@ const Log = {
     const logData = {
       ip: req.ip || req.headers["x-forwarded-for"] || req.connection.remoteAddress,
       userAgent: req.headers["user-id"],
-      header: JSON.stringify(req.headers),
+      header: req.headers,
       method: req.method,
       route: req.originalUrl,
       body: req.method == 'GET' ? req.body : req.method == 'POST' ? req.body : req.method == 'PUT' ? req.body : req.method == 'DELETE' ? req.body : req.body,
