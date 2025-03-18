@@ -6,10 +6,12 @@ const Log = {
   async InsertLog(req, res, next) {
     logger.info("Insert Logs");
 
+    console.log(req)
+
 
     const logData = {
       ip: req.ip || req.headers["x-forwarded-for"] || req.connection.remoteAddress,
-      userAgent: req.headers.agentRequest,
+      userAgent: req.headers["user-id"],
       method: req.method,
       route: req.originalUrl,
       body: req.method == 'GET' ? req.body : req.method == 'POST' ? req.body : req.method == 'PUT' ? req.body : req.method == 'DELETE' ? req.body : req.body,
