@@ -9,12 +9,12 @@ const Log = {
     console.log("=============================================");
     console.log("==================USER ID====================");
     console.log("=============================================");
-    console.log(req.headers["user-id"]);
+    console.log(req.headers["userid"]);
     console.log("=============================================");
 
     const logData = {
       ip: req.ip || req.headers["x-forwarded-for"] || req.connection.remoteAddress,
-      userAgent: req.headers["user-id"],
+      userAgent: req.headers["userid"],
       header: JSON.stringify(req.headers),
       method: req.method,
       route: req.originalUrl,
