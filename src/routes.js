@@ -155,7 +155,7 @@ router.get("/percentageproviderbyclients/:codbuyer", Graphs.getPercentagePovider
 router.get("/percentageclientsorganization", Graphs.getPercentageClientsOrganization);
 router.get("/percentageprovidersorganization", Graphs.getPercentageProvidersOrganization);
 router.get("/totalvalueclients/:codprovider", Graphs.getTotalValueClients);
-router.get("/information", Graphs.getTotalInformations);
+router.get("/information", Log.InsertLog, Graphs.getTotalInformations);
 router.get("/exportpdf/:supplier/:negotiation/:client", Graphs.getExportPdf);
 
 router.get("getnegotiationmultishow/:category", Graphs.getExportPdf);
