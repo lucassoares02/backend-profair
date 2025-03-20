@@ -549,6 +549,35 @@ const Client = {
     // connection.end();
   },
 
+  async getAllStoresGraphEvolution(req, res) {
+    logger.info("Get All Stores Graphs");
+
+    const queryConsult = `SET sql_mode = ''; 
+      WITH time_intervals AS (
+          SELECT 
+              date_format(SUBTIME(dataPedido, '03:00:00'), '%Y-%m-%d %H:%i') as hour,
+              SUM(p.quantMercPedido * m.precoMercadoria) as value
+          FROM pedido p
+          JOIN mercadoria m ON m.codMercadoria = p.codMercPedido
+          GROUP BY hour
+      )
+      SELECT 
+          hour,
+          SUM(value) OVER (ORDER BY hour ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) as cumulative_value
+      FROM time_intervals
+      ORDER BY hour;
+      `;
+
+    connection.query(queryConsult, (error, results, fields) => {
+      if (error) {
+        console.log("Error Select All Stores Graphs: ", error);
+      } else {
+        return res.json(results[1]);
+      }
+    });
+    // connection.end();
+  },
+
   async getSellGraphHourProvider(req, res) {
     logger.info("Get Stores Graphs Provider");
 

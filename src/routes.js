@@ -48,6 +48,7 @@ router.get("/stores", Log.InsertLog, Client.getAllStores);
 router.get("/storesgraph", Log.InsertLog, Client.getAllStoresGraph);
 
 router.get("/valueminutegraph", Log.InsertLog, Client.getAllStoresGraphHour);
+router.get("/graphevolution", Log.InsertLog, Client.getAllStoresGraphEvolution);
 
 router.get("/valueminutegraphprovider/:codeprovider", Log.InsertLog, Client.getSellGraphHourProvider);
 
