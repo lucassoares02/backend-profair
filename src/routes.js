@@ -46,6 +46,7 @@ router.get("/stores/:codconsultor", Log.InsertLog, Client.getStoreConsultant);
 router.get("/storescategory/:codprovider", Log.InsertLog, Client.getStoresCategory);
 router.get("/stores", Log.InsertLog, Client.getAllStores);
 router.get("/storesgraph", Log.InsertLog, Client.getAllStoresGraph);
+router.get("/storesgraphprovider", Log.InsertLog, Client.getAllProvidersGraph);
 
 router.get("/valueminutegraph", Log.InsertLog, Client.getAllStoresGraphHour);
 router.get("/graphevolution", Log.InsertLog, Client.getAllStoresGraphEvolution);
