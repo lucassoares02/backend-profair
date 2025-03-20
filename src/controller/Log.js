@@ -16,7 +16,7 @@ const Log = {
 
     console.log(logData);
 
-    const query = `INSERT INTO log ( userAgent, header, method, route, body, timestamp) VALUES ('${logData.userAgent}', '${logData.header}', '${logData.method}', '${logData.route}', '${JSON.stringify(logData.body)}',  '${logData.timestamp}'); SHOW WARNINGS;`;
+    const query = `INSERT INTO log (userAgent, method, route, body, timestamp) VALUES ('${logData.userAgent}', '${logData.method}', '${logData.route}', '${JSON.stringify(logData.body)}',  '${logData.timestamp}'); SHOW WARNINGS;`;
 
     connection.query(query, (error, results, fields) => {
       next();
