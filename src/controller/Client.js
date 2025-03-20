@@ -528,6 +528,61 @@ const Client = {
     // connection.end();
   },
 
+
+  async getAllProvidersGraph(req, res) {
+    logger.info("Get All Providers Graphs");
+
+    const queryConsult = `
+    SET sql_mode = ''; select 
+    pedido.codPedido ,
+    fornecedor.cnpjForn as 'cnpjAssociado' ,
+    fornecedor.codForn as 'codAssociado',
+    consultor.nomeConsult,
+    pedido.codFornPedido,
+    fornecedor.razaoForn as 'razao',
+    sum(pedido.quantMercPedido * mercadoria.precoMercadoria) as 'valorTotal',
+    TIME_FORMAT(SUBTIME(pedido.dataPedido, '03:00:00'),'%H:%i') as 'horas' 
+    from consultor 
+    join pedido on consultor.codConsult = pedido.codComprPedido 
+    join fornecedor on pedido.codFornPedido = fornecedor.codForn 
+    join mercadoria on pedido.codMercPedido = mercadoria.codMercadoria
+    group by fornecedor.codForn
+    order by valorTotal 
+    desc limit 10
+    `;
+    
+    connection.query(queryConsult, (error, results, fields) => {
+      if (error) {
+        console.log("Error Select All Stores Graphs: ", error);
+      } else {
+        let item = [];
+
+        let total = 0;
+
+        for (let j = 0; j < results[1].length; j++) {
+          total += results[1][j]["valorTotal"];
+        }
+
+        i = 0;
+        for (i = 0; i < results[1].length; i++) {
+          item.push({
+            razao: results[1][i]["razao"],
+            percentage: Math.floor((results[1][i]["valorTotal"] / total) * 100) + "%",
+            value: results[1][i]["valorTotal"],
+          });
+        }
+
+        response = {
+          item: item,
+          total: total,
+        };
+
+        return res.json(response);
+      }
+    });
+    // connection.end();
+  },
+
   async getAllStoresGraphHour(req, res) {
     logger.info("Get All Stores Graphs");
 
