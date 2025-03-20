@@ -563,7 +563,7 @@ const Client = {
       )
       SELECT 
           hour,
-          SUM(value) OVER (ORDER BY hour ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) as cumulative_value
+          SUM(value) OVER (ORDER BY hour ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) as value
       FROM time_intervals
       ORDER BY hour;
       `;
