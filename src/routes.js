@@ -159,6 +159,8 @@ router.get("/percentageprovidersorganization", Log.InsertLog, Graphs.getPercenta
 router.get("/totalvalueclients/:codprovider", Log.InsertLog, Graphs.getTotalValueClients);
 router.get("/information", Log.InsertLog, Graphs.getTotalInformations);
 router.get("/exportpdf/:supplier/:negotiation/:client", Log.InsertLog, Graphs.getExportPdf);
+router.get("/exportpdfgpt/:supplier/:negotiation/:client", Log.InsertLog, Graphs.getExportPdfTesteLayoutGpt);
+router.get("/exportpdfdeep/:supplier/:negotiation/:client", Log.InsertLog, Graphs.getExportPdfTesteLayoutDeep);
 
 router.get("getnegotiationmultishow/:category", Log.InsertLog, Graphs.getExportPdf);
 
