@@ -381,13 +381,13 @@ const User = {
     let queryConsult = "";
 
     if (type == 1) {
-      queryConsult = `SELECT f.codForn, CONCAT(f.codForn, ' - ',f.nomeForn) AS 'razao', f.cnpjForn
+      queryConsult = `SELECT f.codForn, concat(f.codForn, " - ",f.nomeForn) AS 'razao', f.cnpjForn
       FROM fornecedor f
       JOIN relacionafornecedor r ON r.codFornecedor = f.codForn
       WHERE r.codConsultor = ${code}`;
 
     } else if (type == 2) {
-      queryConsult = `    SELECT f.codAssociado as 'codForn', CONCAT(f.codAssociado, ' - ',f.razaoAssociado) AS 'razao', 
+      queryConsult = `    SELECT f.codAssociado as 'codForn', concat(f.codAssociado, " - ",f.razaoAssociado) AS 'razao', 
         f.cnpjAssociado as 'cnpjForn'
         FROM associado f
         JOIN relaciona r ON r.codConsultRelaciona = f.codAssociado

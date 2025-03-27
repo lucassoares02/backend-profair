@@ -98,7 +98,7 @@ const Client = {
     const queryConsult = `
     SET sql_mode = ''; select
     relaciona.codAssocRelaciona as codAssociado,
-    concat(relaciona.codConsultRelaciona, ' - ', associado.razaoAssociado) as cnpjAssociado,
+    concat(relaciona.codConsultRelaciona, " - ", associado.razaoAssociado) as cnpjAssociado,
     consultor.nomeConsult, 
     relaciona.codConsultRelaciona,
     associado.razaoAssociado,
