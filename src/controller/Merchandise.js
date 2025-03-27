@@ -209,7 +209,7 @@ const Merchandise = {
     left join pedido on pedido.codMercPedido = mercadoria.codMercadoria
     where fornecedor.codForn = ${codprovider}
     group by mercadoria.codMercadoria
-    order by IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0)
+    order by IFNULL(sum(pedido.quantMercPedido),0)
     desc
     limit 10
 `;
