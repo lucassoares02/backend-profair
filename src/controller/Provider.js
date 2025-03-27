@@ -29,11 +29,11 @@ const Provider = {
 
     const { type } = req.params;
 
-    const queryConsult = `SELECT cnpjAssociado AS cnpjForn, razaoAssociado AS razao, codAssociado AS codForn
+    const queryConsult = `SELECT cnpjAssociado AS cnpjForn, CONCAT(codAssociado, ' - ',razaoAssociado) AS razao, codAssociado AS codForn
     FROM associado
     WHERE ${type} = 2
     UNION ALL
-    SELECT cnpjForn, razaoForn AS razao, codForn
+    SELECT cnpjForn, (codForn, ' - ', razaoForn) AS razao, codForn
     FROM fornecedor
     WHERE ${type} = 1;`;
 
