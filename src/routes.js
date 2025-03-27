@@ -120,6 +120,7 @@ router.get("/statusnegotiation/:code", Log.InsertLog, Negotiation.changeNegotiat
 router.patch("/merchandise/:codMercadoria", Log.InsertLog, Merchandise.patchMerchandise);
 router.get("/merchandiseclientprovidernegotiation/:codclient/:codprovider/:codnegotiation", Log.InsertLog, Merchandise.getMerchandiseClientProviderNegotiation);
 router.get("/merchandiseprovider/:codprovider", Log.InsertLog, Merchandise.getMerchandiseProvider);
+router.get("/merchandisetoptenprovider/:codprovider", Log.InsertLog, Merchandise.getTopTenMerchandiseProvider);
 router.get("/merchandiseproviderifclient/:codclient/:codprovider/:codnegotiation", Log.InsertLog, Merchandise.getMerchandiseProviderIfClientLimitNegotiation);
 router.get("/merchandiseproviderifclientlimitnegotiation/:codclient/:codprovider/:codnegotiation", Log.InsertLog, Merchandise.getMerchandiseProviderIfClientLimitNegotiation);
 
