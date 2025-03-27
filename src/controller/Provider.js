@@ -33,7 +33,7 @@ const Provider = {
     FROM associado
     WHERE ${type} = 2
     UNION ALL
-    SELECT cnpjForn, (codForn, " - ", razaoForn) AS razao, codForn
+    SELECT cnpjForn, concat(codForn, " - ", razaoForn) AS razao, codForn
     FROM fornecedor
     WHERE ${type} = 1;`;
 
