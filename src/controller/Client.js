@@ -790,7 +790,7 @@ const Client = {
           INSERT INTO acesso 
               (codAcesso, direcAcesso, codUsuario, codOrganization) 
           VALUES 
-              (${hash == '' || hash.length < 4 ? UUID() : hash}, ${type}, LAST_INSERT_ID(), 158);
+              (${hash}, ${type}, LAST_INSERT_ID(), 158);
           COMMIT;
         `;
 
@@ -806,7 +806,7 @@ const Client = {
           INSERT INTO acesso 
               (codAcesso, direcAcesso, codUsuario, codOrganization) 
           VALUES 
-              (${hash == '' || hash.length < 4 ? UUID() : hash}, ${type}, LAST_INSERT_ID(), 158);
+              (${hash}, ${type}, LAST_INSERT_ID(), 158);
           COMMIT; SHOW WARNINGS;
           SELECT @consultorId AS consultor; 
         `;
