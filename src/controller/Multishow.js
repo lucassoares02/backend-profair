@@ -68,24 +68,23 @@ const Notice = {
     const queryConsult = "SELECT n.*, cn.categoria, f.id_erp as id_erp_fornecedor FROM multishow_b2b.negociacoes n JOIN multishow_b2b.categorias_negociacoes cn on cn.id_categoria_negociacao = n.id_categoria_negociacao join multishow_b2b.fornecedores f on f.id_fornecedor = n.id_fornecedor  where n.created_at > '2025-03-31 14:15:15'";
 
     try {
-      console.log("STEP 1");
+      
       connectionMultishow.query(query, async (error, results, fields) => {
         if (error) {
-          console.log("STEP 2");
+          
           console.log("Error Negotiation Multishow: ", error);
         } else {
-          console.log("STEP 3");
+          
           await Notice.insertNegotiation(results);
-          console.log("STEP 4");
-          for (let index = 0; index < results.length; index++) {
-            console.log("STEP 5");
-            fs.writeFileSync(querys, `UPDATE multishow_b2b.negociacoes_lojas SET id_loja = 322 WHERE id_negociacao = ${results[index]["id_negociacao"]};\n`, { encoding: 'utf8', flag: 'a' });
-            console.log("STEP 6");
-            try {
-              console.log("==========================================================");
 
+          for (let index = 0; index < results.length; index++) {
+            
+            fs.writeFileSync(querys, `UPDATE multishow_b2b.negociacoes_lojas SET id_loja = 322 WHERE id_negociacao = ${results[index]["id_negociacao"]};\n`, { encoding: 'utf8', flag: 'a' });
+            
+            try {
+                
               const negotiations = await Notice.getNegotiationClients(results[index]["id_negociacao"]);
-              await Notice.insertNegotiationClients(negotiations);
+              await Notice.insertNegotiationClients(negotiations, `UPDATE multishow_b2b.negociacoes_lojas SET id_loja = 322 WHERE id_negociacao = ${results[index]["id_negociacao"]};`);
 
               const merchandises = await Notice.getMerchandises(results[index]["id_negociacao"]);
               await Notice.insertMerchandises(merchandises, results[index]["id_negociacao"], results[index]["id_erp_fornecedor"]);
@@ -195,7 +194,7 @@ const Notice = {
     });
   },
 
-  insertNegotiationClients(itens) {
+  insertNegotiationClients(itens, queryPre) {
     const data = [];
 
     for (let index = 0; index < itens.length; index++) {
@@ -207,7 +206,9 @@ const Notice = {
       data.push({
         id_negociacao_loja: element["id_negociacao_loja"],
         id_negociacao: element["id_negociacao"],
-        id_loja: element["id_loja"]
+        id_loja: element["id_loja"],
+        query_update_pre: queryPre.tostring(),
+        query_update_pos: `UPDATE multishow_b2b.negociacoes_lojas SET id_loja = ${element["id_loja"]} WHERE id_negociacao = ${element["id_negociacao"]} and id_negociacao_loja = ${element["id_negociacao_loja"]};`.toString(),
       });
     }
 
