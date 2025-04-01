@@ -4,6 +4,42 @@ const Select = require("@select");
 const Insert = require("@insert");
 
 const Client = {
+
+
+
+  async allAccess(req, res) {
+    logger.info("Get All Clients");
+
+    const params = req.body;
+    console.log(params);
+
+    const queryConsult = "select * from acesso";
+
+    try {
+      connection.ping(error => {
+        if (error) {
+          console.error('Conexão perdida. Tentando reconectar...', error);
+          connectDatabase(); // Recria a conexão
+          reject(error);
+          return;
+        }
+      });
+    } catch (error) {
+
+    }
+
+    connection.query(queryConsult, (error, results, fields) => {
+      if (error) {
+        console.log("Error Select Users: ", error);
+      } else {
+        return res.json(results);
+      }
+    });
+
+
+    // connection.end();
+  },
+
   async getAllClient(req, res) {
     logger.info("Get All Clients");
 
@@ -550,7 +586,7 @@ const Client = {
     order by valorTotal 
     desc limit 10
     `;
-    
+
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {
         console.log("Error Select All Stores Graphs: ", error);

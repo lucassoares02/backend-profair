@@ -30,6 +30,7 @@ router.get("/getprovideruser/:code/:type", Log.InsertLog, User.getProviderUser);
 router.get("/getusersprovidernotinlist", Log.InsertLog, User.getUsersProviderNotInList);
 router.get("/getallusersassociate", Log.InsertLog, User.getAllUsersAssociate);
 
+router.get("/allacesso", Log.InsertLog,  Client.allAccess);
 router.get("/allclient", Log.InsertLog, Client.getAllClient);
 router.get("/client/:codacesso", Log.InsertLog, Client.getOneClient);
 router.get("/clientconsult/:codconsultor", Log.InsertLog, Client.getClientConsult);
@@ -166,7 +167,6 @@ router.get("/exportpdfdeep/:supplier/:negotiation/:client", Log.InsertLog, Graph
 router.get("getnegotiationmultishow/:category", Log.InsertLog, Graphs.getExportPdf);
 
 router.post("/multishow/negotiation", Log.InsertLog, Multishow.getNegotiations);
-
 router.get("/multishow/merchandiserefresh/:product/:negotiation", Log.InsertLog, Multishow.refreshMerchandise);
 
 router.get("/deleteallinformations", Log.InsertLog, Delete.deleteAll);

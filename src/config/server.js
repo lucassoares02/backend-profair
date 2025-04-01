@@ -19,7 +19,7 @@ if (process.env.DATABASE == "POSTGRESQL") {
     }
   });
 } else {
-  var connection = mysql.createConnection({
+  var connection = mysql2.createPool({
     port: process.env.MYSQL_PORT,
     host: process.env.MYSQL_HOSTNAME,
     user: process.env.MYSQL_USERNAME,

@@ -58,23 +58,29 @@ const Notice = {
     }
 
     // const queryConsult = "SELECT n.*, cn.categoria, f.id_erp as id_erp_fornecedor FROM multishow_b2b.negociacoes n JOIN multishow_b2b.categorias_negociacoes cn on cn.id_categoria_negociacao = n.id_categoria_negociacao join multishow_b2b.fornecedores f on f.id_fornecedor = n.id_fornecedor where n.id_categoria_negociacao = 25 or n.id_categoria_negociacao = 26";
-    const queryConsult = `
-    SELECT n.*, cn.categoria, 
-    f.id_erp as id_erp_fornecedor 
-    FROM multishow_b2b.negociacoes n 
-    JOIN multishow_b2b.categorias_negociacoes cn on cn.id_categoria_negociacao = n.id_categoria_negociacao 
-    join multishow_b2b.fornecedores f on f.id_fornecedor = n.id_fornecedor 
-    where id_negociacao  in (68444,68445,68446,68447,68448,68449,68450,68451,68452,68453,68454,68455,68456,68457,68458,68459,68460,68461,68462,68463,68464,68465,68466,68467,68468,68469,68470)`;
-    // const queryConsult = "SELECT n.*, cn.categoria, f.id_erp as id_erp_fornecedor FROM multishow_b2b.negociacoes n JOIN multishow_b2b.categorias_negociacoes cn on cn.id_categoria_negociacao = n.id_categoria_negociacao join multishow_b2b.fornecedores f on f.id_fornecedor = n.id_fornecedor  where n.created_at > '2024-07-01 14:15:15'";
+    // const queryConsult = `
+    // SELECT n.*, cn.categoria, 
+    // f.id_erp as id_erp_fornecedor 
+    // FROM multishow_b2b.negociacoes n 
+    // JOIN multishow_b2b.categorias_negociacoes cn on cn.id_categoria_negociacao = n.id_categoria_negociacao 
+    // join multishow_b2b.fornecedores f on f.id_fornecedor = n.id_fornecedor 
+    // where id_negociacao  in (68444,68445,68446,68447,68448,68449,68450,68451,68452,68453,68454,68455,68456,68457,68458,68459,68460,68461,68462,68463,68464,68465,68466,68467,68468,68469,68470)`;
+    const queryConsult = "SELECT n.*, cn.categoria, f.id_erp as id_erp_fornecedor FROM multishow_b2b.negociacoes n JOIN multishow_b2b.categorias_negociacoes cn on cn.id_categoria_negociacao = n.id_categoria_negociacao join multishow_b2b.fornecedores f on f.id_fornecedor = n.id_fornecedor  where n.created_at > '2025-03-31 14:15:15'";
 
     try {
+      console.log("STEP 1");
       connectionMultishow.query(query, async (error, results, fields) => {
         if (error) {
+          console.log("STEP 2");
           console.log("Error Negotiation Multishow: ", error);
         } else {
+          console.log("STEP 3");
           await Notice.insertNegotiation(results);
+          console.log("STEP 4");
           for (let index = 0; index < results.length; index++) {
+            console.log("STEP 5");
             fs.writeFileSync(querys, `UPDATE multishow_b2b.negociacoes_lojas SET id_loja = 322 WHERE id_negociacao = ${results[index]["id_negociacao"]};\n`, { encoding: 'utf8', flag: 'a' });
+            console.log("STEP 6");
             try {
               console.log("==========================================================");
 
@@ -92,6 +98,7 @@ const Notice = {
               console.log(`Fornecedor: ${provider[0]["id_erp"]} - ${provider[0]["fornecedor"]}`)
               console.log(`Quantidade de mercadorias: ${merchandises.length}`)
             } catch (error) {
+              console.log("STEP 7");
               console.log(`Error Get Merchandises: ${error}`);
             }
           }
@@ -305,6 +312,8 @@ const Notice = {
   insertNegotiation(itens) {
     const data = [];
 
+    console.log(itens)
+
     for (let index = 0; index < itens.length; index++) {
       const element = itens[index];
       var date = new Date(element["validade_fim"]);
@@ -451,40 +460,6 @@ const Notice = {
     });
   },
 
-  insertRelationClients(itens) {
-    console.log("Insert Relation Clients");
-    const data = [];
-
-    for (let index = 0; index < itens.length; index++) {
-      const element = itens[index];
-
-      data.push({
-        codAssocRelaciona: element["id_lojista"],
-        codConsultRelaciona: element["id_erp"],
-      });
-    }
-
-    let params = {
-      table: "relaciona",
-      data: data,
-    };
-
-    try {
-      return new Promise((resolve, reject) => {
-        return Insert(params)
-          .then(async (resp) => {
-            resolve(resp);
-          })
-          .catch((error) => {
-            res.status(400).send(error);
-          });
-      });
-    } catch (error) {
-      console.log(`Error Insert Negotiation: ${error}`)
-    }
-
-  },
-
   getStores() {
     console.log("Get Stores");
     const queryMerchandises = `select * from multishow_b2b.lojas where bloqueado = 0;`;
@@ -535,6 +510,42 @@ const Notice = {
     }
 
   },
+
+  
+  insertRelationClients(itens) {
+    console.log("Insert Relation Clients");
+    const data = [];
+
+    for (let index = 0; index < itens.length; index++) {
+      const element = itens[index];
+
+        data.push({
+          codAssocRelaciona: element["id_lojista"],
+          codConsultRelaciona: element["id_erp"],
+        });
+
+    }
+
+    let params = {
+      table: "relaciona",
+      data: data,
+    };
+
+    try {
+      return new Promise((resolve, reject) => {
+        return Insert(params)
+          .then(async (resp) => {
+            resolve(resp);
+          })
+          .catch((error) => {
+            res.status(400).send(error);
+          });
+      });
+    } catch (error) {
+      console.log(`Error Insert Relatin Clients: ${error}`)
+    }
+  },
+
 
   getOrganizers() {
     console.log("Get Organizers");
