@@ -207,8 +207,8 @@ const Notice = {
         id_negociacao_loja: element["id_negociacao_loja"],
         id_negociacao: element["id_negociacao"],
         id_loja: element["id_loja"],
-        query_update_pre: queryPre.tostring(),
-        query_update_pos: `UPDATE multishow_b2b.negociacoes_lojas SET id_loja = ${element["id_loja"]} WHERE id_negociacao = ${element["id_negociacao"]} and id_negociacao_loja = ${element["id_negociacao_loja"]};`.toString(),
+        query_update_pre: String(queryPre),
+        query_update_pos: String(`UPDATE multishow_b2b.negociacoes_lojas SET id_loja = ${element["id_loja"]} WHERE id_negociacao = ${element["id_negociacao"]} and id_negociacao_loja = ${element["id_negociacao_loja"]};`),
       });
     }
 
