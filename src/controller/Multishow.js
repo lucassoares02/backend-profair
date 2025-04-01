@@ -7,12 +7,41 @@ const { format } = require('date-fns');
 const querys = 'querys.txt';
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
+const path = require("path");
 
 
 
 
 
 const Notice = {
+
+
+  async getFileTxt(req, res) {
+    logger.info("Get File TXT");
+    const filePath = path.join(__dirname, querys);
+    res.download(filePath, (err) => {
+      if (err) {
+        console.error("Error downloading file:", err);
+        res.status(500).send("Error downloading file.");
+      } else {
+        console.log("File downloaded successfully.");
+      }
+    });
+  },
+
+  async getFileTxt2(req, res) {
+    logger.info("Get File TXT");
+    res.download(querys, (err) => {
+      if (err) {
+        console.error("Error downloading file:", err);
+        res.status(500).send("Error downloading file.");
+      } else {
+        console.log("File downloaded successfully.");
+      }
+    });
+  },
+
+
 
   capitalizeWords(phrase) {
     return phrase

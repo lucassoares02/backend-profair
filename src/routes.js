@@ -20,7 +20,7 @@ router.post("/faceline-user", Log.InsertLog, Faceline.insert);
 router.post("/faceline-user-update", Log.InsertLog, Faceline.update);
 
 // Router with the headers
-router.post("/getuser", Log.InsertLog,  User.getUser);
+router.post("/getuser", Log.InsertLog, User.getUser);
 router.post("/getusermore", Log.InsertLog, User.getUserDoubleCompany);
 router.post("/getuserweb", Log.InsertLog, User.getUserWeb);
 
@@ -30,7 +30,7 @@ router.get("/getprovideruser/:code/:type", Log.InsertLog, User.getProviderUser);
 router.get("/getusersprovidernotinlist", Log.InsertLog, User.getUsersProviderNotInList);
 router.get("/getallusersassociate", Log.InsertLog, User.getAllUsersAssociate);
 
-router.get("/allacesso", Log.InsertLog,  Client.allAccess);
+router.get("/allacesso", Log.InsertLog, Client.allAccess);
 router.get("/allclient", Log.InsertLog, Client.getAllClient);
 router.get("/client/:codacesso", Log.InsertLog, Client.getOneClient);
 router.get("/clientconsult/:codconsultor", Log.InsertLog, Client.getClientConsult);
@@ -50,7 +50,7 @@ router.get("/storesgraph", Client.getAllStoresGraph);
 router.get("/storesgraphprovider", Client.getAllProvidersGraph);
 
 router.get("/valueminutegraph", Client.getAllStoresGraphHour);
-router.get("/graphevolution",  Client.getAllStoresGraphEvolution);
+router.get("/graphevolution", Client.getAllStoresGraphEvolution);
 
 router.get("/valueminutegraphprovider/:codeprovider", Log.InsertLog, Client.getSellGraphHourProvider);
 
@@ -168,6 +168,8 @@ router.get("getnegotiationmultishow/:category", Log.InsertLog, Graphs.getExportP
 
 router.post("/multishow/negotiation", Log.InsertLog, Multishow.getNegotiations);
 router.get("/multishow/merchandiserefresh/:product/:negotiation", Log.InsertLog, Multishow.refreshMerchandise);
+router.get("/multishow/getFile", Log.InsertLog, Multishow.getFileTxt);
+router.get("/multishow/getFile2", Log.InsertLog, Multishow.getFileTxt2);
 
 router.get("/deleteallinformations", Log.InsertLog, Delete.deleteAll);
 router.delete("/deletecompanytouser/:company/:user/:type", Log.InsertLog, Delete.deleteCompanyToUser);
