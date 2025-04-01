@@ -49,7 +49,7 @@ const User = {
             order by fornecedor.nomeForn desc;
             `;
 
-            connection.query(queryProvider, (error, results) => {
+            connection.promise.query(queryProvider, (error, results) => {
               if (error) {
                 return res.status(400).send(error);
               } else {
@@ -111,7 +111,7 @@ const User = {
             where organizador.codOrg = ${resultsTop[0].codOrganization} 
             and acesso.codAcesso = ${codacesso}`;
 
-            connection.query(queryOrganization, (error, results) => {
+            connection.promise.query(queryOrganization, (error, results) => {
               if (error) {
                 return res.status(400).send(error);
               } else {
