@@ -46,11 +46,11 @@ router.get("/clientmerchandisetrading/:codmercadoria/:codnegotiation", Log.Inser
 router.get("/stores/:codconsultor", Log.InsertLog, Client.getStoreConsultant);
 router.get("/storescategory/:codprovider", Log.InsertLog, Client.getStoresCategory);
 router.get("/stores", Log.InsertLog, Client.getAllStores);
-router.get("/storesgraph", Log.InsertLog, Client.getAllStoresGraph);
-router.get("/storesgraphprovider", Log.InsertLog, Client.getAllProvidersGraph);
+router.get("/storesgraph", Client.getAllStoresGraph);
+router.get("/storesgraphprovider", Client.getAllProvidersGraph);
 
-router.get("/valueminutegraph", Log.InsertLog, Client.getAllStoresGraphHour);
-router.get("/graphevolution", Log.InsertLog, Client.getAllStoresGraphEvolution);
+router.get("/valueminutegraph", Client.getAllStoresGraphHour);
+router.get("/graphevolution",  Client.getAllStoresGraphEvolution);
 
 router.get("/valueminutegraphprovider/:codeprovider", Log.InsertLog, Client.getSellGraphHourProvider);
 
@@ -159,7 +159,7 @@ router.get("/percentageproviderbyclients/:codbuyer", Log.InsertLog, Graphs.getPe
 router.get("/percentageclientsorganization", Log.InsertLog, Graphs.getPercentageClientsOrganization);
 router.get("/percentageprovidersorganization", Log.InsertLog, Graphs.getPercentageProvidersOrganization);
 router.get("/totalvalueclients/:codprovider", Log.InsertLog, Graphs.getTotalValueClients);
-router.get("/information", Log.InsertLog, Graphs.getTotalInformations);
+router.get("/information", Graphs.getTotalInformations);
 router.get("/exportpdf/:supplier/:negotiation/:client", Log.InsertLog, Graphs.getExportPdf);
 router.get("/exportpdfgpt/:supplier/:negotiation/:client", Log.InsertLog, Graphs.getExportPdfTesteLayoutGpt);
 router.get("/exportpdfdeep/:supplier/:negotiation/:client", Log.InsertLog, Graphs.getExportPdfTesteLayoutDeep);

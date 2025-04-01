@@ -161,6 +161,8 @@ const Notice = {
       data: data,
     };
 
+    console.log(params);
+
     try {
       return new Promise((resolve, reject) => {
         return Insert(params)
