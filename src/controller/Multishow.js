@@ -42,10 +42,10 @@ const Notice = {
 
         // Gerar conteúdo do arquivo
         const queries = results.map(row => row.query).join("\n");
-        const tempFilePath = path.join("queries_temp.sql");
+        const tempFilePath = "queries_temp.sql";
 
 
-        
+
         s.writeFile(tempFilePath, queries, (err) => {
           if (err) {
             console.error("Erro ao criar arquivo: ", err);
