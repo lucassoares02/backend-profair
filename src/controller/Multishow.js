@@ -15,7 +15,7 @@ const Notice = {
   async getQueryPreEvent(req, res) {
     logger.info("Get Query Pre Event");
 
-    const queryConsult = "select CONCAT('UPDATE multishow_b2b.negociacoes_lojas SET id_loja = 322 WHERE id_erp = ', codNegoErp, ';') as 'query' from negociacao";
+    const queryConsult = "select CONCAT('UPDATE multishow_b2b.negociacoes_lojas SET id_loja = 322 WHERE id_negociacao = ', codNegociacao, ';') as 'query' from negociacao";
     
     
     connection.query(queryConsult, (error, results, fields) => {
