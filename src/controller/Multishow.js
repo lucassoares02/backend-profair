@@ -1,4 +1,5 @@
 const { connectionMultishow } = require("@server");
+const { connection } = require("@server");
 const logger = require("@logger");
 const Select = require("@select");
 const Insert = require("@insert");
@@ -7,12 +8,6 @@ const { format } = require('date-fns');
 const querys = 'querys.txt';
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
-const path = require("path");
-
-
-
-
-
 const Notice = {
 
 
