@@ -168,7 +168,6 @@ router.get("getnegotiationmultishow/:category", Log.InsertLog, Graphs.getExportP
 
 router.post("/multishow/negotiation", Log.InsertLog, Multishow.getNegotiations);
 router.get("/multishow/merchandiserefresh/:product/:negotiation", Log.InsertLog, Multishow.refreshMerchandise);
-router.get("/multishow/getFile2", Log.InsertLog, Multishow.getFileTxt2);
 router.get("/multishow/getquerypreevent", Log.InsertLog, Multishow.getQueryPreEvent);
 router.get("/multishow/getqueryposevent", Log.InsertLog, Multishow.getQueryPosEvent);
 
