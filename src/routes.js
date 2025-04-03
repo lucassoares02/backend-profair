@@ -167,6 +167,7 @@ router.get("/exportpdfdeep/:supplier/:negotiation/:client", Log.InsertLog, Graph
 router.get("getnegotiationmultishow/:category", Log.InsertLog, Graphs.getExportPdf);
 
 router.post("/multishow/negotiation", Log.InsertLog, Multishow.getNegotiations);
+router.post("/multishow/negotiation/disabled", Log.InsertLog, Multishow.getNegotiationsDisabled);
 router.get("/multishow/merchandiserefresh/:product/:negotiation", Log.InsertLog, Multishow.refreshMerchandise);
 router.get("/multishow/getquerypreevent", Log.InsertLog, Multishow.getQueryPreEvent);
 router.get("/multishow/getqueryposevent", Log.InsertLog, Multishow.getQueryPosEvent);
