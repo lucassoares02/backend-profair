@@ -620,6 +620,7 @@ const Notice = {
         codAssociado: element["id_erp"],
         razaoAssociado: Notice.capitalizeWords(element["descricao"].replaceAll("'", "`").replaceAll('"', '`')),
         cnpjAssociado: element["cnpj"],
+        idLoja: element["id_loja"],
       });
     }
 
