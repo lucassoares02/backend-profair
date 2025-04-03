@@ -44,30 +44,7 @@ const Notice = {
         const queries = results.map(row => row.query).join("\n");
         const tempFilePath = "queries_temp.sql";
 
-
-
-        s.writeFile(tempFilePath, queries, (err) => {
-          if (err) {
-            console.error("Erro ao criar arquivo: ", err);
-            return res.status(500).json({ error: "Erro ao gerar arquivo" });
-          }
-
-          // Enviar arquivo para download
-          res.download(tempFilePath, (err) => {
-            if (err) {
-              console.error("Erro no download: ", err);
-            }
-
-            // Excluir arquivo após envio
-            fs.unlink(tempFilePath, (err) => {
-              if (err) {
-                console.error("Erro ao excluir arquivo: ", err);
-              }
-            });
-          });
-        });
-
-        return res.json(results);
+        return res.json({"querys": queries});
       }
     });
     // connection.end();
