@@ -44,12 +44,44 @@ const Notice = {
   },
 
 
+  async getQueryNegotiationPosEventOutside(req, res) {
+    logger.info("Get Query Pre Event");
+
+    const queryConsult = "SET sql_mode = ''; select CONCAT('UPDATE multishow_b2b.negociacoes_lojas SET id_loja = 322 WHERE id_negociacao = ', id_negociacao, ';') as 'query' from negociacao_loja where status = 1 group by id_negociacao;";
+    
+    
+    connection.query(queryConsult, (error, results, fields) => {
+      if (error) {
+        console.log("Error Query Pre Event: ", error);
+      } else {
+        
+        if (results.length === 0) {
+          return res.status(404).json({ error: "Nenhuma query encontrada" });
+        }
+        // Gerar conteúdo do arquivo
+        const queries = results.map(row => `${row.query}`).join("\n");
+        fs.writeFileSync(querys, queries, { encoding: 'utf8', flag: 'w' });
+
+        res.download(querys, (err) => {
+          if (err) {
+            console.error("Error downloading file:", err);
+            res.status(500).send("Error downloading file.");
+          } else {
+            console.log("File downloaded successfully.");
+          }
+        });
+      }
+    });
+    // connection.end();
+  },
+
+
   async getQueryPosEvent(req, res) {
     logger.info("Get Query Pre Event");
 
-    const queryConsult = "SET sql_mode = ''; select CONCAT('UPDATE multishow_b2b.negociacoes_lojas SET id_loja = ', nl.id_loja, ' WHERE id_negociacao = ', nl.id_negociacao, ' and id_negociacao_loja = ', nl.id_negociacao_loja, ';') as 'query' from log l join acesso a on a.codAcesso = l.userAgent join consultor c on c.codConsult = a.codUsuario join relaciona r on r.codAssocRelaciona = c.codConsult join negociacao_loja nl on nl.id_loja = r.codConsultRelaciona where l.route like '%getusermore%' and a.direcAcesso = 2 and nl.status = 0 group by nl.id_loja, nl.id_negociacao";
-    
-    
+    // const queryConsult = "SET sql_mode = ''; select CONCAT('UPDATE multishow_b2b.negociacoes_lojas SET id_loja = ', nl.id_loja, ' WHERE id_negociacao = ', nl.id_negociacao, ' and id_negociacao_loja = ', nl.id_negociacao_loja, ';') as 'query' from log l join acesso a on a.codAcesso = l.userAgent join consultor c on c.codConsult = a.codUsuario join relaciona r on r.codAssocRelaciona = c.codConsult join negociacao_loja nl on nl.id_loja = r.codConsultRelaciona where l.route like '%getusermore%' and a.direcAcesso = 2 and nl.status = 0 group by nl.id_loja, nl.id_negociacao";
+    const queryConsult = "SET sql_mode = ''; select CONCAT( 'UPDATE multishow_b2b.negociacoes_lojas SET id_loja = ', nl.id_loja, ' WHERE id_negociacao = ', nl.id_negociacao, ' and id_negociacao_loja = ', nl.id_negociacao_loja, ';' ) as 'query' from log l join acesso a on a.codAcesso = l.userAgent join consultor c on c.codConsult = a.codUsuario join relaciona r on r.codAssocRelaciona = c.codConsult join associado aa on aa.codAssociado = r.codConsultRelaciona join negociacao_loja nl on nl.id_loja = aa.idLoja where l.route like '%getusermore%' and a.direcAcesso = 2 and nl.status = 0 group by nl.id_loja, nl.id_negociacao;";
+
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {
         console.log("Error Query Pre Event: ", error);
@@ -78,7 +110,8 @@ const Notice = {
   async getQueryPosEventOutside(req, res) {
     logger.info("Get Query Pre Event");
 
-    const queryConsult = "SET sql_mode = ''; select CONCAT('UPDATE multishow_b2b.negociacoes_lojas SET id_loja = ', nl.id_loja, ' WHERE id_negociacao = ', nl.id_negociacao, ' and id_negociacao_loja = ', nl.id_negociacao_loja, ';' ) as 'query' from acesso a join consultor c on c.codConsult = a.codUsuario left join log l on l.userAgent = a.codAcesso and l.route like '%getusermore%' join relaciona r on r.codAssocRelaciona = c.codConsult join negociacao_loja nl on nl.id_loja = r.codConsultRelaciona where a.direcAcesso = 2 and nl.status = 1 and l.userAgent IS NULL group by nl.id_loja, nl.id_negociacao";
+    // const queryConsult = "SET sql_mode = ''; select CONCAT('UPDATE multishow_b2b.negociacoes_lojas SET id_loja = ', nl.id_loja, ' WHERE id_negociacao = ', nl.id_negociacao, ' and id_negociacao_loja = ', nl.id_negociacao_loja, ';' ) as 'query' from acesso a join consultor c on c.codConsult = a.codUsuario left join log l on l.userAgent = a.codAcesso and l.route like '%getusermore%' join relaciona r on r.codAssocRelaciona = c.codConsult join negociacao_loja nl on nl.id_loja = r.codConsultRelaciona where a.direcAcesso = 2 and nl.status = 1 and l.userAgent IS NULL group by nl.id_loja, nl.id_negociacao";
+    const queryConsult = "select CONCAT( 'UPDATE multishow_b2b.negociacoes_lojas SET id_loja = ', nl.id_loja, ' WHERE id_negociacao = ', nl.id_negociacao, ' and id_negociacao_loja = ', nl.id_negociacao_loja, ';' ) as 'query' from acesso a join consultor c on c.codConsult = a.codUsuario left join log l on l.userAgent = a.codAcesso and l.route like '%getusermore%' join relaciona r on r.codAssocRelaciona = c.codConsult join associado aa on aa.codAssociado = r.codConsultRelaciona join negociacao_loja nl on nl.id_loja = aa.idLoja where a.direcAcesso = 2 and nl.status = 1 and l.userAgent IS NULL group by nl.id_loja, nl.id_negociacao;";
     
     
     connection.query(queryConsult, (error, results, fields) => {
