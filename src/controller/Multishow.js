@@ -59,7 +59,7 @@ const Notice = {
           return res.status(404).json({ error: "Nenhuma query encontrada" });
         }
         // Gerar conteúdo do arquivo
-        const queries = results.map(row => `${row.query}`).join("\n");
+        const queries = results[1].map(row => `${row.query}`).join("\n");
         fs.writeFileSync(querys, queries, { encoding: 'utf8', flag: 'w' });
 
         res.download(querys, (err) => {
