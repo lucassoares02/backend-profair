@@ -33,6 +33,55 @@ const Notice = {
       if (error) {
         console.log("Error Query Pre Event: ", error);
       } else {
+
+        if (results.length === 0) {
+          return res.status(404).json({ error: "Nenhuma query encontrada" });
+        }
+
+
+
+        // Gerar conteúdo do arquivo
+        const queries = results.map(row => row.query).join("\n");
+        const tempFilePath = path.join("queries_temp.sql");
+
+
+        
+        s.writeFile(tempFilePath, queries, (err) => {
+          if (err) {
+            console.error("Erro ao criar arquivo: ", err);
+            return res.status(500).json({ error: "Erro ao gerar arquivo" });
+          }
+
+          // Enviar arquivo para download
+          res.download(tempFilePath, "queries.sql", (err) => {
+            if (err) {
+              console.error("Erro no download: ", err);
+            }
+
+            // Excluir arquivo após envio
+            fs.unlink(tempFilePath, (err) => {
+              if (err) {
+                console.error("Erro ao excluir arquivo: ", err);
+              }
+            });
+          });
+        });
+
+        return res.json(results);
+      }
+    });
+    // connection.end();
+  },
+
+  async getQueryPreEventBackup(req, res) {
+    logger.info("Get Query Pre Event");
+
+    const queryConsult = "select CONCAT('UPDATE multishow_b2b.negociacoes_lojas SET id_loja = 322 WHERE id_negociacao = ', codNegoErp, ';') as 'query' from negociacao";
+
+    connection.query(queryConsult, (error, results, fields) => {
+      if (error) {
+        console.log("Error Query Pre Event: ", error);
+      } else {
         return res.json(results);
       }
     });
