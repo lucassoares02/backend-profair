@@ -42,7 +42,14 @@ const Notice = {
         const queries = results.map(row => `${row.query}`).join("\n");
         fs.writeFileSync(querys, queries, { encoding: 'utf8', flag: 'w' });
 
-        return res.json({"querys": queries});
+        res.download(querys, (err) => {
+          if (err) {
+            console.error("Error downloading file:", err);
+            res.status(500).send("Error downloading file.");
+          } else {
+            console.log("File downloaded successfully.");
+          }
+        });
       }
     });
     // connection.end();
