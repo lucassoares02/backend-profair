@@ -100,7 +100,7 @@ const Merchandise = {
     IFNULL(SUM(pedido.quantMercPedido),  0) as quantMercadoria, 
     IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0) as 'valorTotal' 
     from mercadoria 
-    join pedido on mercadoria.codMercadoria = pedido.codMercPedido 
+    left join pedido on mercadoria.codMercadoria = pedido.codMercPedido 
     where mercadoria.nego = ${codnegotiation}
     group by mercadoria.codMercadoria
     order by sum(mercadoria.precoMercadoria*pedido.quantMercPedido) 
