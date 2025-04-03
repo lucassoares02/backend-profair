@@ -11,20 +11,8 @@ const { v4: uuidv4 } = require('uuid');
 const Notice = {
 
 
-  async getFileTxt23(req, res) {
-    logger.info("Get File TXT");
-    res.download(querys, (err) => {
-      if (err) {
-        console.error("Error downloading file:", err);
-        res.status(500).send("Error downloading file.");
-      } else {
-        console.log("File downloaded successfully.");
-      }
-    });
-  },
 
-
-  async getFileTxt2(req, res) {
+  async getQueryPreEvent(req, res) {
     logger.info("Get Query Pre Event");
 
     const queryConsult = "select CONCAT('UPDATE multishow_b2b.negociacoes_lojas SET id_loja = 322 WHERE id_negociacao = ', codNegoErp, ';') as 'query' from negociacao";
@@ -56,36 +44,15 @@ const Notice = {
   },
 
 
-  async getQueryPreEvent(req, res) {
+  async getQueryPosEvent(req, res) {
     logger.info("Get Query Pre Event");
 
-    const queryConsult = "select CONCAT('UPDATE multishow_b2b.negociacoes_lojas SET id_loja = 322 WHERE id_negociacao = ', codNegoErp, ';') as 'query' from negociacao";
-
+    const queryConsult = "select CONCAT('UPDATE multishow_b2b.negociacoes_lojas SET id_loja = ', nl.id_loja, ' WHERE id_negociacao = ', nl.id_negociacao, ' and id_negociacao_loja = ', nl.id_negociacao_loja, ';') as 'query' from log l join acesso a on a.codAcesso = l.userAgent join consultor c on c.codConsult = a.codUsuario join relaciona r on r.codAssocRelaciona = c.codConsult join negociacao_loja nl on nl.id_loja = r.codConsultRelaciona where l.route like '%getusermore%' and a.direcAcesso = 2";
+    
+    
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {
         console.log("Error Query Pre Event: ", error);
-      } else {
-
-        if (results.length === 0) {
-          return res.status(404).json({ error: "Nenhuma query encontrada" });
-        }
-        // Gerar conteúdo do arquivo
-        const queries = results.map(row => `${row.query}`).join("\n");
-
-        return res.json({"querys": queries});
-      }
-    });
-    // connection.end();
-  },
-
-  async getQueryPosEvent(req, res) {
-    logger.info("Get Pos Event");
-
-    const queryConsult = "select CONCAT('UPDATE multishow_b2b.negociacoes_lojas SET id_loja = ', nl.id_loja, ' WHERE id_negociacao = ', nl.id_negociacao, ' and id_negociacao_loja = ', nl.id_negociacao_loja, ';') as 'query' from log l join acesso a on a.codAcesso = l.userAgent join consultor c on c.codConsult = a.codUsuario join relaciona r on r.codAssocRelaciona = c.codConsult join negociacao_loja nl on nl.id_loja = r.codConsultRelaciona where l.route like '%getusermore%' and a.direcAcesso = 2";
-
-    connection.query(queryConsult, (error, results, fields) => {
-      if (error) {
-        console.log("Error Query Pos Event: ", error);
       } else {
         
         if (results.length === 0) {
@@ -93,8 +60,16 @@ const Notice = {
         }
         // Gerar conteúdo do arquivo
         const queries = results.map(row => `${row.query}`).join("\n");
+        fs.writeFileSync(querys, queries, { encoding: 'utf8', flag: 'w' });
 
-        return res.json({"querys": queries});
+        res.download(querys, (err) => {
+          if (err) {
+            console.error("Error downloading file:", err);
+            res.status(500).send("Error downloading file.");
+          } else {
+            console.log("File downloaded successfully.");
+          }
+        });
       }
     });
     // connection.end();
