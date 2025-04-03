@@ -53,7 +53,7 @@ const Notice = {
           }
 
           // Enviar arquivo para download
-          res.download(tempFilePath, "queries.sql", (err) => {
+          res.download(tempFilePath, (err) => {
             if (err) {
               console.error("Erro no download: ", err);
             }
