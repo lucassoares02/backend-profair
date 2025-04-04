@@ -860,7 +860,7 @@ const Notice = {
       const element = itens[index];
 
       data.push({
-        codAcesso: acessoDire == 3 ? element["senha"].split(10) : generateUniqueIntegerHash(),
+        codAcesso: acessoDire == 3 ? element["senha"].substring(0, 9) : generateUniqueIntegerHash(),
         direcAcesso: acessoDire,
         codUsuario: acessoDire == 3 ? element["id_usuario"] + 999 : element["id_lojista"],
         codOrganization: 158,
