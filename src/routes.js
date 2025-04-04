@@ -171,8 +171,8 @@ router.post("/multishow/negotiation/disabled", Log.InsertLog, Multishow.getNegot
 router.get("/multishow/merchandiserefresh/:product/:negotiation", Log.InsertLog, Multishow.refreshMerchandise);
 router.get("/multishow/getquerypreevent", Log.InsertLog, Multishow.getQueryPreEvent);
 router.get("/multishow/getqueryposevent", Log.InsertLog, Multishow.getQueryPosEvent);
-router.get("/multishow/getqueryposevent/outside", Log.InsertLog, Multishow.getQueryPosEventOutside);
-router.get("/multishow/getquerynegotiationposevent/outside", Log.InsertLog, Multishow.getQueryNegotiationPosEventOutside);
+router.get("/multishow/pre/outside", Log.InsertLog, Multishow.getQueryPreOutside);
+router.get("/multishow/pos/outside", Log.InsertLog, Multishow.getQueryPosOutiside);
 
 router.get("/deleteallinformations", Log.InsertLog, Delete.deleteAll);
 router.delete("/deletecompanytouser/:company/:user/:type", Log.InsertLog, Delete.deleteCompanyToUser);

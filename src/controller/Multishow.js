@@ -44,10 +44,10 @@ const Notice = {
   },
 
 
-  async getQueryNegotiationPosEventOutside(req, res) {
+  async getQueryPreOutside(req, res) {
     logger.info("Get Query Pre Event");
 
-    const queryConsult = "SET sql_mode = ''; select CONCAT('UPDATE multishow_b2b.negociacoes_lojas SET id_loja = 322 WHERE id_negociacao = ', id_negociacao, ';') as 'query' from negociacao_loja where status = 1 group by id_negociacao;";
+    const queryConsult = "select CONCAT('UPDATE multishow_b2b.negociacoes_lojas SET id_loja = 322 WHERE id_negociacao = ', id_negociacao, ';') as 'query' from negociacao_loja where status = 1 group by id_negociacao;";
     
     
     connection.query(queryConsult, (error, results, fields) => {
@@ -107,7 +107,7 @@ const Notice = {
     // connection.end();
   },
 
-  async getQueryPosEventOutside(req, res) {
+  async getQueryPosOutiside(req, res) {
     logger.info("Get Query Pre Event");
 
     // const queryConsult = "SET sql_mode = ''; select CONCAT('UPDATE multishow_b2b.negociacoes_lojas SET id_loja = ', nl.id_loja, ' WHERE id_negociacao = ', nl.id_negociacao, ' and id_negociacao_loja = ', nl.id_negociacao_loja, ';' ) as 'query' from acesso a join consultor c on c.codConsult = a.codUsuario left join log l on l.userAgent = a.codAcesso and l.route like '%getusermore%' join relaciona r on r.codAssocRelaciona = c.codConsult join negociacao_loja nl on nl.id_loja = r.codConsultRelaciona where a.direcAcesso = 2 and nl.status = 1 and l.userAgent IS NULL group by nl.id_loja, nl.id_negociacao";
