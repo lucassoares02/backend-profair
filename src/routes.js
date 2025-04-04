@@ -27,6 +27,7 @@ router.post("/getuserweb", Log.InsertLog, User.getUserWeb);
 router.get("/getallusersorg", Log.InsertLog, User.getAllUsersOrg);
 router.get("/getallusersprovider", Log.InsertLog, User.getAllUsersProvider);
 router.get("/getprovideruser/:code/:type", Log.InsertLog, User.getProviderUser);
+router.get("/getconsultsprovider/:provider", Log.InsertLog, User.getConsultsProvider);
 router.get("/getusersprovidernotinlist", Log.InsertLog, User.getUsersProviderNotInList);
 router.get("/getallusersassociate", Log.InsertLog, User.getAllUsersAssociate);
 

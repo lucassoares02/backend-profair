@@ -360,6 +360,25 @@ const User = {
     // connection.end();
   },
 
+  async getConsultsProvider(req, res) {
+    logger.info("Get Consults Provider");
+
+    const { provider } = req.params;
+
+    const queryConsult = `select * from consultor c
+    join relacionafornecedor rf on rf.codConsultor = c.codConsult
+    where rf.codFornecedor = ${provider}`;
+
+    connection.query(queryConsult, (error, results, fields) => {
+      if (error) {
+        return res.status(400).send(error);
+      } else {
+        return res.json(results);
+      }
+    });
+    // connection.end();
+  },
+
   async getAllUsersProvider(req, res) {
     logger.info("Get All Users Fair");
 
