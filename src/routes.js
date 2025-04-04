@@ -103,11 +103,6 @@ router.get("/ExportNegotiationsPerProvider/:provider", Log.InsertLog, Negotiatio
 
 router.get("/exportproductnegotiationperprovider/:provider", Log.InsertLog, Negotiation.exportProductsPerNegotiationPerProvider);
 
-
-
-
-
-
 router.get("/buyersclient/:codconsultorclient", Log.InsertLog, Buyer.getBuyersClient);
 
 router.get("/buyersprovider/:codprovider", Log.InsertLog, Buyer.getBuyersProvider);

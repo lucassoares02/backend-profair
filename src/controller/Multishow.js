@@ -844,6 +844,8 @@ const Notice = {
 
   insertAccess(itens, acessoDire) {
     console.log("Insert Access");
+
+
     function generateUniqueIntegerHash() {
       const uniqueData = uuidv4() + Date.now();
       const hash = crypto.createHash('sha256').update(uniqueData).digest('hex');
@@ -851,13 +853,14 @@ const Notice = {
       return integerHash;
     }
 
+
     const data = [];
 
     for (let index = 0; index < itens.length; index++) {
       const element = itens[index];
 
       data.push({
-        codAcesso: generateUniqueIntegerHash(),
+        codAcesso: acessoDire == 3 ? element["senha"].split(10) : generateUniqueIntegerHash(),
         direcAcesso: acessoDire,
         codUsuario: acessoDire == 3 ? element["id_usuario"] + 999 : element["id_lojista"],
         codOrganization: 158,
