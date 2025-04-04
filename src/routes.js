@@ -141,6 +141,7 @@ router.get("/exportrequestsprovider/:provider", Log.InsertLog, Request.ExportCli
 router.get("/requestsprovidernegotiation/:codenegotiation", Log.InsertLog, Request.getRequestsNegotiation);
 
 router.get("/requestsnegotiationbyclient/:codebranch", Log.InsertLog, Request.getRequestsClientsWithNegotiation);
+router.get("/requestsnegotiationclientororg/:client/:provider", Log.InsertLog, Request.getRequestsClientsOrOrg);
 
 router.get("/requestsclients/:codconsult", Log.InsertLog, Request.getRequestsClients);
 router.post("/insertrequest", Log.InsertLog, Request.postInsertRequest);

@@ -291,6 +291,78 @@ const Request = {
     // connection.end();
   },
 
+  async getRequestsClientsOrOrg(req, res) {
+    logger.info("Get Negotiation Client Or Org");
+
+    const { client, provider } = req.params;
+
+    console.log("Client: ", client);  
+    console.log("Provider: ", provider);
+
+    var queryConsult = '';
+
+    if (client != null) {
+      queryConsult = `
+      SET sql_mode = ''; select pedido.codPedido , 
+      associado.cnpjAssociado , 
+      associado.codAssociado  as codConsultRelaciona,
+      consultor.nomeConsult, 
+      associado.razaoAssociado, 
+      fornecedor.nomeForn,
+      fornecedor.codForn,
+      negociacao.codNegociacao,
+      negociacao.descNegociacao,
+      sum(pedido.quantMercPedido * mercadoria.precoMercadoria) as 'valor', 
+      TIME_FORMAT(SUBTIME(pedido.dataPedido, '03:00:00'),'%H:%i') as 'horas' 
+      from consultor 
+      join pedido on consultor.codConsult = pedido.codComprPedido 
+      join fornecedor on fornecedor.codForn = pedido.codFornPedido
+      join negociacao on negociacao.codNegociacao = pedido.codNegoPedido
+      join associado on pedido.codAssocPedido = associado.codAssociado 
+      join mercadoria on pedido.codMercPedido = mercadoria.codMercadoria 
+      where pedido.codAssocPedido = ${client} 
+      and pedido.codFornPedido = ${provider}
+      group by pedido.codNegoPedido
+      order by horas 
+      desc
+      `;
+    } else {
+      queryConsult = `
+      SET sql_mode = ''; select pedido.codPedido , 
+      associado.cnpjAssociado , 
+      associado.codAssociado  as codConsultRelaciona,
+      consultor.nomeConsult, 
+      associado.razaoAssociado, 
+      fornecedor.nomeForn,
+      fornecedor.codForn,
+      negociacao.codNegociacao,
+      negociacao.descNegociacao,
+      sum(pedido.quantMercPedido * mercadoria.precoMercadoria) as 'valor', 
+      TIME_FORMAT(SUBTIME(pedido.dataPedido, '03:00:00'),'%H:%i') as 'horas' 
+      from consultor 
+      join pedido on consultor.codConsult = pedido.codComprPedido 
+      join fornecedor on fornecedor.codForn = pedido.codFornPedido
+      join negociacao on negociacao.codNegociacao = pedido.codNegoPedido
+      join associado on pedido.codAssocPedido = associado.codAssociado 
+      join mercadoria on pedido.codMercPedido = mercadoria.codMercadoria 
+      and pedido.codFornPedido = ${provider}
+      group by pedido.codNegoPedido
+      order by horas 
+      desc
+      `;
+    }
+
+
+    connection.query(queryConsult, (error, results, fields) => {
+      if (error) {
+        console.log("Error Select Requests Provider: ", error);
+      } else {
+        return res.json(results[1]);
+      }
+    });
+    // connection.end();
+  },
+
   async getRequestsClientsWithNegotiation(req, res) {
     logger.info("Get Requests Provider");
 
