@@ -731,9 +731,16 @@ const Graphs = {
       from pedido 
       join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido 
       union 
-      select
-      count(associado.codAssociado) as associados
-      from associado
+      SELECT COUNT(*) AS total
+FROM (
+  SELECT asd.codAssociado
+  FROM log l
+  JOIN acesso a ON a.codAcesso = l.userAgent
+  JOIN consultor c ON c.codConsult = a.codUsuario
+  JOIN relaciona r ON r.codAssocRelaciona = c.codConsult
+  JOIN associado asd ON asd.codAssociado = r.codConsultRelaciona
+  GROUP BY asd.codAssociado
+) AS resultado
       union
       select 
       count(fornecedor.codForn) as fornecedores
@@ -741,8 +748,23 @@ const Graphs = {
       union
       select 
       count(mercadoria.codMercadoria) as mercadorias
-      from mercadoria
-    `;
+      from mercadoria;`;
+    // const queryConsult = `SET sql_mode = ''; select
+    //   sum(pedido.quantMercPedido * mercadoria.precoMercadoria) as total
+    //   from pedido 
+    //   join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido 
+    //   union 
+    //   select
+    //   count(associado.codAssociado) as associados
+    //   from associado
+    //   union
+    //   select 
+    //   count(fornecedor.codForn) as fornecedores
+    //   from fornecedor
+    //   union
+    //   select 
+    //   count(mercadoria.codMercadoria) as mercadorias
+    //   from mercadoria;`;
 
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {
