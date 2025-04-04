@@ -447,7 +447,39 @@ const User = {
   async getAllUsersAssociate(req, res) {
     logger.info("Get All Users Fair");
 
-    const queryConsult = `SET sql_mode = ''; SELECT acesso.codAcesso, acesso.direcAcesso, associado.razaoAssociado AS nomeForn, associado.cnpjAssociado AS cnpjForn, acesso.codUsuario, associado.codAssociado AS codForn, consultor.telConsult as 'phone', consultor.emailConsult as 'email', consultor.nomeConsult, consultor.cpfConsult, FORMAT(IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0), 2, 'de_DE') as 'valorPedido' FROM acesso join consultor on acesso.codUsuario = consultor.codConsult join relaciona on relaciona.codAssocRelaciona = consultor.codConsult join associado on associado.codAssociado = relaciona.codConsultRelaciona left join pedido on pedido.codAssocPedido = associado.codAssociado left join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido group by consultor.codConsult`;
+    // const queryConsult = `SET sql_mode = ''; SELECT acesso.codAcesso, acesso.direcAcesso, associado.razaoAssociado AS nomeForn, associado.cnpjAssociado AS cnpjForn, acesso.codUsuario, associado.codAssociado AS codForn, consultor.telConsult as 'phone', consultor.emailConsult as 'email', consultor.nomeConsult, consultor.cpfConsult, FORMAT(IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0), 2, 'de_DE') as 'valorPedido' FROM acesso join consultor on acesso.codUsuario = consultor.codConsult join relaciona on relaciona.codAssocRelaciona = consultor.codConsult join associado on associado.codAssociado = relaciona.codConsultRelaciona left join pedido on pedido.codAssocPedido = associado.codAssociado left join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido group by consultor.codConsult`;
+    const queryConsult = `SET sql_mode = '';
+      SELECT
+        acesso.codAcesso,
+        acesso.direcAcesso,
+        associado.razaoAssociado AS nomeForn,
+        associado.cnpjAssociado AS cnpjForn,
+        acesso.codUsuario,
+        associado.codAssociado AS codForn,
+        consultor.telConsult as 'phone',
+        consultor.emailConsult as 'email',
+        consultor.nomeConsult,
+        consultor.cpfConsult,
+        FORMAT(
+          IFNULL(
+            SUM(mercadoria.precoMercadoria * pedido.quantMercPedido),
+            0
+          ),
+          2,
+          'de_DE'
+        ) AS 'valorPedido',
+        
+        -- 👇 Aqui entra o IF que retorna TRUE se houver log
+        IF(COUNT(log.id) > 0, TRUE, FALSE) AS present
+
+      FROM acesso
+      JOIN consultor ON acesso.codUsuario = consultor.codConsult
+      JOIN relaciona ON relaciona.codAssocRelaciona = consultor.codConsult
+      JOIN associado ON associado.codAssociado = relaciona.codConsultRelaciona
+      LEFT JOIN log ON log.userAgent = acesso.codAcesso
+      LEFT JOIN pedido ON pedido.codAssocPedido = associado.codAssociado
+      LEFT JOIN mercadoria ON mercadoria.codMercadoria = pedido.codMercPedido
+      GROUP BY consultor.codConsult;`;
 
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {
