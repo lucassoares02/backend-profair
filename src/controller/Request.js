@@ -301,7 +301,7 @@ const Request = {
 
     var queryConsult = '';
 
-    if (client != null) {
+    if (client != 0) {
       queryConsult = `
       SET sql_mode = ''; select pedido.codPedido , 
       associado.cnpjAssociado , 
