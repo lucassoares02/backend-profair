@@ -108,7 +108,7 @@ const Client = {
         supplier_id,
         client_id,
         start_at,
-      ) VALUES (${consultant_id}, ${supplier_id}, ${user}, ${startAt});
+      ) VALUES (${consultant_id}, ${supplier_id}, ${user}, "${startAt}");
     `;
 
     console.log(insertNegotiation);
