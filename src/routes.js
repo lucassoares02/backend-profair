@@ -34,7 +34,6 @@ router.get("/getallusersassociate", Log.InsertLog, User.getAllUsersAssociate);
 router.get("/allacesso", Log.InsertLog, Client.allAccess);
 router.get("/allclient", Log.InsertLog, Client.getAllClient);
 router.get("/client/:codacesso", Log.InsertLog, Client.getOneClient);
-router.get("/client/:codacesso/:consultant_id/:supplier_id", Log.InsertLog, Client.getOneClientNew);
 router.get("/clientconsult/:codconsultor", Log.InsertLog, Client.getClientConsult);
 
 router.post("/insertperson", Log.InsertLog, Client.postInsertPerson);
@@ -46,6 +45,7 @@ router.post("/inserrelationprovider", Log.InsertLog, Client.insertRelationProvid
 router.get("/clientmerchandise/:codmercadoria", Log.InsertLog, Client.getClientMerchandise);
 router.get("/clientmerchandisetrading/:codmercadoria/:codnegotiation", Log.InsertLog, Client.getClientMerchandiseTrading);
 router.get("/stores/:codconsultor", Log.InsertLog, Client.getStoreConsultant);
+router.get("/stores/:codacesso/:consultant_id/:supplier_id", Log.InsertLog, Client.getOneClientNew);
 router.get("/storescategory/:codprovider", Log.InsertLog, Client.getStoresCategory);
 router.get("/stores", Log.InsertLog, Client.getAllStores);
 router.get("/storesgraph", Client.getAllStoresGraph);

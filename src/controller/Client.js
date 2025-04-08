@@ -98,7 +98,7 @@ const Client = {
   async getOneClientNew(req, res) {
     logger.info("Get One Clients");
 
-    const { codacesso, consultant_id, supplier_id } = req.params;
+    const { user, consultant_id, supplier_id } = req.params;
 
 
     const startAt = new Date();
@@ -114,28 +114,30 @@ const Client = {
     `;
 
     const queryConsult = `
-      SET sql_mode = '';
-      SELECT acesso.codAcesso,
-             acesso.direcAcesso, 
-             associado.razaoAssociado AS nomeForn,
-             associado.cnpjAssociado AS cnpjForn,
-             acesso.codUsuario, 
-             o.ativo,
-             associado.codAssociado AS codForn,
-             consultor.nomeConsult,
-             consultor.cpfConsult 
-      FROM acesso
-      JOIN consultor ON acesso.codUsuario = consultor.codConsult 
-      JOIN associado ON consultor.codFornConsult = associado.codAssociado 
-      JOIN organizador o ON o.codOrg = acesso.codOrganization
-      WHERE acesso.codAcesso = ?;
-    `;
+    SET sql_mode = ''; select
+    relaciona.codAssocRelaciona as codAssociado,
+    concat(relaciona.codConsultRelaciona, " - ", associado.razaoAssociado) as cnpjAssociado,
+    consultor.nomeConsult, 
+    relaciona.codConsultRelaciona,
+    associado.razaoAssociado,
+    associado.cnpjAssociado as cnpj, 
+    IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido),0) as 'valor',
+    IFNULL(sum(pedido.quantMercPedido), 0) as 'volume'
+    from consultor
+    inner join relaciona on consultor.codConsult = relaciona.codAssocRelaciona
+    inner join associado on associado.codAssociado = relaciona.codConsultRelaciona 
+    left join pedido on pedido.codAssocPedido = relaciona.codConsultRelaciona 
+    left join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido 
+    where relaciona.codAssocRelaciona = ${user}
+    group by relaciona.codConsultRelaciona 
+    order by valor 
+    desc`;
 
     try {
       // Primeiro insere os dados na tabela negotiation_windows
       connection.query(
         insertNegotiation,
-        [consultant_id, supplier_id, codacesso, startAt],
+        [consultant_id, supplier_id, user, startAt],
         (insertErr) => {
           if (insertErr) {
             logger.error("Erro ao inserir negotiation_window:", insertErr);
