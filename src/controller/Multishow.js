@@ -613,7 +613,8 @@ const Notice = {
 
   getRelationClients() {
     console.log("Get Relation Clients");
-    const queryMerchandises = `select * from lojistas_lojas ll join lojas l on l.id_loja = ll.id_loja where ll.ativa = 1`;
+    // const queryMerchandises = `select * from lojistas_lojas ll join lojas l on l.id_loja = ll.id_loja where ll.ativa = 1`;
+    const queryMerchandises = `select * from lojistas_lojas ll join lojas l on l.id_loja = ll.id_loja`;
 
     return new Promise((resolve, reject) => {
       connectionMultishow.query(queryMerchandises, (error, buyers, fields) => {
