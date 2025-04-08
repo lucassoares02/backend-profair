@@ -108,8 +108,10 @@ const Client = {
         supplier_id,
         client_id,
         start_at,
-      ) VALUES (?, ?, ?, ?);
+      ) VALUES (${consultant_id}, ${supplier_id}, ${user}, ${startAt});
     `;
+
+    console.log(insertNegotiation);
 
     const queryConsult = `
     SET sql_mode = ''; select
@@ -131,29 +133,24 @@ const Client = {
     order by valor 
     desc`;
 
-    console.log("INSERT QUERY:", mysql.format(insertNegotiation, insertParams));
-
     try {
       // Primeiro insere os dados na tabela negotiation_windows
-      connection.query(
-        insertNegotiation,
-        [consultant_id, supplier_id, user, startAt],
-        (insertErr) => {
-          if (insertErr) {
-            logger.error("Erro ao inserir negotiation_window:", insertErr);
-            return res.status(500).json({ error: "Erro ao registrar período de negociação" });
+      connection.query(insertNegotiation, (insertErr) => {
+        if (insertErr) {
+          logger.error("Erro ao inserir negotiation_window:", insertErr);
+          return res.status(500).json({ error: "Erro ao registrar período de negociação" });
+        }
+
+        // Depois executa o select normalmente
+        connection.query(queryConsult, [codacesso], (selectErr, results) => {
+          if (selectErr) {
+            logger.error("Erro ao buscar dados do cliente:", selectErr);
+            return res.status(500).json({ error: "Erro ao buscar dados" });
           }
 
-          // Depois executa o select normalmente
-          connection.query(queryConsult, [codacesso], (selectErr, results) => {
-            if (selectErr) {
-              logger.error("Erro ao buscar dados do cliente:", selectErr);
-              return res.status(500).json({ error: "Erro ao buscar dados" });
-            }
-
-            return res.json(results[1]); // ou results[0], dependendo de como o driver do MySQL retorna múltiplas queries
-          });
-        }
+          return res.json(results[1]); // ou results[0], dependendo de como o driver do MySQL retorna múltiplas queries
+        });
+      }
       );
 
     } catch (error) {
