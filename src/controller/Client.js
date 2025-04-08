@@ -100,15 +100,13 @@ const Client = {
 
     const { user, consultant_id, supplier_id } = req.params;
 
-    const startAt = new Date();
-
     const insertNegotiation = `
       INSERT INTO negotiation_windows (
         consultant_id,
         supplier_id,
         client_id,
         start_at,
-      ) VALUES (${consultant_id}, ${supplier_id}, ${user}, "${startAt}");
+      ) VALUES (${consultant_id}, ${supplier_id}, ${user}, NOW());
     `;
 
     console.log(insertNegotiation);
