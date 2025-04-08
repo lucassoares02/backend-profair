@@ -58,6 +58,7 @@ router.get("/valueminutegraphprovider/:codeprovider", Log.InsertLog, Client.getS
 router.get("/valuefair", Log.InsertLog, Client.getValueTotalFair);
 
 router.get("/storesbyprovider/:codprovider", Log.InsertLog, Client.getStoresbyProvider);
+router.get("/storespresentbyprovider/:codprovider", Log.InsertLog, Client.getStoresPresentbyProvider);
 
 router.get("/categoriesconsult/:codconsult", Log.InsertLog, Category.getCategoryConsult);
 

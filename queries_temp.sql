@@ -1,33 +1,21 @@
-SET
-  sql_mode = '';
+SET sql_mode = '';
 
-SELECT
-  acesso.codAcesso,
-  acesso.direcAcesso,
-  associado.razaoAssociado AS nomeForn,
-  associado.cnpjAssociado AS cnpjForn,
-  acesso.codUsuario,
-  associado.codAssociado AS codForn,
-  consultor.telConsult as 'phone',
-  consultor.emailConsult as 'email',
-  consultor.nomeConsult,
-  consultor.cpfConsult,
-  FORMAT(
-    IFNULL(
-      sum(
-        mercadoria.precoMercadoria * pedido.quantMercPedido
-      ),
-      0
-    ),
-    2,
-    'de_DE'
-  ) as 'valorPedido'
-FROM
-  acesso
-  join consultor on acesso.codUsuario = consultor.codConsult
-  join relaciona on relaciona.codAssocRelaciona = consultor.codConsult
-  join associado on associado.codAssociado = relaciona.codConsultRelaciona
-  left join pedido on pedido.codAssocPedido = associado.codAssociado
-  left join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido
-group by
-  consultor.codConsult
+SELECT  
+    a.codAssociado,
+    a.razaoAssociado AS razao,
+    a.cnpjAssociado,
+    SUM(IF(p.codFornPedido = ${codprovider}, p.quantMercPedido * m.precoMercadoria, 0)) AS valorTotal,
+    SUM(IF(p.codFornPedido = ${codprovider}, p.quantMercPedido, 0)) AS volumeTotal
+FROM (
+    -- Lista de associados cujos consultores estavam no log
+    SELECT DISTINCT a.codAssociado, a.razaoAssociado, a.cnpjAssociado
+    FROM log l
+    JOIN acesso ac ON ac.codAcesso = l.userAgent
+    JOIN consultor c ON c.codConsult = ac.codUsuario
+    JOIN relaciona r ON r.codAssocRelaciona = c.codConsult
+    JOIN associado a ON a.codAssociado = r.codConsultRelaciona
+) AS a
+LEFT JOIN pedido p ON p.codAssocPedido = a.codAssociado
+LEFT JOIN mercadoria m ON m.codMercadoria = p.codMercPedido
+GROUP BY a.codAssociado
+ORDER BY valorTotal DESC;
