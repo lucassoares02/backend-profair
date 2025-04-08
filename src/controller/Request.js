@@ -296,7 +296,7 @@ const Request = {
 
     const { client, provider } = req.params;
 
-    console.log("Client: ", client);  
+    console.log("Client: ", client);
     console.log("Provider: ", provider);
 
     var queryConsult = '';
@@ -628,6 +628,28 @@ const Request = {
           error: error.message // Inclui a mensagem de erro
         });
       } else {
+
+
+
+        const insertUpdate = `update negotiation_windows set end_at=now() where supplier_id = ${codFornecedor} and client_id = ${codeConsult}`;
+
+        connection.query(insertUpdate, (error, results, fields) => {
+          if (error) {
+            error.logger(error);
+            return res.status(400).json({
+              response: 400,
+              message: "Failed to insert data",
+              error: error.message // Inclui a mensagem de erro
+            });
+          } else {
+            logger.info("Update negotiation_windows", results);
+            return res.status(200).json({
+              response: 200,
+              message: "Data inserted successfully"
+            });
+          }
+        });
+
         return res.status(200).json({
           response: 200,
           message: "Data inserted successfully"
