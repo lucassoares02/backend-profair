@@ -631,7 +631,7 @@ const Request = {
 
 
 
-        const insertUpdate = `update negotiation_windows set end_at=now() where supplier_id = ${codFornecedor} and client_id = ${codeConsult}`;
+        const insertUpdate = `update negotiation_windows set end_at=now() where supplier_id = ${codFornecedor} and client_id = ${codComprador}`;
 
         connection.query(insertUpdate, (error, results, fields) => {
           if (error) {
