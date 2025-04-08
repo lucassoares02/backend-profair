@@ -99,10 +99,8 @@ const Client = {
     logger.info("Get One Clients");
 
     const { user, consultant_id, supplier_id } = req.params;
-
-
+    
     const startAt = new Date();
-    endAt.setDate(startAt.getDate() + 4); // negociação válida por 4 dias, por exemplo
 
     const insertNegotiation = `
       INSERT INTO negotiation_windows (
