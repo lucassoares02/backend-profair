@@ -105,7 +105,7 @@ const Client = {
         consultant_id,
         supplier_id,
         client_id,
-        start_at,
+        start_at
       ) VALUES (${consultant_id}, ${supplier_id}, ${user}, NOW());
     `;
 
