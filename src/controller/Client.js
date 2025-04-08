@@ -140,7 +140,7 @@ const Client = {
         }
 
         // Depois executa o select normalmente
-        connection.query(queryConsult, [codacesso], (selectErr, results) => {
+        connection.query(queryConsult, (selectErr, results) => {
           if (selectErr) {
             logger.error("Erro ao buscar dados do cliente:", selectErr);
             return res.status(500).json({ error: "Erro ao buscar dados" });
