@@ -34,6 +34,7 @@ router.get("/getallusersassociate", Log.InsertLog, User.getAllUsersAssociate);
 router.get("/allacesso", Log.InsertLog, Client.allAccess);
 router.get("/allclient", Log.InsertLog, Client.getAllClient);
 router.get("/client/:codacesso", Log.InsertLog, Client.getOneClient);
+router.get("/client/:codacesso/:consultant_id/:supplier_id", Log.InsertLog, Client.getOneClientNew);
 router.get("/clientconsult/:codconsultor", Log.InsertLog, Client.getClientConsult);
 
 router.post("/insertperson", Log.InsertLog, Client.postInsertPerson);

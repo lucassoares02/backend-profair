@@ -62,7 +62,7 @@ const Client = {
   async getOneClient(req, res) {
     logger.info("Get One Clients");
 
-    const { codacesso } = req.params;
+    const { codacesso, consultant_id, supplier_id, client_id, associate_id } = req.params;
 
     const queryConsult =
       `SET sql_mode = ''; select acesso.codAcesso,
@@ -86,25 +86,80 @@ const Client = {
           logger.error("Error Select Client: ", error);
         } else {
           return res.json(results[1]);
-          // try {
-          //   if (results[1][0]["ativo"] == 0) {
-          //     return res.json({ "message": "Período de negociações ainda não está ativo" });
-          //   } else {
-          //     return res.json(results[1]);
-          //   }
-          // } catch (error) {
-          //   logger.error(`Error Ativo User: ${error}`)
-          //   return res.json({ "message": "Problemas ao selecionar o ativo" });
-          // }
         }
       });
 
     } catch (error) {
       logger.error(`Error Select Client: ${error}`)
     }
-
-    // connection.end();
   },
+
+
+  async getOneClientNew(req, res) {
+    logger.info("Get One Clients");
+
+    const { codacesso, consultant_id, supplier_id } = req.params;
+
+
+    const startAt = new Date();
+    endAt.setDate(startAt.getDate() + 4); // negociação válida por 4 dias, por exemplo
+
+    const insertNegotiation = `
+      INSERT INTO negotiation_windows (
+        consultant_id,
+        supplier_id,
+        client_id,
+        start_at,
+      ) VALUES (?, ?, ?, ?);
+    `;
+
+    const queryConsult = `
+      SET sql_mode = '';
+      SELECT acesso.codAcesso,
+             acesso.direcAcesso, 
+             associado.razaoAssociado AS nomeForn,
+             associado.cnpjAssociado AS cnpjForn,
+             acesso.codUsuario, 
+             o.ativo,
+             associado.codAssociado AS codForn,
+             consultor.nomeConsult,
+             consultor.cpfConsult 
+      FROM acesso
+      JOIN consultor ON acesso.codUsuario = consultor.codConsult 
+      JOIN associado ON consultor.codFornConsult = associado.codAssociado 
+      JOIN organizador o ON o.codOrg = acesso.codOrganization
+      WHERE acesso.codAcesso = ?;
+    `;
+
+    try {
+      // Primeiro insere os dados na tabela negotiation_windows
+      connection.query(
+        insertNegotiation,
+        [consultant_id, supplier_id, codacesso, startAt],
+        (insertErr) => {
+          if (insertErr) {
+            logger.error("Erro ao inserir negotiation_window:", insertErr);
+            return res.status(500).json({ error: "Erro ao registrar período de negociação" });
+          }
+
+          // Depois executa o select normalmente
+          connection.query(queryConsult, [codacesso], (selectErr, results) => {
+            if (selectErr) {
+              logger.error("Erro ao buscar dados do cliente:", selectErr);
+              return res.status(500).json({ error: "Erro ao buscar dados" });
+            }
+
+            return res.json(results[1]); // ou results[0], dependendo de como o driver do MySQL retorna múltiplas queries
+          });
+        }
+      );
+
+    } catch (error) {
+      logger.error(`Erro inesperado: ${error}`);
+      return res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  },
+
 
   async getClientConsult(req, res) {
     logger.info("Get Clients to Consult");
