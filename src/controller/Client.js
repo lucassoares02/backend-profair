@@ -99,7 +99,7 @@ const Client = {
     logger.info("Get One Clients");
 
     const { user, consultant_id, supplier_id } = req.params;
-    
+
     const startAt = new Date();
 
     const insertNegotiation = `
@@ -130,6 +130,8 @@ const Client = {
     group by relaciona.codConsultRelaciona 
     order by valor 
     desc`;
+
+    console.log("INSERT QUERY:", mysql.format(insertNegotiation, insertParams));
 
     try {
       // Primeiro insere os dados na tabela negotiation_windows
