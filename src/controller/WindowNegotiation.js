@@ -18,7 +18,7 @@ const WindowNegotiation = {
         console.log("Error Get WindowNegotiation: ", error);
         return res.status(400).send(`message: ${error}`);
       } else {
-        return res.json({ "message": "Get success!" });
+        return res.json(results[0]);
       }
     });
 
