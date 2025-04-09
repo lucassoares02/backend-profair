@@ -15,6 +15,7 @@ const Delete = require("@controller/Delete");
 const Faceline = require("@controller/Faceline");
 const Wedding = require("@controller/Wedding");
 const Log = require("@controller/Log");
+const WindowNegotiation = require("@controller/WindowNegotiation");
 
 router.post("/faceline-user", Log.InsertLog, Faceline.insert);
 router.post("/faceline-user-update", Log.InsertLog, Faceline.update);
@@ -183,5 +184,6 @@ router.get("/wedding/confirm", Log.InsertLog, Wedding.confirm);
 router.get("/wedding/desconfirm", Log.InsertLog, Wedding.disconfirm);
 router.get("/wedding/getallguests", Log.InsertLog, Wedding.getAllGuests);
 
+router.get("/getwindownegotiations/:client", Log.InsertLog, WindowNegotiation.getWindowNegotiation);
 
 module.exports = router;
