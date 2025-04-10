@@ -40,6 +40,24 @@ const Client = {
     // connection.end();
   },
 
+  async checkCodeUser(req, res) {
+    logger.info("Get Check Code User");
+
+    const { code } = req.params;
+
+    const queryConsult =
+      `SELECT EXISTS (SELECT 1 FROM acesso WHERE codAcesso = ${code}) AS exist;`;
+
+    connection.query(queryConsult, (error, results, fields) => {
+      if (error) {
+        console.log("Error Select Users: ", error);
+      } else {
+        return res.json(results[1]);
+      }
+    });
+    // connection.end();
+  },
+
   async getAllClient(req, res) {
     logger.info("Get All Clients");
 

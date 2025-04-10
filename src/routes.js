@@ -37,6 +37,7 @@ router.get("/allclient", Log.InsertLog, Client.getAllClient);
 router.get("/client/:codacesso", Log.InsertLog, Client.getOneClient);
 router.get("/clientconsult/:codconsultor", Log.InsertLog, Client.getClientConsult);
 
+router.get("/checkcodeuser/:code", Log.InsertLog, Client.checkCodeUser);
 router.post("/insertperson", Log.InsertLog, Client.postInsertPerson);
 router.post("/insertuser", Log.InsertLog, Client.postInsertUser);
 router.post("/updateperson", Log.InsertLog, Client.updatePerson);
