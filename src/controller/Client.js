@@ -52,7 +52,7 @@ const Client = {
       if (error) {
         console.log("Error Select Users: ", error);
       } else {
-        return res.json(results[1]);
+        return res.json(results);
       }
     });
     // connection.end();
