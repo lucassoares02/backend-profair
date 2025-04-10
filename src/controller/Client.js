@@ -557,7 +557,7 @@ ORDER BY valorTotal DESC;`;
     //=============================================================
 
     if (result) {
-      await Client.insertRelationProvider(cod, empresa, type);
+      await Client.insertRelationUsersProvider(cod, empresa, type);
       return res.json({ "message": "saved" });
     } else {
       return res.status(400).send(`message: Nothing Result!`);
@@ -805,6 +805,46 @@ ORDER BY valorTotal DESC;`;
     // connection.end();
   },
 
+
+  insertRelationUsersProvider(cod, empresa, type) {
+    console.log("Insert Relation Provider");
+
+    console.log("\n---------------------------------------------------");
+    console.log(cod);
+    console.log("---------------------------------------------------\n");
+
+    let dataConsultor = [];
+
+    dataConsultor.push({
+      codConsultor: cod,
+      codFornecedor: empresa,
+    })
+
+
+
+    let params = {
+      table: "relacionafornecedor",
+      data: dataConsultor,
+    };
+
+    console.log(params)
+
+
+    try {
+      return new Promise((resolve, reject) => {
+        return Insert(params)
+          .then(async (resp) => {
+            resolve(resp);
+          })
+          .catch((error) => {
+            res.status(400).send(error);
+          });
+      });
+    } catch (error) {
+      console.log(`Error Insert Negotiation: ${error}`)
+    }
+
+  },
 
   insertRelationProvider(cod, empresas, type) {
     console.log("Insert Relation Provider");
