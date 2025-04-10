@@ -581,84 +581,115 @@ const Request = {
   },
 
 
-
   async postInserRequestNew(req, res) {
     logger.info("POST INSERT REQUEST NEW");
 
     const { codAssociado, codFornecedor, codComprador, codNegociacao, codOrganizacao, items, codeConsult } = req.body;
 
-    // try {
-    //   if (process.env.INDEX_API == 0) {
-    //     axios.post(`${process.env.API_BACKUP}/insertrequestnew`, {
-    //       "codAssociado": codAssociado,
-    //       "codFornecedor": codFornecedor,
-    //       "codComprador": codComprador,
-    //       "codNegociacao": codNegociacao,
-    //       "codeConsult": codeConsult,
-    //       "codOrganizacao": codOrganizacao,
-    //       "items": items
-    //     });
-    //   }
-    // } catch (error) {
-    //   logger.error(`Error Backup Save: ${error}`);
-    // }
-
-    let values = "";
-
-    for (let i = 0; i < items.length; i++) {
-      values =
-        values +
-        `(${items[i]["codMercadoria"]}, ${codNegociacao}, ${codAssociado},  ${codFornecedor}, ${codeConsult}, ${codComprador}, ${items[i]["quantMercadoria"]}, ${codOrganizacao})`;
-      values = values + (i == items.length - 1 ? " " : ",");
-    }
-
-    logger.info("4");
+    let values = items.map(item =>
+      `(${item["codMercadoria"]}, ${codNegociacao}, ${codAssociado}, ${codFornecedor}, ${codeConsult}, ${codComprador}, ${item["quantMercadoria"]}, ${codOrganizacao})`
+    ).join(',');
 
     const queryConsult =
-      "INSERT INTO pedido (codMercPedido, codNegoPedido, codAssocPedido, codFornPedido, codConsultPedido, codComprPedido, quantMercPedido, codOrganizador) VALUES" +
-      values +
-      "ON DUPLICATE KEY UPDATE quantMercPedido = VALUES(quantMercPedido); SHOW WARNINGS";
+      `INSERT INTO pedido (codMercPedido, codNegoPedido, codAssocPedido, codFornPedido, codConsultPedido, codComprPedido, quantMercPedido, codOrganizador) VALUES ${values}
+       ON DUPLICATE KEY UPDATE quantMercPedido = VALUES(quantMercPedido)`;
 
-    connection.query(queryConsult, (error, results, fields) => {
+    connection.query(queryConsult, (error, results) => {
       if (error) {
-        error.logger(error);
+        logger.error(error);
         return res.status(400).json({
           response: 400,
           message: "Failed to insert data",
-          error: error.message // Inclui a mensagem de erro
+          error: error.message
         });
-      } else {
+      }
 
+      const insertUpdate = `UPDATE negotiation_windows SET end_at = NOW() WHERE supplier_id = ${codFornecedor} AND client_id = ${codComprador}`;
 
+      connection.query(insertUpdate, (error, results) => {
+        if (error) {
+          logger.error(error);
+          return res.status(400).json({
+            response: 400,
+            message: "Failed to update negotiation_windows",
+            error: error.message
+          });
+        }
 
-        const insertUpdate = `update negotiation_windows set end_at=now() where supplier_id = ${codFornecedor} and client_id = ${codComprador}`;
-
-        connection.query(insertUpdate, (error, results, fields) => {
-          if (error) {
-            error.logger(error);
-            return res.status(400).json({
-              response: 400,
-              message: "Failed to insert data",
-              error: error.message // Inclui a mensagem de erro
-            });
-          } else {
-            logger.info("Update negotiation_windows", results);
-            return res.status(200).json({
-              response: 200,
-              message: "Data inserted successfully"
-            });
-          }
-        });
+        logger.info("Update negotiation_windows", results);
 
         return res.status(200).json({
           response: 200,
-          message: "Data inserted successfully"
+          message: "Data inserted and negotiation window updated successfully"
         });
-      }
+      });
     });
-    return 0;
-    // connection.end();
-  },
+  }
+
+
+  // async postInserRequestNew(req, res) {
+  //   logger.info("POST INSERT REQUEST NEW");
+
+  //   const { codAssociado, codFornecedor, codComprador, codNegociacao, codOrganizacao, items, codeConsult } = req.body;
+
+  //   let values = "";
+
+  //   for (let i = 0; i < items.length; i++) {
+  //     values =
+  //       values +
+  //       `(${items[i]["codMercadoria"]}, ${codNegociacao}, ${codAssociado},  ${codFornecedor}, ${codeConsult}, ${codComprador}, ${items[i]["quantMercadoria"]}, ${codOrganizacao})`;
+  //     values = values + (i == items.length - 1 ? " " : ",");
+  //   }
+
+  //   logger.info("4");
+
+  //   const queryConsult =
+  //     "INSERT INTO pedido (codMercPedido, codNegoPedido, codAssocPedido, codFornPedido, codConsultPedido, codComprPedido, quantMercPedido, codOrganizador) VALUES" +
+  //     values +
+  //     "ON DUPLICATE KEY UPDATE quantMercPedido = VALUES(quantMercPedido); SHOW WARNINGS";
+
+  //   connection.query(queryConsult, (error, results, fields) => {
+  //     if (error) {
+  //       error.logger(error);
+  //       return res.status(400).json({
+  //         response: 400,
+  //         message: "Failed to insert data",
+  //         error: error.message // Inclui a mensagem de erro
+  //       });
+  //     } else {
+
+
+
+  //       const insertUpdate = `update negotiation_windows set end_at=now() where supplier_id = ${codFornecedor} and client_id = ${codComprador}`;
+
+  //       connection.query(insertUpdate, (error, resultsss, fields) => {
+  //         if (error) {
+  //           error.logger(error);
+  //           return res.status(400).json({
+  //             response: 400,
+  //             message: "Failed to insert data",
+  //             error: error.message // Inclui a mensagem de erro
+  //           });
+  //         } else {
+  //           logger.info("Update negotiation_windows", results);
+
+  //           return res.status(200).json({
+  //             response: 200,
+  //             message: "Data inserted successfully"
+  //           });
+
+  //         }
+  //       });
+
+  //       return res.status(200).json({
+  //         response: 200,
+  //         message: "Data inserted successfully"
+  //       });
+  //     }
+  //   });
+  //   return 0;
+  //   // connection.end();
+  // },
 
 
 };
