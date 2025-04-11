@@ -346,7 +346,7 @@ const Request = {
       join associado on pedido.codAssocPedido = associado.codAssociado 
       join mercadoria on pedido.codMercPedido = mercadoria.codMercadoria 
       and pedido.codFornPedido = ${provider}
-      group by pedido.codNegoPedido
+      group by pedido.codNegoPedido, pedido.codAssocPedido
       order by horas 
       desc
       `;
