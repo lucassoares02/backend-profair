@@ -71,6 +71,7 @@ router.get("/schedule", Log.InsertLog, Notice.getAllSchedule);
 router.get("/providerclient/:codconsultor", Log.InsertLog, Provider.getProviderClient);
 
 router.get("/suppliersinvoicing", Log.InsertLog, Provider.getProviderSells);
+router.post("/updatedetailsprovider", Log.InsertLog, Provider.updateProviderImageAndColor);
 router.get("/companies/:type", Log.InsertLog, Provider.getCompanies);
 router.get("/providerscategories/:codbuyer", Log.InsertLog, Provider.getProvidersCategories);
 router.get("/providersconsult/:codconsultclient", Log.InsertLog, Provider.getProvidersClient);

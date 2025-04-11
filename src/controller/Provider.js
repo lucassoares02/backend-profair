@@ -179,6 +179,36 @@ const Provider = {
     // connection.end();
   },
 
+
+  async updateProviderImageAndColor(req, res) {
+    logger.info("Update Image and Color Provider");
+
+    const providerDetails = req.body; // deve ser um array [{id: 1, color: 'red', image: 'url'}, ...]
+
+    if (!Array.isArray(providerDetails)) {
+      return res.status(400).json({ error: "Invalid data format" });
+    }
+
+    const promises = providerDetails.map((provider) => {
+      return new Promise((resolve, reject) => {
+        const query = "UPDATE fornecedor SET color = ?, image = ? WHERE codForn = ?";
+        const values = [provider.color, provider.image, provider.id];
+
+        connection.query(query, values, (error, results) => {
+          if (error) return reject(error);
+          resolve(results);
+        });
+      });
+    });
+
+    try {
+      const results = await Promise.all(promises);
+      res.json({ success: true, results });
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+  },
+
   async getProviderDetails(req, res) {
     logger.info("Get Provider Consult");
 
@@ -254,7 +284,7 @@ const Provider = {
         codConsultRelaciona: company,
       });
     }
-   
+
 
     let params = {
       table: type == 1 ? "relacionafornecedor" : "relaciona",
