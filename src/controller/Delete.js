@@ -6,6 +6,7 @@ const Delete = {
     logger.info("Get Deletes All Informations");
 
     const queryKill = `
+    delete from acesso;
     delete from consultor;
     delete from negociacao;
     delete from mercadoria;
@@ -14,13 +15,13 @@ const Delete = {
     delete from comprador;
     delete from negociacao_loja;
     delete from relaciona;
+    delete from relacionafornecedor;
     delete from categoria;
     delete from log;
     delete from organizador;
-    delete from acesso;
-    delete from relacionafornecedor;
     delete from notices;
     delete from pedido;
+    delete from negotiation_windows;
     `;
 
     connection.query(queryKill, (error, results, fields) => {
