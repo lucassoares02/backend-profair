@@ -985,14 +985,14 @@ const Notice = {
       },
       {
         codNotice: 4,
-        title: "3º Feira de negócios - 2024",
-        description: "Apresentação das funcionalidades do Profair para os fornecedores.",
+        title: "Adega Show - 2025",
+        description: "Uma oportunidade única com condições exclusivas, para conhecer lançamentos e fortalecer parcerias estratégicas",
         image: "",
         action: "",
         priority: 0,
-        primaryColor: "0XFF0000ff",
-        secondaryColor: "0XFFff0000",
-        stamp: "12/07/2024",
+        primaryColor: "0XFFE21E26",
+        secondaryColor: "0XFFB01F24",
+        stamp: "12/04/2025",
         type: 0
       }
     ];
