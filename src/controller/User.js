@@ -60,24 +60,69 @@ const User = {
           } else if (resultsTop[0].direcAcesso == 2) {
             const queryClient = `
               SET sql_mode = ''; 
-              SELECT acesso.codAcesso,
-              acesso.direcAcesso,
-              associado.razaoAssociado AS nomeForn,
-              associado.cnpjAssociado AS cnpjForn,
-              acesso.codUsuario, 
-              associado.codAssociado AS codForn,
-              consultor.nomeConsult, consultor.cpfConsult, 
-              FORMAT(IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0), 2, 'de_DE') as valorPedido 
-              FROM acesso
-              join consultor on acesso.codUsuario = consultor.codConsult 
-              join relaciona on relaciona.codAssocRelaciona = consultor.codConsult
-              join associado on associado.codAssociado = relaciona.codConsultRelaciona
-              left join pedido on pedido.codAssocPedido = associado.codAssociado 
-              left join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido
-              WHERE acesso.codAcesso = '${codacesso}'
-              group by associado.codAssociado
-              order by valorPedido desc;
+
+              SELECT 
+                  dados.codAcesso,
+                  dados.direcAcesso,
+                  IF(dados.total_associados > 1,
+                      CONCAT(dados.codAssociado, ' - ', dados.razaoAssociado),
+                      dados.razaoAssociado
+                  ) AS nomeForn,
+                  dados.cnpjAssociado AS cnpjForn,
+                  dados.codUsuario, 
+                  dados.codAssociado AS codForn,
+                  dados.nomeConsult,
+                  dados.cpfConsult,
+                  FORMAT(IFNULL(SUM(dados.precoMercadoria * dados.quantMercPedido), 0), 2, 'de_DE') as valorPedido 
+              FROM (
+                  SELECT 
+                      acesso.codAcesso,
+                      acesso.direcAcesso,
+                      associado.codAssociado,
+                      associado.razaoAssociado,
+                      associado.cnpjAssociado,
+                      acesso.codUsuario,
+                      consultor.nomeConsult,
+                      consultor.cpfConsult,
+                      mercadoria.precoMercadoria,
+                      pedido.quantMercPedido,
+                      (SELECT COUNT(DISTINCT a.codAssociado)
+                      FROM acesso ac
+                      JOIN consultor c ON ac.codUsuario = c.codConsult
+                      JOIN relaciona r ON r.codAssocRelaciona = c.codConsult
+                      JOIN associado a ON a.codAssociado = r.codConsultRelaciona
+                      WHERE ac.codAcesso = '${codacesso}') AS total_associados
+                  FROM acesso
+                  JOIN consultor ON acesso.codUsuario = consultor.codConsult 
+                  JOIN relaciona ON relaciona.codAssocRelaciona = consultor.codConsult
+                  JOIN associado ON associado.codAssociado = relaciona.codConsultRelaciona
+                  LEFT JOIN pedido ON pedido.codAssocPedido = associado.codAssociado 
+                  LEFT JOIN mercadoria ON mercadoria.codMercadoria = pedido.codMercPedido
+                  WHERE acesso.codAcesso = '${codacesso}'
+              ) AS dados
+              GROUP BY dados.codAssociado
+              ORDER BY valorPedido DESC;
             `;
+            // const queryClient = `
+            //   SET sql_mode = ''; 
+            //   SELECT acesso.codAcesso,
+            //   acesso.direcAcesso,
+            //   associado.razaoAssociado AS nomeForn,
+            //   associado.cnpjAssociado AS cnpjForn,
+            //   acesso.codUsuario, 
+            //   associado.codAssociado AS codForn,
+            //   consultor.nomeConsult, consultor.cpfConsult, 
+            //   FORMAT(IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0), 2, 'de_DE') as valorPedido 
+            //   FROM acesso
+            //   join consultor on acesso.codUsuario = consultor.codConsult 
+            //   join relaciona on relaciona.codAssocRelaciona = consultor.codConsult
+            //   join associado on associado.codAssociado = relaciona.codConsultRelaciona
+            //   left join pedido on pedido.codAssocPedido = associado.codAssociado 
+            //   left join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido
+            //   WHERE acesso.codAcesso = '${codacesso}'
+            //   group by associado.codAssociado
+            //   order by valorPedido desc;
+            // `;
 
             // `SET sql_mode = ''; SELECT acesso.codAcesso, acesso.direcAcesso, associado.razaoAssociado AS nomeForn, associado.cnpjAssociado AS cnpjForn, acesso.codUsuario, associado.codAssociado AS codForn, consultor.nomeConsult, consultor.cpfConsult, FORMAT(IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0), 2, 'de_DE') as valorPedido FROM acesso join consultor on acesso.codUsuario = consultor.codConsult join relaciona on relaciona.codAssocRelaciona = consultor.codConsult join associado on associado.codAssociado = relaciona.codConsultRelaciona left join pedido on pedido.codAssocPedido = associado.codAssociado left join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido WHERE acesso.codAcesso = '${codacesso}'`;
 
