@@ -395,7 +395,7 @@ const User = {
     where organizador.codOrg = 158 
     group by consultor.codConsult`;
 
-    connection.query(queryConsult, (error, results, fields) => {
+    connection.query({sql: queryConsult, timeout: 15000}, (error, results, fields) => {
       if (error) {
         return res.status(400).send(error);
       } else {
@@ -429,7 +429,7 @@ const User = {
 
     const queryConsult = `SET sql_mode = ''; select acesso.codAcesso, acesso.direcAcesso, fornecedor.nomeForn, fornecedor.cnpjForn, acesso.codUsuario, fornecedor.codForn, consultor.nomeConsult, consultor.telConsult as 'phone', consultor.emailConsult as 'email', consultor.cpfConsult from acesso join consultor on acesso.codUsuario = consultor.codConsult join relacionafornecedor on consultor.codConsult = relacionafornecedor.codConsultor	join fornecedor on relacionafornecedor.codFornecedor = fornecedor.codForn left join pedido on pedido.codFornPedido = fornecedor.codForn left join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido group by consultor.codConsult`;
 
-    connection.query(queryConsult, (error, results, fields) => {
+    connection.query({sql: queryConsult, timeout: 15000}, (error, results, fields) => {
       if (error) {
         return res.status(400).send(error);
       } else {
@@ -545,7 +545,7 @@ const User = {
       LEFT JOIN mercadoria ON mercadoria.codMercadoria = pedido.codMercPedido
       GROUP BY consultor.codConsult;`;
 
-    connection.query(queryConsult, (error, results, fields) => {
+    connection.query({sql: queryConsult, timeout: 15000}, (error, results, fields) => {
       if (error) {
         return res.status(400).send(error);
       } else {
