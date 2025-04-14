@@ -99,6 +99,7 @@ const Request = {
       n.descNegociacao,
       n.observacao,
       n.prazo,
+      n.codNegoErp,
       IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0) as 'valorTotal', 
       IFNULL(sum(pedido.quantMercPedido), 0) as 'volumeTotal'
       from fornecedor 
@@ -119,6 +120,7 @@ const Request = {
     });
     // connection.end();
   },
+  
   async getRequestNegotiationsPerProvider(req, res) {
     logger.info("Get Top Providers per Client");
 
