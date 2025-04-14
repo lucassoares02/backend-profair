@@ -421,7 +421,7 @@ const Negotiation = {
 
             csvData += results[1]
               .map((row) => {
-                return ` ${row.codMercPedido};${row.codNegoPedido};"${row.erpcode}";"${row.barcode}";"${row.nomeMercadoria}";"${row.complemento}";;;;;;;;;;;"${row.marca}";;${row.quantidade}`; // Substitua com os nomes das colunas do seu banco de dados
+                return ` ${row.codMercPedido};${row.nego};"${row.erpcode}";"${row.barcode}";"${row.nomeMercadoria}";"${row.complemento}";;;;;;;;;;;"${row.marca}";;${row.quantidade}`; // Substitua com os nomes das colunas do seu banco de dados
               })
               .join("\n");
 
@@ -430,7 +430,7 @@ const Negotiation = {
             // Configurar os cabeçalhos de resposta para fazer o download
             res.setHeader(
               "Content-Disposition",
-              `attachment; filename=negociacao${codenegotiation}_${results[1][0].cliente.replaceAll(" ", "_").toLowerCase()}_${results[1][0].fornecedor.replaceAll(" ", "_").toLowerCase()}.csv`
+              `attachment; filename=negociacao${results[1][0].codNegoPedido}_${results[1][0].cliente.replaceAll(" ", "_").toLowerCase()}_${results[1][0].fornecedor.replaceAll(" ", "_").toLowerCase()}.csv`
             );
             res.setHeader("Content-Type", "text/csv");
 
