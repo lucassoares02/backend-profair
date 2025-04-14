@@ -44,6 +44,37 @@ const Notice = {
   },
 
 
+  async getQueryPreInside(req, res) {
+    logger.info("Get Query Pre Event");
+
+    const queryConsult = "select CONCAT('UPDATE multishow_b2b.negociacoes_lojas SET id_loja = 322 WHERE id_negociacao = ', id_negociacao, ';') as 'query' from negociacao_loja where status = 2 group by id_negociacao;";
+    
+    
+    connection.query(queryConsult, (error, results, fields) => {
+      if (error) {
+        console.log("Error Query Pre Event: ", error);
+      } else {
+        
+        if (results.length === 0) {
+          return res.status(404).json({ error: "Nenhuma query encontrada" });
+        }
+        // Gerar conteúdo do arquivo
+        const queries = results.map(row => `${row.query}`).join("\n");
+        fs.writeFileSync(querys, queries, { encoding: 'utf8', flag: 'w' });
+
+        res.download(querys, (err) => {
+          if (err) {
+            console.error("Error downloading file:", err);
+            res.status(500).send("Error downloading file.");
+          } else {
+            console.log("File downloaded successfully.");
+          }
+        });
+      }
+    });
+    // connection.end();
+  },
+
   async getQueryPreOutside(req, res) {
     logger.info("Get Query Pre Event");
 
@@ -82,6 +113,39 @@ const Notice = {
     // const queryConsult = "SET sql_mode = ''; select CONCAT('UPDATE multishow_b2b.negociacoes_lojas SET id_loja = ', nl.id_loja, ' WHERE id_negociacao = ', nl.id_negociacao, ' and id_negociacao_loja = ', nl.id_negociacao_loja, ';') as 'query' from log l join acesso a on a.codAcesso = l.userAgent join consultor c on c.codConsult = a.codUsuario join relaciona r on r.codAssocRelaciona = c.codConsult join negociacao_loja nl on nl.id_loja = r.codConsultRelaciona where l.route like '%getusermore%' and a.direcAcesso = 2 and nl.status = 0 group by nl.id_loja, nl.id_negociacao";
     const queryConsult = "SET sql_mode = ''; select CONCAT( 'UPDATE multishow_b2b.negociacoes_lojas SET id_loja = ', nl.id_loja, ' WHERE id_negociacao = ', nl.id_negociacao, ' and id_negociacao_loja = ', nl.id_negociacao_loja, ';' ) as 'query' from log l join acesso a on a.codAcesso = l.userAgent join consultor c on c.codConsult = a.codUsuario join relaciona r on r.codAssocRelaciona = c.codConsult join associado aa on aa.codAssociado = r.codConsultRelaciona join negociacao_loja nl on nl.id_loja = aa.idLoja where l.route like '%getusermore%' and a.direcAcesso = 2 and nl.status = 0 group by nl.id_loja, nl.id_negociacao;";
 
+    connection.query(queryConsult, (error, results, fields) => {
+      if (error) {
+        console.log("Error Query Pre Event: ", error);
+      } else {
+        
+        if (results.length === 0) {
+          return res.status(404).json({ error: "Nenhuma query encontrada" });
+        }
+        // Gerar conteúdo do arquivo
+        const queries = results[1].map(row => `${row.query}`).join("\n");
+        fs.writeFileSync(querys, queries, { encoding: 'utf8', flag: 'w' });
+
+        res.download(querys, (err) => {
+          if (err) {
+            console.error("Error downloading file:", err);
+            res.status(500).send("Error downloading file.");
+          } else {
+            console.log("File downloaded successfully.");
+          }
+        });
+      }
+    });
+    // connection.end();
+  },
+
+  async getQueryPosInside(req, res) {
+    logger.info("Get Query Pre Event");
+
+    // const queryConsult = "SET sql_mode = ''; select CONCAT('UPDATE multishow_b2b.negociacoes_lojas SET id_loja = ', nl.id_loja, ' WHERE id_negociacao = ', nl.id_negociacao, ' and id_negociacao_loja = ', nl.id_negociacao_loja, ';' ) as 'query' from acesso a join consultor c on c.codConsult = a.codUsuario left join log l on l.userAgent = a.codAcesso and l.route like '%getusermore%' join relaciona r on r.codAssocRelaciona = c.codConsult join negociacao_loja nl on nl.id_loja = r.codConsultRelaciona where a.direcAcesso = 2 and nl.status = 1 and l.userAgent IS NULL group by nl.id_loja, nl.id_negociacao";
+    // const queryConsult = "SET sql_mode = ''; select CONCAT( 'UPDATE multishow_b2b.negociacoes_lojas SET id_loja = ', nl.id_loja, ' WHERE id_negociacao = ', nl.id_negociacao, ' and id_negociacao_loja = ', nl.id_negociacao_loja, ';' ) as 'query' from acesso a join consultor c on c.codConsult = a.codUsuario left join log l on l.userAgent = a.codAcesso and l.route like '%getusermore%' join relaciona r on r.codAssocRelaciona = c.codConsult join associado aa on aa.codAssociado = r.codConsultRelaciona join negociacao_loja nl on nl.id_loja = aa.idLoja where a.direcAcesso = 2 and nl.status = 1 and l.userAgent IS NULL group by nl.id_loja, nl.id_negociacao;";
+    const queryConsult = "SET sql_mode = ''; SELECT CONCAT( 'UPDATE multishow_b2b.negociacoes_lojas SET id_loja = ', nl.id_loja, ' WHERE id_negociacao = ', nl.id_negociacao, ' and id_negociacao_loja = ', nl.id_negociacao_loja, ';' ) AS 'query' FROM negociacao_loja nl JOIN associado a ON a.idLoja = nl.id_loja JOIN relaciona r ON r.codConsultRelaciona = a.codAssociado JOIN consultor c ON c.codConsult = r.codAssocRelaciona JOIN acesso ac ON ac.codUsuario = c.codConsult LEFT JOIN log l ON l.userAgent = ac.codAcesso AND l.route LIKE '%getusermore%' WHERE nl.status = 2 AND l.id IS NULL AND a.codAssociado IN (SELECT r2.codConsultRelaciona FROM relaciona r2 JOIN consultor c2 ON c2.codConsult = r2.codAssocRelaciona JOIN acesso ac2 ON ac2.codUsuario = c2.codConsult JOIN log l2 ON l2.userAgent = ac2.codAcesso WHERE l2.route LIKE '%getusermore%' ) GROUP BY r.codConsultRelaciona;";
+    
+    
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {
         console.log("Error Query Pre Event: ", error);
@@ -148,6 +212,42 @@ const Notice = {
       .join(' ');
   },
 
+  async getNegotiationsOutAdega(req, res){
+
+    const { query } = req.body;
+
+    
+    try {
+
+      connectionMultishow.query(query, async (error, results, fields) => {
+        if (error) {
+
+          console.log("Error Negotiation Multishow Disabled: ", error);
+        } else {
+
+          for (let index = 0; index < results.length; index++) {
+
+            try {
+
+              const negotiations = await Notice.getNegotiationClients(results[index]["id_negociacao"]);
+              await Notice.insertNegotiationClients(negotiations, 2);
+              console.log(`${index} - ${results[index]["id_negociacao"]} - ${results[index]["categoria"]}`);
+              console.log(`Fornecedor: ${provider[0]["id_erp"]} - ${provider[0]["fornecedor"]}`)
+              console.log(`Quantidade de mercadorias: ${merchandises.length}`)
+
+            } catch (error) {
+              console.log(`Error Get Merchandises: ${error}`);
+            }
+          }
+          return res.json(results);
+        }
+      });
+    } catch (error) {
+      console.log(`Error Connection Multishow: ${error}`);
+    }
+
+
+  },
   async getNegotiationsDisabled(req, res){
 
     const { query } = req.body;
