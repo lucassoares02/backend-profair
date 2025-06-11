@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+  <title>Atualização Cadastral</title>
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+      color: #333333;
+      line-height: 1.6;
+    }
+
+    .email-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .header {
+      background-color: #6e41ff;
+
+      /* background: linear-gradient(135deg, #6e41ff 0%, #6e41ff 100%); */
+      padding: 30px 25px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 10px;
+      background-color: #6e41ff;
+
+      /* background: linear-gradient(90deg, #6e41ff 0%, #6e41ff 50%, #6e41ff 100%); */
+    }
+
+    .div-logo {
+      border-radius: 60px;
+      background: linear-gradient(135deg, #6e41ff 0%, #6e41ff 100%);
+      height: 100px;
+      width: 100px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 3px solid #6e41ff;
+    }
+
+    .logo {
+      height: 100px;
+      /* margin-bottom: 15px; */
+
+    }
+
+    .title {
+      color: #ffffff;
+      font-size: 24px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .subtitle {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 14px;
+      font-weight: 500;
+      margin: 8px 0 0;
+    }
+
+    .content {
+      padding: 30px;
+    }
+
+    .greeting {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 20px;
+      color: #6e41ff;
+    }
+
+    .message {
+      font-size: 15px;
+      margin-bottom: 25px;
+      color: #555555;
+    }
+
+    .data-section {
+      background-color: #f5f2ff;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 25px 0;
+    }
+
+    .data-item {
+      margin-bottom: 12px;
+      display: flex;
+    }
+
+    .data-label {
+      font-weight: 500;
+      color: #666666;
+      width: 100px;
+    }
+
+    .data-value {
+      font-weight: 600;
+      color: #6e41ff;
+      flex: 1;
+    }
+
+    .button-container {
+      text-align: center;
+      margin: 30px 0;
+    }
+
+    .button {
+      display: inline-block;
+      /* background: linear-gradient(135deg, #6e41ff 0%, #3a1a8a 100%); */
+      background-color: #6e41ff;
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+      padding: 14px 30px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(26, 0, 70, 0.2);
+    }
+
+    .button:hover {
+      background-color: #6e41ff;
+
+      /* background: linear-gradient(135deg, #3a1a8a 0%, #6e41ff 100%); */
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(26, 0, 70, 0.25);
+    }
+
+    .footer {
+      padding: 20px 30px;
+      background-color: #f9f9f9;
+      font-size: 12px;
+      color: #888888;
+      border-top: 1px solid #eeeeee;
+    }
+
+    .footer-links {
+      margin: 15px 0;
+      text-align: center;
+    }
+
+    .footer-link {
+      color: #6e41ff;
+      text-decoration: none;
+      margin: 0 8px;
+      font-weight: 500;
+    }
+
+    .footer-link:hover {
+      text-decoration: underline;
+    }
+
+    .confidential {
+      font-style: italic;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #eeeeee;
+      font-size: 11px;
+    }
+
+    .direct-link {
+      word-break: break-all;
+      margin: 15px 0;
+      font-size: 13px;
+    }
+
+    @media only screen and (max-width: 600px) {
+
+      .content,
+      .footer {
+        padding: 20px;
+      }
+
+      .data-item {
+        flex-direction: column;
+      }
+
+      .data-label {
+        width: auto;
+        margin-bottom: 4px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="email-container">
+    <div class="header">
+
+      <h1 class="title">Atualização Cadastral</h1>
+      <p class="subtitle">Manutenção de dados</p>
+    </div>
+
+    <div class="content">
+
+      <div>
+        <img
+          src="https://play-lh.googleusercontent.com/6FINLIOgGm5UN2MuqBIYnqhydb71JlO55aOG1ox_S7WtSGvo-72p5pWkL2OufnIjBbY=w240-h480-rw"
+          alt="Ayko Logo"
+          class="logo"
+        >
+      </div>
+
+      
+      <h2>Obrigado por estar conosco no Adega Show!</h2>
+      <p class="greeting">Olá, @name!</p>
+      <p>Foi um prazer contar com sua presença no evento <strong>Adega Show</strong> da rede <strong>Multishow Supermercados</strong>, realizado no dia <strong>12/04/2025</strong>. Sua participação foi essencial para o sucesso desta edição.</p>
+      <p>Os dados gerados no aplicativo <strong>Profair</strong> durante o evento já estão disponíveis. Você pode acessá-los e realizar o download através do link abaixo:</p>
+      <a href="https://profair-web.web.app/" class="cta-button">🔗 Acessar Dados do Evento</a>
+      <p>Desejamos a você muito sucesso nos seus negócios e esperamos encontrá-lo novamente nos próximos eventos!</p>
+
+
+      <div class="data-section">
+        <div class="data-item">
+          <span class="data-label">Nome:</span>
+          <span class="data-value">@name</span>
+        </div>
+        <div class="data-item">
+          <span class="data-label">E-mail:</span>
+          <span class="data-value">@email</span>
+        </div>
+        <div class="data-item">
+          <span class="data-label">Telefone:</span>
+          <span class="data-value">@phone</span>
+        </div>
+      </div>
+
+      <p class="message">Por favor, verifique se as informações acima estão corretas. Clique no botão abaixo para confirmar ou atualizar seus dados:</p>
+
+      <div class="button-container">
+        <a
+          href="https://upward.ayko.tech/upward/update-users/@hash_id"
+          class="button"
+        >Verificar meus dados</a>
+      </div>
+
+      <p class="direct-link">Se o botão não funcionar, copie e cole este link em seu navegador:<br>
+        <a
+          href="https://upward.ayko.tech/upward/update-users/@hash_id"
+          style="color: #6e41ff;"
+        >https://upward.ayko.tech/upward/update-users/@hash_id</a>
+      </p>
+    </div>
+
+    <div class="footer">
+      <div class="footer-links">
+        <a
+          href="https://portal.ayko.tech/portal/"
+          class="footer-link"
+        >Portal de tickets</a>
+        <a
+          href="https://ayko.tech/politica-de-seguranca/"
+          class="footer-link"
+        >Política de segurança</a>
+        <a
+          href="https://ayko.tech/aviso-de-privacidade/"
+          class="footer-link"
+        >Privacidade</a>
+        <a
+          href="https://ayko.tech/"
+          class="footer-link"
+        >Website</a>
+        <a
+          href="https://ayko.tech/ciberseguranca/"
+          class="footer-link"
+        >Cibersegurança</a>
+        <a
+          href="https://ayko.tech/quem-somos/"
+          class="footer-link"
+        >Quem somos</a>
+      </div>
+
+      <p class="confidential">
+        <strong>Notificação de Confidencialidade:</strong><br>
+        O conteúdo deste e-mail é confidencial e destinado exclusivamente ao destinatário. É proibido compartilhar esta mensagem sem consentimento. Se recebeu esta mensagem por engano, exclua-a imediatamente.
+      </p>
+    </div>
+  </div>
+</body>
+
+</html>

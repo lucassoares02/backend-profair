@@ -1,37 +1,166 @@
-SET
-    sql_mode = '';
-
 SELECT
     CONCAT(
-        'UPDATE multishow_b2b.negociacoes_lojas SET id_loja = ',
-        nl.id_loja,
-        ' WHERE id_negociacao = ',
-        nl.id_negociacao,
-        ' and id_negociacao_loja = ',
-        nl.id_negociacao_loja,
-        ';'
-    ) AS 'query'
+        '<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+  <title>Profair - Agradecimento e Dados Exportados</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  >
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background-color: #f3f3f8;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 650px;
+      margin: 40px auto;
+      background: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    }
+
+    .header {
+      background-color: #6e41ff;
+      padding: 30px 20px;
+      text-align: center;
+    }
+
+    .logo-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+
+    .logo-wrapper img {
+      max-height: 60px;
+      object-fit: contain;
+    }
+
+    .content {
+      padding: 30px 30px 10px 30px;
+      color: #333333;
+    }
+
+    .content h2 {
+      color: #6e41ff;
+      margin-top: 0;
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .content p {
+      font-size: 15px;
+      line-height: 1.7;
+      margin: 15px 0;
+    }
+
+    .cta-button {
+      display: inline-block;
+      background-color: #6e41ff;
+      color: #fff;
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-weight: 500;
+      margin-top: 25px;
+      transition: background 0.3s ease;
+      box-shadow: 0 6px 18px rgba(110, 65, 255, 0.3);
+    }
+
+    .cta-button:hover {
+      background-color: #5933e6;
+    }
+
+    .footer {
+      padding: 25px;
+      text-align: center;
+      font-size: 13px;
+      color: #888888;
+      border-top: 1px solid #eee;
+    }
+
+    .footer a {
+      color: #6e41ff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .icon {
+      font-size: 18px;
+      margin-right: 6px;
+      vertical-align: middle;
+      color: #b16cff;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo-wrapper">
+        <br>
+        <br>
+        <img
+          src="https://drive.google.com/thumbnail?id=1QEnAWD9eNO1j9HkVGEgwC4QMb40WKCSD"
+          alt="Logo Profair"
+          width="120"
+        >
+        <br>
+        <br>
+      </div>
+    </div>
+    <div class="content">
+      <br>
+      <br>
+      <h2>Olá ', c.nomeConsult, '!</h2>
+      <p>Foi um prazer contar com sua presença no evento <strong>Adega Show</strong> do grupo <strong>Multishow Supermercados</strong>, realizado no dia <strong>12/04/2025</strong>. Sua participação foi essencial para o sucesso desta edição.</p>
+      <p>Os dados gerados no aplicativo <strong>Profair</strong> durante o evento já estão disponíveis. Caso precise exportar, você pode acessá-los e realizar o download através do link abaixo:</p>
+      <p>Para realizar o login informe o seu código: <strong> ', a.codAcesso, '</strong>.</p>
+      <a
+        href="https://profair-web.web.app/#/login"
+        class="cta-button"
+      >🔗 Acessar Dados do Evento</a>
+      <br>
+      <p>Desejamos a você muito sucesso nos seus negócios e esperamos encontrá-lo novamente nos próximos eventos! Para quaisquer dúvidas, sugestões ou indicações nossos contatos estão disponíveis abaixo!</p>
+    </div>
+    <div class="footer">
+
+      <img
+      width="90"
+        src="https://drive.google.com/thumbnail?id=1ITmd92H6XRPx_ZQIpyqHimN5WDuH0hrD"
+        alt="Logo Profair"
+      >
+      <p>Atenciosamente, <br><strong>Equipe Profair</strong></p>
+      <p>Dúvidas ou suporte? <a href="mailto:suporte@profair.com.br">contato@profair.com.br</a></p>
+    </div>
+    <div style="text-align: center; padding-bottom: 30px;">
+      <a
+        href="https://wa.me/5527988158797"
+        target="_blank"
+        style="display: inline-block; background-color: #25D366; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 500; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); font-size: 14px;"
+      >
+        💬 Fale conosco no WhatsApp
+      </a>
+    </div>
+  </div>
+</body>
+
+</html>'
+    ) AS 'html'
 FROM
-    negociacao_loja nl
-    JOIN associado a ON a.idLoja = nl.id_loja
-    JOIN relaciona r ON r.codConsultRelaciona = a.codAssociado
-    JOIN consultor c ON c.codConsult = r.codAssocRelaciona
-    JOIN acesso ac ON ac.codUsuario = c.codConsult
-    LEFT JOIN log l ON l.userAgent = ac.codAcesso
-    AND l.route LIKE '%getusermore%'
-WHERE
-    nl.status = 2
-    AND l.id IS NULL
-    AND a.codAssociado IN (
-        SELECT
-            r2.codConsultRelaciona
-        FROM
-            relaciona r2
-            JOIN consultor c2 ON c2.codConsult = r2.codAssocRelaciona
-            JOIN acesso ac2 ON ac2.codUsuario = c2.codConsult
-            JOIN log l2 ON l2.userAgent = ac2.codAcesso
-        WHERE
-            l2.route LIKE '%getusermore%'
-    )
-GROUP BY
-    r.codConsultRelaciona;
+    acesso a join consultor c on c.codConsult = a.codUsuario
+    where a.direcAcesso = 1
