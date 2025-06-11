@@ -6,8 +6,6 @@ const Insert = require("@insert");
 const fs = require("fs");
 const PDFDocument = require("pdfkit-table");
 const path = require("path");
-const axios = require("axios");
-const path = require("path");
 
 const Graphs = {
   async getPercentageClients(req, res) {
@@ -197,10 +195,7 @@ WHERE
     doc.end();
   },
 
-
-
-
-  async getExportPdf1(req, res) {
+  async getExportPdf(req, res) {
     logger.info("Get Exports Pdf");
     const { supplier, negotiation, client } = req.params;
 
@@ -335,160 +330,6 @@ WHERE
     });
   },
 
-
-  async getExportPdf(req, res) {
-    logger.info("Get Exports Pdf");
-    const { supplier, negotiation, client } = req.params;
-
-    let queryConsult = `
-    SET sql_mode = ''; SELECT 
-    mercadoria.codMercadoria as product,
-    mercadoria.nomeMercadoria as title,
-    mercadoria.barcode,
-    mercadoria.embMercadoria as packing,
-    mercadoria.fatorMerc as factor,
-    mercadoria.complemento as  complement,
-    mercadoria.marca as brand,  
-    a.codAssociado  as client,
-    a.razaoAssociado as client_name,
-    f.codForn as provider,
-    f.nomeForn as provider_name,
-    IFNULL(SUM(pedido.quantMercPedido), 0) as 'quantity', 
-    mercadoria.precoMercadoria as price,
-    mercadoria.precoUnit as unitprice,
-    IFNULL(SUM(mercadoria.precoMercadoria * pedido.quantMercPedido), 0) as 'totalprice' 
-    FROM 
-        mercadoria 
-    JOIN 
-        pedido ON pedido.codMercPedido = mercadoria.codMercadoria 
-    JOIN
-        associado a ON pedido.codAssocPedido = a.codAssociado 
-    JOIN 
-        fornecedor f ON pedido.codFornPedido = f.codForn 
-    WHERE 
-        pedido.codAssocPedido = ${client}
-        AND pedido.codfornpedido =  ${supplier} 
-        AND pedido.codNegoPedido =  ${negotiation}  
-    GROUP BY 
-        mercadoria.codMercadoria
-        
-    HAVING 
-    totalprice != 0
-    ORDER BY 
-        quantMercPedido;`;
-
-    connection.query(queryConsult, async (error, results, fields) => {
-      if (error) {
-        console.log("Error Export Negotiation : ", error);
-        return res.status(500).send("Erro ao gerar PDF.");
-      }
-
-      try {
-        const data = results[1];
-
-        let valorTotal = 0;
-        let testefull = [];
-
-        const clientQuery = `${data[0].client} - ${data[0].client_name}`;
-        const providerQuery = `${data[0].provider} - ${data[0].provider_name}`;
-
-        data.forEach((item) => {
-          testefull.push([
-            item.product,
-            item.barcode,
-            item.title,
-            `${item.packing} | ${item.factor}`,
-            item.quantity,
-            item.price.toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            }),
-            item.totalprice.toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            }),
-          ]);
-          valorTotal += item.totalprice;
-        });
-
-        // Adiciona linha total
-        testefull.push(["Total", "", "", "", "", "", valorTotal.toLocaleString("pt-BR", {
-          style: "currency",
-          currency: "BRL",
-        })]);
-
-        const doc = new PDFDocument({ margin: 20, size: "A4" });
-
-        // Baixar logo da internet
-        const logoUrl = "https://i0.wp.com/www.cofril.com.br/wp-content/uploads/2019/02/logo-borda-branca.png?fit=268%2C232&ssl=1"; // <-- substitua por sua URL real
-        const logoPath = path.join(__dirname, "tmp_logo.png");
-        const logoResponse = await axios.get(logoUrl, { responseType: "arraybuffer" });
-        fs.writeFileSync(logoPath, logoResponse.data);
-
-        // Cabeçalho da empresa
-        const empresa = {
-          nome: "PROFAIR TECNOLOGIA LTDA",
-          cnpj: "12.345.678/0001-99",
-          telefone: "(27) 99999-9999",
-          responsavel: "Lucas Soares",
-          endereco: "Rua das Feiras, 123 - Serra/ES",
-        };
-
-        try {
-          doc.image(logoPath, 20, 20, { width: 60 });
-        } catch (e) {
-          console.warn("Erro ao inserir logo:", e.message);
-        }
-
-        doc
-          .fontSize(10)
-          .text(empresa.nome, 90, 20)
-          .text(`CNPJ: ${empresa.cnpj}`, 90, 35)
-          .text(`Telefone: ${empresa.telefone}`, 90, 50)
-          .text(`Responsável: ${empresa.responsavel}`, 90, 65)
-          .text(`Endereço: ${empresa.endereco}`, 90, 80);
-
-        doc.moveTo(20, 100).lineTo(570, 100).stroke();
-        doc.moveDown(2);
-
-        const table = {
-          title: providerQuery,
-          subtitle: clientQuery,
-          headers: [
-            { label: "Produto", property: "name", width: 40 },
-            { label: "Código de barras", property: "barcode", width: 70 },
-            { label: "Descrição", property: "description", width: 200 },
-            { label: "Fator", property: "brand", width: 50 },
-            { label: "Quantidade", property: "quantity", width: 60 },
-            { label: "Preço", property: "price", width: 60 },
-            { label: "Valor Total", property: "total", width: 80 },
-          ],
-          rows: testefull,
-        };
-
-        doc.table(table, {
-          prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
-        });
-
-        const chunks = [];
-        doc.on("data", (chunk) => chunks.push(chunk));
-        doc.on("end", () => {
-          const pdfBuffer = Buffer.concat(chunks);
-          res.setHeader("Content-Type", "application/pdf");
-          res.setHeader("Content-Disposition", 'inline; filename="documento.pdf"');
-          res.send(pdfBuffer);
-
-          // 🧹 Remove imagem temporária após envio do PDF
-          fs.unlink(logoPath, () => { });
-        });
-
-        doc.end();
-      } catch (err) {
-        console.error("Erro ao gerar PDF:", err);
-        res.status(500).send("Erro ao gerar PDF.");
-      }
-    });
-  },
 
   async getExportPdfTesteLayoutDeep(req, res) {
     logger.info("Get Exports Pdf");
