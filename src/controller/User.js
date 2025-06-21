@@ -183,7 +183,7 @@ const User = {
     } catch (error) {
       console.log(`Error Save Logs: ${error}`);
     }
-    const { codacesso } = req.body;
+    const { codacesso, token } = req.body;
 
     const queryConsult = "select codAcesso, codOrganization, direcAcesso from acesso where codAcesso = " + codacesso;
 
@@ -192,29 +192,14 @@ const User = {
         return res.status(400).send(error);
       } else {
         if (results.length > 0) {
+
+          // add token in table acesso in field token
+          const queryUpdate = `UPDATE acesso SET token = '${token}' WHERE codAcesso = ${codacesso}`;
+          await connection.query(queryUpdate, (error, resultsUpdate) => {
+            if (error) { console.log(`Error insert token acesso: ${error}`) } else { }
+          });
+
           if (results[0].direcAcesso == 1) {
-            //             set sql_mode='';
-            // select
-            // acesso.codAcesso,
-            // acesso.direcAcesso,
-            //  fornecedor.nomeForn,
-            // fornecedor.cnpjForn,
-            //  acesso.codUsuario,
-            // fornecedor.codForn,
-            // consultor.nomeConsult,
-            //  consultor.cpfConsult,
-            // FORMAT(IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0), 2, 'de_DE') as 'valorPedido'
-            // from acesso
-
-            // join consultor on acesso.codUsuario = consultor.codConsult
-            // join relacionafornecedor on consultor.codConsult = relacionafornecedor.codConsultor
-            // join fornecedor on relacionafornecedor.codFornecedor = fornecedor.codForn
-            // left join pedido on pedido.codFornPedido = fornecedor.codForn
-            // left join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido
-            // where acesso.codAcesso = 1000000059091
-            // group by fornecedor.codForn
-            // order by valorPedido desc;
-
             const queryProvider = `
             SET sql_mode = ''; select 
             acesso.codAcesso, 
