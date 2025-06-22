@@ -15,6 +15,7 @@ const Delete = require("@controller/Delete");
 const Faceline = require("@controller/Faceline");
 const Wedding = require("@controller/Wedding");
 const Log = require("@controller/Log");
+const Notification = require("@controller/Notification");
 const WindowNegotiation = require("@controller/WindowNegotiation");
 
 router.post("/faceline-user", Log.InsertLog, Faceline.insert);
@@ -190,5 +191,7 @@ router.get("/wedding/desconfirm", Log.InsertLog, Wedding.disconfirm);
 router.get("/wedding/getallguests", Log.InsertLog, Wedding.getAllGuests);
 
 router.get("/getwindownegotiations/:client", Log.InsertLog, WindowNegotiation.getWindowNegotiation);
+
+router.post("/notification", Log.InsertLog, Notification.insertNotification);
 
 module.exports = router;

@@ -194,7 +194,7 @@ const User = {
         if (results.length > 0) {
 
           // add token in table acesso in field token
-          const queryUpdate = `UPDATE acesso SET token = '${token}' WHERE codAcesso = ${codacesso}`;
+          const queryUpdate = `UPDATE acesso SET token = '${token}', is_present = 1 WHERE codAcesso = ${codacesso}`;
           await connection.query(queryUpdate, (error, resultsUpdate) => {
             if (error) { console.log(`Error insert token acesso: ${error}`) } else { }
           });
