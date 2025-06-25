@@ -99,10 +99,6 @@ const Notification = {
       console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 
 
-      // Verifica se a função realmente existe
-      if (typeof admin.messaging().sendMulticast !== 'function') {
-        throw new Error("sendMulticast() is not available in this version of firebase-admin");
-      }
 
       const response = await admin.messaging().sendEachForMulticast(message);
       logger.info("Notification sent successfully", { successCount: response.successCount });
