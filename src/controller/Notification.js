@@ -137,6 +137,19 @@ const Notification = {
       console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 
       const response = await admin.messaging().sendEachForMulticast(message);
+
+      // verify if the response contains errors
+      if (response.failureCount > 0) {
+        const failedTokens = response.responses
+          .map((resp, idx) => resp.error ? tokens[idx] : null)
+          .filter(token => token !== null);
+
+        logger.error("Failed to send notifications to tokens:", failedTokens);
+        return { success: false, message: "Some notifications failed to send", failedTokens };
+      }
+
+
+
       logger.info("Notification sent successfully", { successCount: response.successCount });
       return { success: true, message: "Notification sent", response };
 
