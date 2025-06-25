@@ -104,7 +104,7 @@ const Notification = {
         throw new Error("sendMulticast() is not available in this version of firebase-admin");
       }
 
-      const response = await admin.messaging().sendMulticast(message);
+      const response = await admin.messaging().sendEachForMulticast(message);
       logger.info("Notification sent successfully", { successCount: response.successCount });
       return { success: true, message: "Notification sent", response };
 
