@@ -192,6 +192,7 @@ router.get("/wedding/getallguests", Log.InsertLog, Wedding.getAllGuests);
 
 router.get("/getwindownegotiations/:client", Log.InsertLog, WindowNegotiation.getWindowNegotiation);
 
+router.get("/notifications", Log.InsertLog, Notification.getNotifications);
 router.post("/notification", Log.InsertLog, Notification.insertNotification);
 router.post("/notification/send", Log.InsertLog, Notification.sendNotification);
 

@@ -3,6 +3,7 @@ const logger = require("@logger");
 const admin = require("firebase-admin");
 const { connection } = require("@server");
 const util = require("util");
+const { getMonth } = require("date-fns");
 const query = util.promisify(connection.query).bind(connection);
 
 // Firebase Initialization (seguro e único)
@@ -18,6 +19,20 @@ function initializeFirebase() {
 }
 
 const Notification = {
+
+  async getNotifications(req, res) {
+    logger.info("Get Notifications");
+
+    const query = `select * from notifications`;
+
+    connection.query({ sql: query, timeout: 15000 }, (error, results, fields) => {
+      if (error) {
+        return res.status(400).send(error);
+      } else {
+        return res.json(results);
+      }
+    });
+  },
 
   async insertNotification(req, res) {
     logger.info("Insert Notifications");
@@ -95,7 +110,7 @@ const Notification = {
       console.log("Message:");
       console.log(message);
       console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-      
+
       const response = await admin.messaging().sendEachForMulticast(message);
       logger.info("Notification sent successfully", { successCount: response.successCount });
       return { success: true, message: "Notification sent", response };
