@@ -63,6 +63,31 @@ const Notification = {
     }
   },
 
+  async updateNotification(req, res) {
+    logger.info("Insert Notifications");
+    const { title, content, redirect, target, day, month, hour, minute, method, id } = req.body.data;
+
+    try {
+
+      const query = `UPDATE notifications SET title = ?, content = ?, redirect = ?, target = ?, day = ?, month = ?, hour = ?, minute = ?, method = ? WHERE id = ?`;
+      const values = [title, content, redirect, target, day, month, hour, minute, method, id];
+
+      connection.query(query, values, (error, results) => {
+        if (error) {
+          return res.status(400).send(error);
+        } else {
+          return res.status(200).send({
+            message: "Notification Updated Successfully",
+          });
+        }
+      });
+
+    } catch (error) {
+      logger.error("Update Notification:", error);
+      return res.status(400).send({ message: "Error update notification", error });
+    }
+  },
+
   async sendNotification(title, content, redirect, target) {
     logger.info("Send Notifications");
 
