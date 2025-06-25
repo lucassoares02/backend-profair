@@ -194,7 +194,7 @@ router.get("/getwindownegotiations/:client", Log.InsertLog, WindowNegotiation.ge
 
 router.get("/notifications", Log.InsertLog, Notification.getNotifications);
 router.post("/notification", Log.InsertLog, Notification.insertNotification);
-router.patch("/notification/:id", Log.InsertLog, Notification.upateNotification);
+router.patch("/notification", Log.InsertLog, Notification.upateNotification);
 router.post("/notification/send", Log.InsertLog, Notification.sendNotification);
 
 module.exports = router;
