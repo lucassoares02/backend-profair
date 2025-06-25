@@ -18,6 +18,7 @@ function initializeFirebase() {
 }
 
 const Notification = {
+
   async insertNotification(req, res) {
     logger.info("Insert Notifications");
     const data = req.body;
@@ -30,12 +31,9 @@ const Notification = {
     try {
       const resp = await Insert(params);
 
-      let result;
+      let result = { success: true, message: "" };
       if (data.method == 1) {
         result = await Notification.sendNotification(data.title, data.content, data.redirect, data.target);
-      } else if (data.method == 2) {
-        const { day, month, hour, minute } = data;
-        result = await Notification.scheduleNotification(data.title, data.content, data.redirect, data.target, day, month, hour, minute);
       }
 
       return res.status(200).send({
@@ -60,8 +58,8 @@ const Notification = {
     initializeFirebase();
 
     let queryStr = `SELECT token FROM acesso WHERE token IS NOT NULL AND token != ''`;
-    if ([1, 2, 3].includes(Number(redirect))) {
-      queryStr += ` AND direcAcesso = ${Number(redirect)}`;
+    if ([1, 2, 3].includes(Number(target))) {
+      queryStr += ` AND direcAcesso = ${Number(target)}`;
     }
 
 
@@ -99,6 +97,10 @@ const Notification = {
       console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 
 
+      // Verifica se a função realmente existe
+      if (typeof admin.messaging().sendMulticast !== 'function') {
+        throw new Error("sendMulticast() is not available in this version of firebase-admin");
+      }
 
       const response = await admin.messaging().sendEachForMulticast(message);
       logger.info("Notification sent successfully", { successCount: response.successCount });
@@ -110,20 +112,6 @@ const Notification = {
     }
   },
 
-  async scheduleNotification(title, content, redirect, target, day, month, hour, minute) {
-    logger.info("Schedule Notifications");
-
-    if (!title || !content || !day || !month || !hour || !minute) {
-      return { success: false, message: "Missing scheduling parameters" };
-    }
-
-    const scheduleTime = `${day}-${month} ${hour}:${minute}:00`;
-    return {
-      success: true,
-      message: "Notification scheduled",
-      data: { title, content, redirect, target, scheduleTime },
-    };
-  },
 };
 
 module.exports = Notification;
