@@ -23,7 +23,7 @@ const Notification = {
   async getNotifications(req, res) {
     logger.info("Get Notifications");
 
-    const query = `select * from notifications`;
+    const query = `select * from notifications order by id desc`;
 
     connection.query({ sql: query, timeout: 15000 }, (error, results, fields) => {
       if (error) {
