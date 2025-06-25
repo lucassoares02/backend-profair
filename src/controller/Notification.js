@@ -5,6 +5,18 @@ const { connection } = require("@server");
 const util = require("util");
 const query = util.promisify(connection.query).bind(connection);
 
+// Firebase Initialization (seguro e único)
+function initializeFirebase() {
+  if (!admin.apps.length) {
+    const decodedKey = Buffer.from(process.env.FIREBASE_KEY_BASE64, "base64").toString("utf8");
+    const serviceAccount = JSON.parse(decodedKey);
+
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+    });
+  }
+}
+
 const Notification = {
   async insertNotification(req, res) {
     logger.info("Insert Notifications");
@@ -45,33 +57,26 @@ const Notification = {
       return { success: false, message: "Title and content are required" };
     }
 
-    const decodedKey = Buffer.from(process.env.FIREBASE_KEY_BASE64, "base64").toString("utf8");
-    const serviceAccount = JSON.parse(decodedKey);
-
-    if (!admin.apps.length) {
-      admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
-      });
-    }
+    initializeFirebase();
 
     let queryStr = `SELECT token FROM acesso WHERE token IS NOT NULL AND token != ''`;
-    if ([1, 2, 3].includes(redirect)) {
-      queryStr += ` AND direcAcesso = ${redirect}`;
+    if ([1, 2, 3].includes(Number(redirect))) {
+      queryStr += ` AND direcAcesso = ${Number(redirect)}`;
     }
 
-    
-      console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-      console.log("QueryStr:");
-      console.log(queryStr);
-      console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 
+    console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+    console.log("Query:");
+    console.log(query);
+    console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 
 
     try {
       const results = await query(queryStr);
 
       if (!results.length) {
-        return { success: false, message: "No tokens found for the specified redirect." };
+        logger.warn("No tokens found for the specified redirect.");
+        return { success: false, message: "No tokens found." };
       }
 
       const tokens = results.map(row => row.token);
@@ -80,7 +85,6 @@ const Notification = {
       console.log("Tokens:");
       console.log(tokens);
       console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-
 
 
       const message = {
@@ -95,9 +99,13 @@ const Notification = {
       console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 
 
+      // Verifica se a função realmente existe
+      if (typeof admin.messaging().sendMulticast !== 'function') {
+        throw new Error("sendMulticast() is not available in this version of firebase-admin");
+      }
 
       const response = await admin.messaging().sendMulticast(message);
-      logger.info("Notification sent:", response);
+      logger.info("Notification sent successfully", { successCount: response.successCount });
       return { success: true, message: "Notification sent", response };
 
     } catch (error) {
