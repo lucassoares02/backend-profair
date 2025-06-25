@@ -11,9 +11,9 @@ cron.schedule('* * * * *', async () => {
     logger.info('🔔 Init cronjob...');
     try {
         const now = new Date();
-        const day = now.getDay();
+        const day = now.getDate();
         const month = now.getMonth() + 1;
-        const hour = now.getHours();
+        const hour = now.getHours() - 3;
         const minute = now.getMinutes();
         
         console.log(`SELECT * FROM notifications WHERE method = 2 AND day = ${day} AND month = ${month} AND hour = ${hour} AND minute = ${minute}`);
