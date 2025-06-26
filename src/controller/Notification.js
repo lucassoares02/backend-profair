@@ -49,6 +49,8 @@ const Notification = {
       console.log(resp);
       console.log(resp[1]);
       console.log(resp[1][0]);
+      console.log(resp[1][0][0]);
+      console.log(resp[1][0][1]);
 
       let result = { success: true, message: "" };
       if (data.method == 1) {
