@@ -46,6 +46,8 @@ const Notification = {
     try {
       const resp = await Insert(params);
 
+      console.log(resp[1][0]["LAST_INSERT_ID()"])
+
       let result = { success: true, message: "" };
       if (data.method == 1) {
         result = await Notification.sendNotification(data.title, data.content, data.redirect, data.target, resp[1][0]["LAST_INSERT_ID()"]);
