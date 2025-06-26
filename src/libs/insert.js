@@ -21,7 +21,7 @@ async function Insert(params) {
 
     // const query = "INSERT INTO " + table + " (" + columnsData.join(",") + ") VALUES (" + valuesData.join("','") + "')";
     
-    const query = "INSERT INTO " + table + " (" + columnsData.join(",") + ") VALUES (" + valuesData.join("), (") + "); SHOW WARNINGS";
+    const query = "INSERT INTO " + table + " (" + columnsData.join(",") + ") VALUES (" + valuesData.join("), (") + "); SELECT LAST_INSERT_ID();";
 
 
     return new Promise(function (resolve, reject) {

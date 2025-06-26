@@ -15,7 +15,7 @@ cron.schedule('* * * * *', async () => {
         const month = now.getMonth() + 1;
         const hour = now.getHours() - 3;
         const minute = now.getMinutes();
-        
+
         console.log(`SELECT * FROM notifications WHERE method = 2 AND day = ${day} AND month = ${month} AND hour = ${hour} AND minute = ${minute}`);
 
         const rows = await query(`SELECT * FROM notifications WHERE method = 2 AND day = ? AND month = ? AND hour = ? AND minute = ?`, [day, month, hour, minute]);
@@ -24,7 +24,7 @@ cron.schedule('* * * * *', async () => {
         console.log('Notificações agendadas:', rows);
 
         for (const n of rows) {
-            const result = await Notification.sendNotification(n.title, n.content, n.redirect, n.target);
+            const result = await Notification.sendNotification(n.title, n.content, n.redirect, n.target, n.id);
 
             // marca como enviada
             await query(`UPDATE notifications SET sent = 1 WHERE id = ?`, [n.id]);

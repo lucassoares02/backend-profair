@@ -46,14 +46,18 @@ const Notification = {
     try {
       const resp = await Insert(params);
 
+      console.log(resp);
+      console.log(resp[1]);
+      console.log(resp[1][0]);
+
       let result = { success: true, message: "" };
       if (data.method == 1) {
-        result = await Notification.sendNotification(data.title, data.content, data.redirect, data.target);
+        result = await Notification.sendNotification(data.title, data.content, data.redirect, data.target, resp[1][0]);
       }
 
       return res.status(200).send({
         message: "Notification Inserted Successfully",
-        insertData: resp,
+        insertData: resp[0],
         result,
       });
 
@@ -118,7 +122,7 @@ const Notification = {
     }
   },
 
-  async sendNotification(title, content, redirect, target) {
+  async sendNotification(title, content, redirect, target, id) {
     logger.info("Send Notifications");
 
     if (!title || !content) {
@@ -144,7 +148,7 @@ const Notification = {
 
       const message = {
         notification: { title, body: content },
-        data: { notificationId: "1kj2m1lk2h3na8a6vz0a" },
+        data: { notificationId: id },
         tokens,
       };
 
