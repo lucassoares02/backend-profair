@@ -88,6 +88,36 @@ const Notification = {
     }
   },
 
+  async openedNotification(req, res) {
+    logger.info("Opened Notifications");
+    const { id } = req.body;
+
+    console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+    console.log("ID:");
+    console.log(id);
+    console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+
+    try {
+
+      const query = `UPDATE notifications SET method = ? WHERE id = ?`;
+      const values = [id, id];
+
+      connection.query(query, values, (error, results) => {
+        if (error) {
+          return res.status(400).send(error);
+        } else {
+          return res.status(200).send({
+            message: "Notification Updated Successfully",
+          });
+        }
+      });
+
+    } catch (error) {
+      logger.error("Update Notification:", error);
+      return res.status(400).send({ message: "Error update notification", error });
+    }
+  },
+
   async sendNotification(title, content, redirect, target) {
     logger.info("Send Notifications");
 
@@ -102,13 +132,6 @@ const Notification = {
       queryStr += ` AND direcAcesso = ${Number(target)}`;
     }
 
-
-    console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-    console.log("Query:");
-    console.log(query);
-    console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-
-
     try {
       const results = await query(queryStr);
 
@@ -119,22 +142,11 @@ const Notification = {
 
       const tokens = results.map(row => row.token);
 
-      console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-      console.log("Tokens:");
-      console.log(tokens);
-      console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-
-
       const message = {
         notification: { title, body: content },
+        data: { notificationId: "1kj2m1lk2h3na8a6vz0a" },
         tokens,
       };
-
-
-      console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-      console.log("Message:");
-      console.log(message);
-      console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");''
 
       const response = await admin.messaging().sendEachForMulticast(message);
 

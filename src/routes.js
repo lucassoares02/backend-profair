@@ -196,5 +196,6 @@ router.get("/notifications", Log.InsertLog, Notification.getNotifications);
 router.post("/notification", Log.InsertLog, Notification.insertNotification);
 router.patch("/notification", Log.InsertLog, Notification.updateNotification);
 router.post("/notification/send", Log.InsertLog, Notification.sendNotification);
+router.post("/notification/opened", Log.InsertLog, Notification.openedNotification);
 
 module.exports = router;
