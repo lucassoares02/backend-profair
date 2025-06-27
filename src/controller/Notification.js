@@ -170,7 +170,7 @@ const Notification = {
 
       const message = {
         notification: { title, body: content },
-        data: { notificationId: 12, userId: 1 },
+        data: { notificationId: "12", userId: "1" },
         tokens,
       };
 
