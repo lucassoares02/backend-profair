@@ -34,6 +34,27 @@ const Notification = {
     });
   },
 
+  async saveTokenNotification(req, res) {
+    logger.info("Save Token Notification");
+    const { tokenFcm, userId } = req.body;
+
+    if (!tokenFcm || !userId) {
+      return res.status(400).send({ message: "Token and User ID are required" });
+    }
+
+    const query = `UPDATE acesso SET token = ? WHERE codAcesso = ?`;
+    const values = [tokenFcm, userId];
+    connection.query(query, values, (error, results) => {
+      if (error) {
+        logger.error("Error saving token:", error);
+        return res.status(400).send({ message: "Error saving token", error });
+      } else {
+        logger.info("Token saved successfully");
+        return res.status(200).send({ message: "Token saved successfully" });
+      }
+    });
+  },
+
   async insertNotification(req, res) {
     logger.info("Insert Notifications");
     const data = req.body;
