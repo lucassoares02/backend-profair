@@ -135,12 +135,25 @@ const Notification = {
     initializeFirebase();
 
     let queryStr = `SELECT token FROM acesso WHERE token IS NOT NULL AND token != ''`;
+
+    
     if ([1, 2, 3].includes(Number(target))) {
       queryStr += ` AND direcAcesso = ${Number(target)}`;
     }
-
+    
+    console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+    console.log("queryStr:");
+    console.log(queryStr);
+    console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+    
     try {
       const results = await query(queryStr);
+
+      
+    console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+    console.log("results:");
+    console.log(results);
+    console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 
       if (!results.length) {
         logger.warn("No tokens found for the specified redirect.");
@@ -156,6 +169,8 @@ const Notification = {
       };
 
       const response = await admin.messaging().sendEachForMulticast(message);
+
+      console.log("Response from Firebase:", response);
 
       // verify if the response contains errors
       if (response.failureCount > 0) {
