@@ -141,19 +141,9 @@ const Notification = {
       queryStr += ` AND direcAcesso = ${Number(target)}`;
     }
 
-    console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-    console.log("queryStr:");
-    console.log(queryStr);
-    console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-
     try {
       const results = await query(queryStr);
 
-
-      console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-      console.log("results:");
-      console.log(results);
-      console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 
       if (!results.length) {
         logger.warn("No tokens found for the specified redirect.");
@@ -163,11 +153,6 @@ const Notification = {
       const tokens = results.map(row => row.token);
 
 
-      console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-      console.log("tokens:");
-      console.log(tokens);
-      console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-
       const message = {
         notification: { title, body: content },
         data: { notificationId: "12", userId: "1" },
@@ -175,15 +160,6 @@ const Notification = {
       };
 
       const response = await admin.messaging().sendEachForMulticast(message);
-
-
-      console.log("Response from Firebase:", response.responses[0].error);
-      console.log("Response from Firebase:", response.responses[1].error);
-      console.log("Response from Firebase:", response.responses[2].error);
-      console.log("Response from Firebase:", response.responses[3].error);
-      console.log("Response from Firebase:", response.responses[4].error);
-      console.log("Response from Firebase:", response.responses[5].error);
-      console.log("Response from Firebase:", response.responses[6].error);
 
       // verify if the response contains errors
       if (response.failureCount > 0) {
