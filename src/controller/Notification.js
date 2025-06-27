@@ -92,11 +92,16 @@ const Notification = {
 
   async openedNotification(req, res) {
     logger.info("Opened Notifications");
-    const { id } = req.body;
+    const { notificationId, tokenFcm } = req.body;
 
     console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-    console.log("ID:");
-    console.log(id);
+    console.log("notificationId:");
+    console.log(notificationId);
+    console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+
+    console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+    console.log("tokenFcm:");
+    console.log(tokenFcm);
     console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 
     try {
@@ -146,7 +151,7 @@ const Notification = {
 
       const message = {
         notification: { title, body: content },
-        data: { notificationId: id },
+        data: { notificationId: id, userId: 1 },
         tokens,
       };
 
