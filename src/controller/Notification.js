@@ -50,7 +50,7 @@ const Notification = {
 
       let result = { success: true, message: "" };
       if (data.method == 1) {
-        result = await Notification.sendNotification(data.title, data.content, data.redirect, data.target, resp[1][0]["LAST_INSERT_ID()"]);
+        result = await Notification.sendNotification(data.title, data.content, data.redirect, data.target);
       }
 
       return res.status(200).send({
@@ -125,7 +125,7 @@ const Notification = {
     }
   },
 
-  async sendNotification(title, content, redirect, target, id) {
+  async sendNotification(title, content, redirect, target) {
     logger.info("Send Notifications");
 
     if (!title || !content) {
@@ -151,7 +151,7 @@ const Notification = {
 
       const message = {
         notification: { title, body: content },
-        data: { notificationId: id, userId: 1 },
+        data: { notificationId: 12, userId: 1 },
         tokens,
       };
 

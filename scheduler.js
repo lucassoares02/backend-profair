@@ -24,7 +24,7 @@ cron.schedule('* * * * *', async () => {
         console.log('Notificações agendadas:', rows);
 
         for (const n of rows) {
-            const result = await Notification.sendNotification(n.title, n.content, n.redirect, n.target, n.id);
+            const result = await Notification.sendNotification(n.title, n.content, n.redirect, n.target);
 
             // marca como enviada
             await query(`UPDATE notifications SET sent = 1 WHERE id = ?`, [n.id]);
