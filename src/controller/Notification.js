@@ -177,7 +177,13 @@ const Notification = {
       const response = await admin.messaging().sendEachForMulticast(message);
 
 
-      console.log("Response from Firebase:", response);
+      console.log("Response from Firebase:", response.responses[0].error);
+      console.log("Response from Firebase:", response.responses[1].error);
+      console.log("Response from Firebase:", response.responses[2].error);
+      console.log("Response from Firebase:", response.responses[3].error);
+      console.log("Response from Firebase:", response.responses[4].error);
+      console.log("Response from Firebase:", response.responses[5].error);
+      console.log("Response from Firebase:", response.responses[6].error);
 
       // verify if the response contains errors
       if (response.failureCount > 0) {
