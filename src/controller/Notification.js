@@ -71,7 +71,7 @@ const Notification = {
 
       let result = { success: true, message: "" };
       if (data.method == 1) {
-        result = await Notification.sendNotification(data.title, data.content, data.redirect, data.target);
+        result = await Notification.sendNotification(data.title, data.content, data.redirect, data.target, resp[1][0]["LAST_INSERT_ID()"]);
       }
 
       return res.status(200).send({
@@ -146,7 +146,65 @@ const Notification = {
     }
   },
 
-  async sendNotification(title, content, redirect, target) {
+  // async sendNotification(title, content, redirect, target, notification) {
+  //   logger.info("Send Notifications");
+
+  //   if (!title || !content) {
+  //     return { success: false, message: "Title and content are required" };
+  //   }
+
+  //   initializeFirebase();
+
+  //   let queryStr = `SELECT token, codUsuario as 'usuario' FROM acesso WHERE token IS NOT NULL AND token != ''`;
+
+
+  //   if ([1, 2, 3].includes(Number(target))) {
+  //     queryStr += ` AND direcAcesso = ${Number(target)}`;
+  //   }
+
+  //   try {
+  //     const results = await query(queryStr);
+
+
+  //     if (!results.length) {
+  //       logger.warn("No tokens found for the specified redirect.");
+  //       return { success: false, message: "No tokens found." };
+  //     }
+
+  //     const tokens = results.map(row => row.token);
+  //     const users = results.map(row => row.usuario);
+
+
+  //     const message = {
+  //       notification: { title, body: content },
+  //       data: { notificationId: "12", userId: "1" },
+  //       tokens,
+  //     };
+
+  //     const response = await admin.messaging().sendEachForMulticast(message);
+
+  //     // verify if the response contains errors
+  //     if (response.failureCount > 0) {
+  //       const failedTokens = response.responses
+  //         .map((resp, idx) => resp.error ? tokens[idx] : resp.error)
+  //         .filter(token => token !== null);
+
+  //       logger.error("Failed to send notifications to tokens:", failedTokens);
+  //       return { success: false, message: "Some notifications failed to send", failedTokens };
+  //     }
+
+
+
+  //     logger.info("Notification sent successfully", { successCount: response.successCount });
+  //     return { success: true, message: "Notification sent", response };
+
+  //   } catch (error) {
+  //     logger.error("Error sending notification:", error);
+  //     return { success: false, message: "Error sending notification", error };
+  //   }
+  // },
+
+  async sendNotification(title, content, redirect, target, notificationId) {
     logger.info("Send Notifications");
 
     if (!title || !content) {
@@ -155,8 +213,7 @@ const Notification = {
 
     initializeFirebase();
 
-    let queryStr = `SELECT token FROM acesso WHERE token IS NOT NULL AND token != ''`;
-
+    let queryStr = `SELECT token, codUsuario AS user_id FROM acesso WHERE token IS NOT NULL AND token != ''`;
 
     if ([1, 2, 3].includes(Number(target))) {
       queryStr += ` AND direcAcesso = ${Number(target)}`;
@@ -165,34 +222,46 @@ const Notification = {
     try {
       const results = await query(queryStr);
 
-
       if (!results.length) {
         logger.warn("No tokens found for the specified redirect.");
         return { success: false, message: "No tokens found." };
       }
 
       const tokens = results.map(row => row.token);
-
+      const users = results.map(row => row.user_id);
 
       const message = {
         notification: { title, body: content },
-        data: { notificationId: "12", userId: "1" },
+        data: { notificationId: String(notificationId) },
         tokens,
       };
 
       const response = await admin.messaging().sendEachForMulticast(message);
 
-      // verify if the response contains errors
+      const insertValues = results.map((row, index) => {
+        const res = response.responses[index];
+        return `(${row.user_id}, ${notificationId}, ${res.success ? 1 : 0}, 0)`;
+      }).join(', ');
+
+      const insertQuery = `
+      INSERT INTO user_notifications (user_id, notification_id, success, viewed)
+      VALUES ${insertValues}
+    `;
+
+      await query(insertQuery);
+
       if (response.failureCount > 0) {
         const failedTokens = response.responses
-          .map((resp, idx) => resp.error ? tokens[idx] : resp.error)
-          .filter(token => token !== null);
+          .map((res, idx) => !res.success ? tokens[idx] : null)
+          .filter(t => t !== null);
 
         logger.error("Failed to send notifications to tokens:", failedTokens);
-        return { success: false, message: "Some notifications failed to send", failedTokens };
+        return {
+          success: false,
+          message: "Some notifications failed to send",
+          failedTokens,
+        };
       }
-
-
 
       logger.info("Notification sent successfully", { successCount: response.successCount });
       return { success: true, message: "Notification sent", response };
@@ -201,7 +270,7 @@ const Notification = {
       logger.error("Error sending notification:", error);
       return { success: false, message: "Error sending notification", error };
     }
-  },
+  }
 
 };
 
