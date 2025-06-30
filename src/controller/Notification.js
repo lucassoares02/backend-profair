@@ -240,13 +240,18 @@ const Notification = {
 
       const insertValues = results.map((row, index) => {
         const res = response.responses[index];
-        return `(${row.user_id}, ${notificationId}, ${res.success ? 1 : 0}, 0)`;
+        console.log("Response:", res);
+        return `(${users[index]}, ${notificationId}, ${res.success ? 1 : 0}, 0)`;
       }).join(', ');
+
+      console.log("Insert Values:", insertValues);
 
       const insertQuery = `
       INSERT INTO user_notifications (user_id, notification_id, success, viewed)
       VALUES ${insertValues}
     `;
+
+      console.log("Insert Query:", insertQuery);
 
       await query(insertQuery);
 
