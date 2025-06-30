@@ -247,7 +247,7 @@ const Notification = {
       console.log("Insert Values:", insertValues);
 
       const insertQuery = `
-      INSERT INTO user_notifications (user_id, notification_id, success, viewed)
+      INSERT INTO user_notifications (user, notification, success, viewed)
       VALUES ${insertValues}
     `;
 
