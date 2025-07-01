@@ -23,9 +23,12 @@ const Notification = {
   async getNotifications(req, res) {
     logger.info("Get Notifications");
 
-    const query = `select * from notifications order by id desc`;
+    const user = req.headers["user-id"];
 
-    connection.query({ sql: query, timeout: 15000 }, (error, results, fields) => {
+    const query = `select * from notifications n join acesso a on a.codUsuario = n.user where a.codAcesso = ? order by id desc`;
+    const values = [user];
+
+    connection.query(query, values, (error, results, fields) => {
       if (error) {
         return res.status(400).send(error);
       } else {
