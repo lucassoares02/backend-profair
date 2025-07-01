@@ -219,6 +219,8 @@ const Notification = {
       queryStr += ` AND direcAcesso = ${Number(target)}`;
     }
 
+    console.log("Query String:", queryStr);
+
     try {
       const results = await query(queryStr);
 
@@ -227,12 +229,14 @@ const Notification = {
         return { success: false, message: "No tokens found." };
       }
 
+      console.log("Results:", results);
+
       const tokens = results.map(row => row.token);
       const users = results.map(row => row.user_id);
 
       const message = {
         notification: { title, body: content },
-        data: { notificationId: String(notificationId) },
+        data: { notificationId: notificationId.toString() },
         tokens,
       };
 
