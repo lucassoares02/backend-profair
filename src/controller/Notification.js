@@ -42,7 +42,7 @@ const Notification = {
       return res.status(400).send({ message: "Token and User ID are required" });
     }
 
-    const query = `UPDATE acesso SET token = ? WHERE codAcesso = ?`;
+    const query = `UPDATE acesso SET token = ? WHERE codUsuario = ?`;
     const values = [tokenFcm, userId];
     connection.query(query, values, (error, results) => {
       if (error) {
