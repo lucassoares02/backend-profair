@@ -183,7 +183,7 @@ const User = {
     } catch (error) {
       console.log(`Error Save Logs: ${error}`);
     }
-    const { codacesso, token } = req.body;
+    const { codacesso } = req.body;
 
     const queryConsult = "select codAcesso, codOrganization, direcAcesso from acesso where codAcesso = " + codacesso;
 
@@ -194,7 +194,7 @@ const User = {
         if (results.length > 0) {
 
           // add token in table acesso in field token
-          const queryUpdate = `UPDATE acesso SET token = '${token}', is_present = 1 WHERE codAcesso = ${codacesso}`;
+          const queryUpdate = `UPDATE acesso SET is_present = 1 WHERE codAcesso = ${codacesso}`;
           await connection.query(queryUpdate, (error, resultsUpdate) => {
             if (error) { console.log(`Error insert token acesso: ${error}`) } else { }
           });
