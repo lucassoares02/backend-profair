@@ -25,6 +25,7 @@ if (process.env.DATABASE == "POSTGRESQL") {
     user: process.env.MYSQL_USERNAME,
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE,
+    charset: 'utf8mb4',
     ssl: {
       rejectUnauthorized: false,
     },
