@@ -32,6 +32,8 @@ const Notification = {
       if (error) {
         return res.status(400).send(error);
       } else {
+        console.log("Query:", query);
+        console.log("Results:", results);
         return res.json(results);
       }
     });
