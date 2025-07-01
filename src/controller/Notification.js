@@ -25,12 +25,12 @@ const Notification = {
 
     const user = req.headers["user-id"];
 
-    const query = 'select * from negotiations order by id desc';
+    const query = 'select * from notifications order by id desc';
 
     // const query = `select * from notifications n join acesso a on a.codUsuario = n.user where a.codAcesso = ? order by n.id desc`;
     // const values = [user];
 
-    connection.query(query, values, (error, results, fields) => {
+    connection.query(query, (error, results, fields) => {
       if (error) {
         return res.status(400).send(error);
       } else {
