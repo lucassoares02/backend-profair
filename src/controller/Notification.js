@@ -127,8 +127,10 @@ const Notification = {
 
     try {
 
-      const query = `UPDATE notifications SET method = ? WHERE id = ?`;
-      const values = [id, id];
+      const query = `UPDATE user_notifications SET viewed = 1 WHERE notification = ? AND user = ( select codUsuario from acesso where token = ? LIMIT 1);`;
+      const values = [notificationId, tokenFcm];
+
+      console.log("Query:", query);
 
       connection.query(query, values, (error, results) => {
         if (error) {
