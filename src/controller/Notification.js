@@ -263,10 +263,27 @@ const Notification = {
       const tokens = results.map(row => row.token);
       const users = results.map(row => row.user_id);
 
+      const imageUrlString = 'https://gkpb.com.br/wp-content/uploads/2024/08/novo-logo-perdigao.jpg';
+
       const message = {
         notification: { title, body: content },
         data: { notificationId: notificationId.toString() },
         tokens,
+        android: {
+          notification: {
+            // aqui você garante que o Android nativo vai receber a imagem
+            imageUrl: imageUrlString,
+          }
+        },
+        apns: {
+          payload: {
+            aps: { 'mutable-content': 1 }
+          },
+          fcm_options: {
+            // para iOS (APNs) também exibir imagem
+            image: imageUrlString,
+          }
+        }
       };
 
       const response = await admin.messaging().sendEachForMulticast(message);
