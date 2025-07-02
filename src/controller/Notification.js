@@ -254,13 +254,13 @@ const Notification = {
       const insertValues = results.map((row, index) => {
         const res = response.responses[index];
         console.log("Response:", res);
-        return `(${users[index]}, ${notificationId}, ${res.success ? 1 : 0}, 0)`;
+        return `(${users[index]}, ${notificationId}, ${res.success ? 1 : 0}, 0, '${res.success ? "Sent" : res.error.message}')`;
       }).join(', ');
 
       console.log("Insert Values:", insertValues);
 
       const insertQuery = `
-      INSERT INTO user_notifications (user, notification, success, viewed)
+      INSERT INTO user_notifications (user, notification, success, viewed, reason)
       VALUES ${insertValues}
     `;
 
