@@ -41,6 +41,26 @@ const Notification = {
     });
   },
 
+  async getTargetsNotifications(req, res) {
+    logger.info("Get Targets Notifications");
+
+    const { notification } = req.params;
+
+    console.log(`Notificação: ${notification}`)
+
+    const query = 'select un.*, c.codConsult, c.nomeConsult  from user_notifications un join consultor c on c.codConsult = un.user where un.notification = ?';
+    const values = [notification];
+
+    connection.query(query, values, (error, results, fields) => {
+      if (error) {
+        return res.status(400).send(error);
+      } else {
+        console.log("Results:", results);
+        return res.json(results);
+      }
+    });
+  },
+
   async saveTokenNotification(req, res) {
     logger.info("Save Token Notification");
     const { tokenFcm, userId } = req.body;
