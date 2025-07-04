@@ -264,12 +264,12 @@ const Notification = {
       const users = results.map(row => row.user_id);
 
 
-      let imageUrl = 'https://play-lh.googleusercontent.com/6FINLIOgGm5UN2MuqBIYnqhydb71JlO55aOG1ox_S7WtSGvo-72p5pWkL2OufnIjBbY=w240-h480-rw';
+      let imageUrlString = 'https://play-lh.googleusercontent.com/6FINLIOgGm5UN2MuqBIYnqhydb71JlO55aOG1ox_S7WtSGvo-72p5pWkL2OufnIjBbY=w240-h480-rw';
       if (provider != null || provider != undefined || provider != '' || provider != 0 || provider != '0') {
         let queryProviders = `select image from fornecedor`;
         const resultProvider = await query(queryProviders);
         if (resultProvider.length > 0) {
-          imageUrl = resultProvider[0].image;
+          imageUrlString = resultProvider[0].image;
         } else {
           logger.warn("No provider token found, using default image URL.");
         }
