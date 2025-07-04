@@ -98,7 +98,7 @@ const Notification = {
 
       let result = { success: true, message: "" };
       if (data.method == 1) {
-        result = await Notification.sendNotification(data.title, data.content, data.redirect, data.target, resp[1][0]["LAST_INSERT_ID()"]);
+        result = await Notification.sendNotification(data.title, data.content, data.redirect, data.target, data.provider, resp[1][0]["LAST_INSERT_ID()"]);
       }
 
       return res.status(200).send({
@@ -233,7 +233,7 @@ const Notification = {
   //   }
   // },
 
-  async sendNotification(title, content, redirect, target, notificationId) {
+  async sendNotification(title, content, redirect, target, provider, notificationId) {
     logger.info("Send Notifications");
 
     if (!title || !content) {
@@ -263,7 +263,18 @@ const Notification = {
       const tokens = results.map(row => row.token);
       const users = results.map(row => row.user_id);
 
-      const imageUrlString = 'https://gkpb.com.br/wp-content/uploads/2024/08/novo-logo-perdigao.jpg';
+
+      let imageUrl = 'https://play-lh.googleusercontent.com/6FINLIOgGm5UN2MuqBIYnqhydb71JlO55aOG1ox_S7WtSGvo-72p5pWkL2OufnIjBbY=w240-h480-rw';
+      if (provider != null || provider != undefined || provider != '' || provider != 0 || provider != '0') {
+        let queryProviders = `select image from fornecedor`;
+        const resultProvider = await query(queryProviders);
+        if (resultProvider.length > 0) {
+          imageUrl = resultProvider[0].image;
+        } else {
+          logger.warn("No provider token found, using default image URL.");
+        }
+      }
+
 
       const message = {
         notification: { title, body: content },
