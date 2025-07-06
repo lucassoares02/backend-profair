@@ -275,11 +275,9 @@ const Notification = {
         }
       }
 
-      let items = `{ notificationId: ${notificationId.toString()}, direct: ${redirect.toString()}, provider: ${provider.toString()}}`;
-
       const message = {
         notification: { title, body: content },
-        data: { notificationId: items.toString(), imageUrl: imageUrlString },
+        data: { notificationId: items.toString(), direct: redirect.toString(), provider: provider.toString(), imageUrl: imageUrlString },
         tokens,
         android: {
           notification: {
