@@ -4,6 +4,7 @@ const admin = require("firebase-admin");
 const { connection } = require("@server");
 const util = require("util");
 const { getMonth } = require("date-fns");
+const { image } = require("pdfkit");
 const query = util.promisify(connection.query).bind(connection);
 
 // Firebase Initialization (seguro e único)
@@ -276,7 +277,7 @@ const Notification = {
       }
 
       const message = {
-        notification: { title, body: content },
+        notification: { title, body: content, image: imageUrlString },
         data: { notificationId: notificationId.toString(), direct: redirect.toString(), provider: provider.toString(), imageUrl: imageUrlString },
         tokens,
         android: {
