@@ -368,6 +368,7 @@ const User = {
 
     const queryConsult = `SET sql_mode = ''; 
     SELECT acesso.codAcesso, 
+    acesso.is_present as present,
     acesso.direcAcesso, organizador.nomeOrg AS nomeForn, 
     organizador.cnpjOrg AS cnpjForn, acesso.codUsuario,  
     organizador.codOrg AS codForn, consultor.nomeConsult, 
@@ -412,7 +413,7 @@ const User = {
   async getAllUsersProvider(req, res) {
     logger.info("Get All Users Fair");
 
-    const queryConsult = `SET sql_mode = ''; select acesso.codAcesso, acesso.direcAcesso, fornecedor.nomeForn, fornecedor.cnpjForn, acesso.codUsuario, fornecedor.codForn, consultor.nomeConsult, consultor.telConsult as 'phone', consultor.emailConsult as 'email', consultor.cpfConsult from acesso join consultor on acesso.codUsuario = consultor.codConsult join relacionafornecedor on consultor.codConsult = relacionafornecedor.codConsultor	join fornecedor on relacionafornecedor.codFornecedor = fornecedor.codForn left join pedido on pedido.codFornPedido = fornecedor.codForn left join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido group by consultor.codConsult`;
+    const queryConsult = `SET sql_mode = ''; select acesso.is_present as present, acesso.codAcesso, acesso.direcAcesso, fornecedor.nomeForn, fornecedor.cnpjForn, acesso.codUsuario, fornecedor.codForn, consultor.nomeConsult, consultor.telConsult as 'phone', consultor.emailConsult as 'email', consultor.cpfConsult from acesso join consultor on acesso.codUsuario = consultor.codConsult join relacionafornecedor on consultor.codConsult = relacionafornecedor.codConsultor	join fornecedor on relacionafornecedor.codFornecedor = fornecedor.codForn left join pedido on pedido.codFornPedido = fornecedor.codForn left join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido group by consultor.codConsult`;
 
     connection.query({ sql: queryConsult, timeout: 15000 }, (error, results, fields) => {
       if (error) {
@@ -496,7 +497,7 @@ const User = {
   async getAllUsersAssociate(req, res) {
     logger.info("Get All Users Fair");
 
-    const queryConsult = `SET sql_mode = ''; SELECT acess.is_present as present,  acesso.codAcesso, acesso.direcAcesso, associado.razaoAssociado AS nomeForn, associado.cnpjAssociado AS cnpjForn, acesso.codUsuario, associado.codAssociado AS codForn, consultor.telConsult as 'phone', consultor.emailConsult as 'email', consultor.nomeConsult, consultor.cpfConsult, FORMAT(IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0), 2, 'de_DE') as 'valorPedido' FROM acesso join consultor on acesso.codUsuario = consultor.codConsult join relaciona on relaciona.codAssocRelaciona = consultor.codConsult join associado on associado.codAssociado = relaciona.codConsultRelaciona left join pedido on pedido.codAssocPedido = associado.codAssociado left join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido group by consultor.codConsult`;
+    const queryConsult = `SET sql_mode = ''; SELECT acesso.is_present as present,  acesso.codAcesso, acesso.direcAcesso, associado.razaoAssociado AS nomeForn, associado.cnpjAssociado AS cnpjForn, acesso.codUsuario, associado.codAssociado AS codForn, consultor.telConsult as 'phone', consultor.emailConsult as 'email', consultor.nomeConsult, consultor.cpfConsult, FORMAT(IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0), 2, 'de_DE') as 'valorPedido' FROM acesso join consultor on acesso.codUsuario = consultor.codConsult join relaciona on relaciona.codAssocRelaciona = consultor.codConsult join associado on associado.codAssociado = relaciona.codConsultRelaciona left join pedido on pedido.codAssocPedido = associado.codAssociado left join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido group by consultor.codConsult`;
     // const queryConsult = `SET sql_mode = '';
     //   SELECT
     //     acesso.codAcesso,
