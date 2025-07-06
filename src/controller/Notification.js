@@ -275,7 +275,7 @@ const Notification = {
         }
       }
 
-      const items = JSON.stringify({ notificationId: notificationId.toString(), direct: redirect.toString(), provider: provider.toString() });
+      let items = `{ notificationId: ${notificationId.toString()}, direct: ${redirect.toString()}, provider: ${provider.toString()}}`;
 
       const message = {
         notification: { title, body: content },
