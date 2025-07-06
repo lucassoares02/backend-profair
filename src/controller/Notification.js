@@ -244,6 +244,8 @@ const Notification = {
 
     let queryStr = `SELECT token, codUsuario AS user_id FROM acesso WHERE token IS NOT NULL AND token != ''`;
 
+    console.log("Target", target);
+
     if ([1, 2, 3].includes(Number(target))) {
       queryStr += ` AND direcAcesso = ${Number(target)}`;
     }
@@ -252,6 +254,10 @@ const Notification = {
 
     try {
       const results = await query(queryStr);
+
+      console.log("-------------------------------------------");
+      console.log("Results:", results);
+      console.log("-------------------------------------------");
 
       if (!results.length) {
         logger.warn("No tokens found for the specified redirect.");
