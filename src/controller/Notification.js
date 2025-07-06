@@ -299,6 +299,12 @@ const Notification = {
 
       const response = await admin.messaging().sendEachForMulticast(message);
 
+
+      const updateNotifications = `update notifications set sent = 1 where id = ${notificationId}`;
+
+      await query(updateNotifications);
+
+
       const insertValues = results.map((row, index) => {
         const res = response.responses[index];
         console.log("Response:", res);
