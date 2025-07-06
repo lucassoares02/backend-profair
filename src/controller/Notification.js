@@ -279,7 +279,7 @@ const Notification = {
 
       const message = {
         notification: { title, body: content },
-        data: { notificationId: notificationId.toString(), imageUrl: imageUrlString },
+        data: { notificationId: items.toString(), imageUrl: imageUrlString },
         tokens,
         android: {
           notification: {
