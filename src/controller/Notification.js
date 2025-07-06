@@ -279,7 +279,7 @@ const Notification = {
 
       const message = {
         notification: { title, body: content },
-        data: { items: items, imageUrl: imageUrlString },
+        data: { notificationId: notificationId.toString(), imageUrl: imageUrlString },
         tokens,
         android: {
           notification: {
@@ -340,7 +340,7 @@ const Notification = {
       return { success: true, message: "Notification sent", response };
 
     } catch (error) {
-      logger.error("Error sending notification:", error);
+      logger.info("Error sending notification:", error);
       return { success: false, message: "Error sending notification", error };
     }
   }
