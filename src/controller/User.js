@@ -35,7 +35,7 @@ const User = {
               fornecedor.cnpjForn,
               acesso.codUsuario,
               fornecedor.codForn,
-              CONCAT(consultor.nomeConsult, ' - ', acesso.codAcesso) as 'nomeConsult',
+              consultor.nomeConsult,
               consultor.cpfConsult,
               FORMAT(IFNULL(sum(mercadoria.precoMercadoria * pedido.quantMercPedido), 0), 2, 'de_DE') as 'valorPedido' 
             from acesso 
