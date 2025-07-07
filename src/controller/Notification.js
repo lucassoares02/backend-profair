@@ -28,8 +28,9 @@ const Notification = {
 
 
     // const query = "SELECT n.*, DATE_SUB(NOW(), INTERVAL 3 HOUR) AS data_atual_menos_3h FROM notifications n LEFT JOIN acesso a ON a.direcAcesso = n.target WHERE (a.codAcesso = ? OR n.target = 0) AND (n.method = 1 OR (n.method = 2 AND STR_TO_DATE(CONCAT(YEAR(NOW()), '-', LPAD(n.month, 2, '0'), '-', LPAD(n.day, 2, '0'), ' ', LPAD(n.hour, 2, '0'), ':', LPAD(n.minute, 2, '0'), ':00'), '%Y-%m-%d %H:%i:%s') < DATE_SUB(NOW(), INTERVAL 3 HOUR))) order by created_at desc;";
-    const query = ```
-    SELECT
+    try {
+
+      const query = ``` SELECT
     a.codUsuario,
     n.*,
     COALESCE(un.viewed, 0) AS viewed,
@@ -68,18 +69,22 @@ AND (
             ) < DATE_SUB(NOW(), INTERVAL 3 HOUR)
         )
     )
-ORDER BY
-    n.created_at DESC;```;
+ORDER BY n.created_at DESC;```;
 
-    console.log("Query:", query);
+      console.log("Query:", query);
 
-    connection.query(query, (error, results, fields) => {
-      if (error) {
-        return res.status(400).send(error);
-      } else {
-        return res.json(results);
-      }
-    });
+      connection.query(query, (error, results, fields) => {
+        if (error) {
+          return res.status(400).send(error);
+        } else {
+          return res.json(results);
+        }
+      });
+
+    } catch (error) {
+      return res.status(400).send(error);
+    }
+    con
   },
 
   async getNotificationDetails(req, res) {
