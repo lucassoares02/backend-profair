@@ -38,6 +38,23 @@ const Notification = {
     });
   },
 
+  async getNotificationDetails(req, res) {
+    logger.info("Get Details Notification");
+
+    const { id } = req.params;
+
+    const query = "select * from notifications n where n.id = ?";
+    const values = [id];
+
+    connection.query(query, values, (error, results, fields) => {
+      if (error) {
+        return res.status(400).send(error);
+      } else {
+        return res.json(results);
+      }
+    });
+  },
+
   async getPendingNotificationPerUser(req, res) {
     logger.info("Get Notifications");
 
