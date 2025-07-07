@@ -38,6 +38,23 @@ const Notification = {
     });
   },
 
+  async getPendingNotificationPerUser(req, res) {
+    logger.info("Get Notifications");
+
+    const user = req.headers["user-id"];
+
+    const query = "select * from user_notifications where user = ? and viewed = 0";
+    const values = [user];
+
+    connection.query(query, values, (error, results, fields) => {
+      if (error) {
+        return res.status(400).send(error);
+      } else {
+        return res.json(results);
+      }
+    });
+  },
+
   async getNotificationsAll(req, res) {
     logger.info("Get Notifications");
 
