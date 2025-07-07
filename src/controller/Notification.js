@@ -43,7 +43,7 @@ const Notification = {
 
     const user = req.headers["user-id"];
 
-    const query = "select * from user_notifications where user = ? and viewed = 0";
+    const query = "select un.* from user_notifications un join acesso a on a.codUsuario = un.user where a.codAcesso = ? and un.viewed = 0";
     const values = [user];
 
     connection.query(query, values, (error, results, fields) => {
