@@ -82,6 +82,8 @@ ORDER BY n.created_at DESC;```;
       });
 
     } catch (error) {
+      console.log("Error in getNotifications:", error);
+      logger.error("Error in getNotifications:", error);
       return res.status(400).send(error);
     }
     con
