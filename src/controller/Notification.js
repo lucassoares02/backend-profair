@@ -26,17 +26,27 @@ const Notification = {
 
     const user = req.headers["user-id"];
 
-    const query = 'select * from notifications order by id desc';
+    const query = "SELECT *, DATE_SUB(NOW(), INTERVAL 3 HOUR) FROM notifications join acesso on acesso.direcAcesso = notifications.target WHERE acesso.codAcesso = ? AND (method = 1 OR (method = 2 AND STR_TO_DATE(CONCAT(YEAR(NOW()),'-',LPAD(month, 2, '0'),'-',LPAD(day, 2, '0'),' ',LPAD(hour, 2, '0'),':',LPAD(minute, 2, '0'),':00'),'%Y-%m-%d %H:%i:%s') < DATE_SUB(NOW(), INTERVAL 3 HOUR)));";
+    const values = [user];
 
-    // const query = `select * from notifications n join acesso a on a.codUsuario = n.user where a.codAcesso = ? order by n.id desc`;
-    // const values = [user];
+    connection.query(query, values, (error, results, fields) => {
+      if (error) {
+        return res.status(400).send(error);
+      } else {
+        return res.json(results);
+      }
+    });
+  },
+
+  async getNotificationsAll(req, res) {
+    logger.info("Get Notifications");
+
+    const query = 'select * from notifications order by id desc';
 
     connection.query(query, (error, results, fields) => {
       if (error) {
         return res.status(400).send(error);
       } else {
-        // console.log("Query:", query);
-        // console.log("Results:", results);
         return res.json(results);
       }
     });
@@ -175,64 +185,6 @@ const Notification = {
       return res.status(400).send({ message: "Error update notification", error });
     }
   },
-
-  // async sendNotification(title, content, redirect, target, notification) {
-  //   logger.info("Send Notifications");
-
-  //   if (!title || !content) {
-  //     return { success: false, message: "Title and content are required" };
-  //   }
-
-  //   initializeFirebase();
-
-  //   let queryStr = `SELECT token, codUsuario as 'usuario' FROM acesso WHERE token IS NOT NULL AND token != ''`;
-
-
-  //   if ([1, 2, 3].includes(Number(target))) {
-  //     queryStr += ` AND direcAcesso = ${Number(target)}`;
-  //   }
-
-  //   try {
-  //     const results = await query(queryStr);
-
-
-  //     if (!results.length) {
-  //       logger.warn("No tokens found for the specified redirect.");
-  //       return { success: false, message: "No tokens found." };
-  //     }
-
-  //     const tokens = results.map(row => row.token);
-  //     const users = results.map(row => row.usuario);
-
-
-  //     const message = {
-  //       notification: { title, body: content },
-  //       data: { notificationId: "12", userId: "1" },
-  //       tokens,
-  //     };
-
-  //     const response = await admin.messaging().sendEachForMulticast(message);
-
-  //     // verify if the response contains errors
-  //     if (response.failureCount > 0) {
-  //       const failedTokens = response.responses
-  //         .map((resp, idx) => resp.error ? tokens[idx] : resp.error)
-  //         .filter(token => token !== null);
-
-  //       logger.error("Failed to send notifications to tokens:", failedTokens);
-  //       return { success: false, message: "Some notifications failed to send", failedTokens };
-  //     }
-
-
-
-  //     logger.info("Notification sent successfully", { successCount: response.successCount });
-  //     return { success: true, message: "Notification sent", response };
-
-  //   } catch (error) {
-  //     logger.error("Error sending notification:", error);
-  //     return { success: false, message: "Error sending notification", error };
-  //   }
-  // },
 
   async sendNotification(title, content, redirect, target, provider, notificationId) {
     logger.info("Send Notifications");
