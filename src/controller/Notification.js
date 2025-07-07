@@ -30,6 +30,8 @@ const Notification = {
     const query = "SELECT a.codUsuario, n.*, COALESCE(un.viewed, 0) AS viewed, DATE_SUB(NOW(), INTERVAL 3 HOUR) AS data_atual_menos_3h FROM notifications n LEFT JOIN  a ON a.direcAcesso = n.target LEFT JOIN user_notifications un ON un.notification = n.id AND un.user = a.codUsuario WHERE ( a.codAcesso = ? OR n.target = 0 ) AND ( n.method = 1 OR ( n.method = 2 AND STR_TO_DATE( CONCAT( YEAR(NOW()), '-', LPAD(n.month, 2, '0'), '-', LPAD(n.day, 2, '0'), ' ', LPAD(n.hour, 2, '0'), ':', LPAD(n.minute, 2, '0'), ':00' ), '%Y-%m-%d %H:%i:%s' ) < DATE_SUB(NOW(), INTERVAL 3 HOUR) ) ) ORDER BY n.created_at DESC;";
     const values = [user];
 
+    console.log("Query:", query);
+
     connection.query(query, values, (error, results, fields) => {
       if (error) {
         return res.status(400).send(error);
