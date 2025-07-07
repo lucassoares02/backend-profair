@@ -200,6 +200,7 @@ router.post("/notification/send", Notification.sendNotification);
 router.post("/notification/opened", Notification.openedNotification);
 router.post("/notification/save/token", Notification.saveTokenNotification);
 router.get("/notification/targets/:notification", Notification.getTargetsNotifications);
+router.get("/notification/pending", Notification.getPendingNotificationPerUser);
 
 
 module.exports = router;
