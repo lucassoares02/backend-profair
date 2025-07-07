@@ -280,25 +280,38 @@ const Notification = {
       }
 
       const message = {
-        notification: { title, body: content, image: imageUrlString },
-        data: { notificationId: notificationId.toString(), direct: redirect.toString(), provider: provider.toString(), imageUrl: imageUrlString },
+        notification: {
+          title,
+          body: content,
+          image: imageUrlString,
+        },
+        data: {
+          notificationId: notificationId.toString(),
+          direct: redirect.toString(),
+          provider: provider.toString(),
+          imageUrl: imageUrlString,
+          title,
+          body: content,
+        },
         tokens,
         android: {
           notification: {
-            // aqui você garante que o Android nativo vai receber a imagem
             imageUrl: imageUrlString,
-          }
+          },
         },
         apns: {
           payload: {
-            aps: { 'mutable-content': 1 }
+            aps: {
+              'mutable-content': 1,
+              'content-available': 1,
+            },
           },
           fcm_options: {
-            // para iOS (APNs) também exibir imagem
             image: imageUrlString,
-          }
-        }
+          },
+        },
       };
+
 
       const response = await admin.messaging().sendEachForMulticast(message);
 
