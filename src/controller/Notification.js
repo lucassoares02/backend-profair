@@ -43,7 +43,7 @@ const Notification = {
 
     const { id } = req.params;
 
-    const query = "select * from notifications n where n.id = ?";
+    const query = "SELECT n.*, CASE WHEN n.provider != 0 THEN f.nomeForn ELSE NULL END AS nomeForn, CASE WHEN n.provider != 0 THEN f.color ELSE NULL END AS color, CASE WHEN n.provider != 0 THEN f.image ELSE NULL END AS image FROM notifications n LEFT JOIN fornecedor f ON n.provider = f.codForn WHERE n.id = ?;";
     const values = [id];
 
     connection.query(query, values, (error, results, fields) => {
