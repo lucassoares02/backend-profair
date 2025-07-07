@@ -26,7 +26,7 @@ const Notification = {
 
     const user = req.headers["user-id"];
 
-    const query = "SELECT *, DATE_SUB(NOW(), INTERVAL 3 HOUR) FROM notifications join acesso on acesso.direcAcesso = notifications.target WHERE acesso.codAcesso = ? AND (method = 1 OR (method = 2 AND STR_TO_DATE(CONCAT(YEAR(NOW()),'-',LPAD(month, 2, '0'),'-',LPAD(day, 2, '0'),' ',LPAD(hour, 2, '0'),':',LPAD(minute, 2, '0'),':00'),'%Y-%m-%d %H:%i:%s') < DATE_SUB(NOW(), INTERVAL 3 HOUR)));";
+    const query = "SELECT *, DATE_SUB(NOW(), INTERVAL 3 HOUR) FROM notifications join acesso on acesso.direcAcesso = notifications.target WHERE acesso.codAcesso = ? or target = 0 AND (method = 1 OR (method = 2 AND STR_TO_DATE(CONCAT(YEAR(NOW()),'-',LPAD(month, 2, '0'),'-',LPAD(day, 2, '0'),' ',LPAD(hour, 2, '0'),':',LPAD(minute, 2, '0'),':00'),'%Y-%m-%d %H:%i:%s') < DATE_SUB(NOW(), INTERVAL 3 HOUR)));";
     const values = [user];
 
     connection.query(query, values, (error, results, fields) => {
