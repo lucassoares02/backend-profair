@@ -267,6 +267,8 @@ const Notification = {
       const tokens = results.map(row => row.token);
       const users = results.map(row => row.user_id);
 
+      console.log("Provider:", provider);
+
 
       let imageUrlString = 'https://play-lh.googleusercontent.com/6FINLIOgGm5UN2MuqBIYnqhydb71JlO55aOG1ox_S7WtSGvo-72p5pWkL2OufnIjBbY=w240-h480-rw';
       if (provider != null || provider != undefined || provider != '' || provider != 0 || provider != '0') {
@@ -311,6 +313,8 @@ const Notification = {
           },
         },
       };
+
+      console.log("Message:", message);
 
 
       const response = await admin.messaging().sendEachForMulticast(message);
