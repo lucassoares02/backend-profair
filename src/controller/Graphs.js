@@ -6,6 +6,8 @@ const Insert = require("@insert");
 const fs = require("fs");
 const PDFDocument = require("pdfkit-table");
 const path = require("path");
+const axios = require("axios");
+const PDFDocument = require("pdfkit");
 
 const Graphs = {
   async getPercentageClients(req, res) {
@@ -381,8 +383,7 @@ WHERE
 
       const clientInfo = `${rows[0].client} - ${rows[0].client_name}`;
       const providerInfo = `${rows[0].provider} - ${rows[0].provider_name}`;
-
-      const providerImage = rows[0].provider_image;  // URL
+      const providerImage = rows[0].provider_image;
       const providerColorHex = rows[0].provider_color?.replace("0XFF", "#") || "#000000";
 
       let valorTotal = 0;
@@ -404,7 +405,7 @@ WHERE
         valorTotal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
       ]);
 
-      const doc = new PDFDocument({ margin: 40, size: "A4" });
+      const doc = new PDFDocument({ margin: 20, size: "A4" });
       const chunks = [];
       doc.on("data", (chunk) => chunks.push(chunk));
       doc.on("end", () => {
@@ -415,66 +416,48 @@ WHERE
       });
 
       // HEADER
-      const headerHeight = 100;
-
       if (providerImage) {
         try {
           const response = await axios.get(providerImage, { responseType: "arraybuffer" });
           const imageBuffer = Buffer.from(response.data, "binary");
-          doc.rect(0, 0, doc.page.width, headerHeight).fill(providerColorHex);
-          doc.image(imageBuffer, 40, 20, { height: 60 });
+          doc.image(imageBuffer, doc.page.width - 120, 20, { width: 100 });
         } catch (err) {
           console.error("Erro ao carregar imagem do fornecedor:", err.message);
-          doc.rect(0, 0, doc.page.width, headerHeight).fill(providerColorHex);
-          doc
-            .fillColor("#fff")
-            .fontSize(20)
-            .text(providerInfo, 150, 40);
         }
-      } else {
-        doc.rect(0, 0, doc.page.width, headerHeight).fill(providerColorHex);
-        doc
-          .fillColor("#fff")
-          .fontSize(20)
-          .text(providerInfo, 40, 40);
       }
 
-      doc.moveDown(2);
-      doc.fillColor("#000").fontSize(12);
-      doc.text(`Cliente: ${clientInfo}`);
-      doc.text(`Data: ${dateStr} Hora: ${timeStr}`);
-      doc.moveDown(1.5);
+      doc
+        .fillColor(providerColorHex)
+        .fontSize(20)
+        .text("Nota de Negociação", { align: "left" });
+
+      doc
+        .fillColor("black")
+        .fontSize(10)
+        .text(`Fornecedor: ${providerInfo}`)
+        .text(`Cliente: ${clientInfo}`)
+        .text(`Data: ${dateStr} Hora: ${timeStr}`)
+        .moveDown(1);
 
       // TABELA
-      const headers = [
-        "Produto", "Código de Barras", "Descrição", "Fator",
-        "Quantidade", "Preço", "Valor Total"
-      ];
+      const table = {
+        title: providerInfo,
+        subtitle: clientInfo,
+        headers: [
+          { label: "Produto", property: "name", width: 40, renderer: null },
+          { label: "Código de barras", property: "barcode", width: 70, renderer: null },
+          { label: "Descrição", property: "description", width: 200, renderer: null },
+          { label: "Fator", property: "brand", width: 50, renderer: null },
+          { label: "Quantidade", property: "quantity", width: 60, renderer: null },
+          { label: "Preço", property: "price", width: 60, renderer: null },
+          { label: "Valor Total", property: "total", width: 80, renderer: null },
+        ],
+        rows: tableRows,
+      };
 
-      const tableTop = doc.y + 20;
-      const colWidth = (doc.page.width - 80) / headers.length;
-
-      // Cabeçalho da tabela
-      headers.forEach((header, i) => {
-        doc
-          .font("Helvetica-Bold")
-          .fontSize(8)
-          .fillColor("#000")
-          .text(header, 40 + i * colWidth, tableTop, { width: colWidth, align: "center" });
-      });
-
-      doc.moveDown();
-
-      // Linhas da tabela
-      tableRows.forEach((row) => {
-        row.forEach((cell, i) => {
-          doc
-            .font("Helvetica")
-            .fontSize(8)
-            .fillColor("#000")
-            .text(cell, 40 + i * colWidth, doc.y, { width: colWidth, align: "center" });
-        });
-        doc.moveDown();
+      // Mantenha a mágica da sua tabela original
+      doc.table(table, {
+        prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
       });
 
       doc.end();
