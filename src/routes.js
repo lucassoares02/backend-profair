@@ -17,6 +17,7 @@ const Wedding = require("@controller/Wedding");
 const Log = require("@controller/Log");
 const Notification = require("@controller/Notification");
 const WindowNegotiation = require("@controller/WindowNegotiation");
+const Backup = require("@controller/Backup");
 
 router.post("/faceline-user", Faceline.insert);
 router.post("/faceline-user-update", Faceline.update);
@@ -154,7 +155,7 @@ router.get("/requestsnegotiationclientororg/:client/:provider", Request.getReque
 router.get("/requestsclients/:codconsult", Request.getRequestsClients);
 router.post("/insertrequest", Request.postInsertRequest);
 
-router.post("/insertrequestnew", Log.InsertLog, Request.postInserRequestNew);
+router.post("/insertrequestnew", Log.InsertLog, Backup.InsertSell, Request.postInserRequestNew);
 
 router.get("/allrequestclients", Request.getAllRequests);
 
