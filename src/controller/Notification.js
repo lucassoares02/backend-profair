@@ -72,6 +72,29 @@ const Notification = {
   },
 
 
+  async deleteNotifications(req, res) {
+    logger.info("Delete Notifications");
+
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).send({ message: "Notification ID is required" });
+    }
+
+    const query = "DELETE FROM notifications WHERE id = ?";
+    const values = [id];
+
+    connection.query(query, values, (error, results) => {
+      if (error) {
+        logger.error("Error deleting notification:", error);
+        return res.status(400).send({ message: "Error deleting notification", error });
+      } else {
+        return res.status(200).send({ message: "Notification deleted successfully" });
+      }
+    });
+
+  },
+
   async getNotificationDetails(req, res) {
     logger.info("Get Details Notification");
 
