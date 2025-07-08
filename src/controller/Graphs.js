@@ -523,177 +523,137 @@ WHERE
     logger.info("Get Exports Pdf");
     const { supplier, negotiation, client } = req.params;
 
-    let queryConsult = `
+    const queryConsult = `
     SET sql_mode = ''; SELECT 
     mercadoria.codMercadoria as product,
     mercadoria.nomeMercadoria as title,
     mercadoria.barcode,
     mercadoria.embMercadoria as packing,
     mercadoria.fatorMerc as factor,
-    mercadoria.complemento as  complement,
+    mercadoria.complemento as complement,
     mercadoria.marca as brand,  
-    a.codAssociado  as client,
+    a.codAssociado as client,
     a.razaoAssociado as client_name,
     f.codForn as provider,
     f.nomeForn as provider_name,
-    IFNULL(SUM(pedido.quantMercPedido), 0) as 'quantity', 
+    IFNULL(SUM(pedido.quantMercPedido), 0) as quantity, 
     mercadoria.precoMercadoria as price,
     mercadoria.precoUnit as unitprice,
-    IFNULL(SUM(mercadoria.precoMercadoria * pedido.quantMercPedido), 0) as 'totalprice' 
-    FROM 
-        mercadoria 
-    JOIN 
-        pedido ON pedido.codMercPedido = mercadoria.codMercadoria 
-    JOIN
-    	associado a ON pedido.codAssocPedido = a.codAssociado 
-    JOIN 
-    	fornecedor f ON pedido.codFornPedido = f.codForn 
-    WHERE 
-        pedido.codAssocPedido = ${client}
-        AND pedido.codfornpedido =  ${supplier} 
-        AND pedido.codNegoPedido =  ${negotiation}  
-    GROUP BY 
-        mercadoria.codMercadoria
-        
-    HAVING 
-    totalprice != 0
-    ORDER BY 
-        quantMercPedido;`;
+    IFNULL(SUM(mercadoria.precoMercadoria * pedido.quantMercPedido), 0) as totalprice 
+    FROM mercadoria 
+    JOIN pedido ON pedido.codMercPedido = mercadoria.codMercadoria 
+    JOIN associado a ON pedido.codAssocPedido = a.codAssociado 
+    JOIN fornecedor f ON pedido.codFornPedido = f.codForn 
+    WHERE pedido.codAssocPedido = ${client}
+      AND pedido.codfornpedido = ${supplier} 
+      AND pedido.codNegoPedido = ${negotiation}  
+    GROUP BY mercadoria.codMercadoria
+    HAVING totalprice != 0
+    ORDER BY quantMercPedido;`;
 
-    connection.query(queryConsult, (error, results, fields) => {
+    connection.query(queryConsult, (error, results) => {
       if (error) {
-        console.log("Error Export Negotiation : ", error);
+        console.error("Error Export Negotiation:", error);
+        return res.status(500).send("Erro ao gerar PDF");
+      }
+
+      const rows = results[1];
+      if (!rows.length) {
+        return res.status(404).send("Nenhum dado encontrado");
+      }
+
+      const now = new Date();
+      const dateStr = now.toLocaleDateString("pt-BR");
+      const timeStr = now.toLocaleTimeString("pt-BR");
+
+      const clientInfo = `${rows[0].client} - ${rows[0].client_name}`;
+      const providerInfo = `${rows[0].provider} - ${rows[0].provider_name}`;
+
+      let valorTotal = 0;
+      const tableRows = rows.map((item) => {
+        valorTotal += item.totalprice;
+        return [
+          item.product,
+          item.barcode,
+          item.title,
+          `${item.packing} | ${item.factor}`,
+          item.quantity,
+          item.price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }),
+          item.totalprice.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }),
+        ];
+      });
+
+      tableRows.push([
+        "Total", "", "", "", "", "",
+        valorTotal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+      ]);
+
+      const doc = new PDFDocument({ margin: 40, size: "A4" });
+
+      const chunks = [];
+      doc.on("data", (chunk) => chunks.push(chunk));
+      doc.on("end", () => {
+        const pdfBuffer = Buffer.concat(chunks);
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", 'inline; filename="nota.pdf"');
+        res.send(pdfBuffer);
+      });
+
+      // Header
+      if (fs.existsSync("./assets/logo.png")) {
+        doc.image("./assets/logo.png", 40, 40, { width: 100 });
       } else {
-        let valorTotal = 0;
-        let testefull = [];
-        let clientQuery = `${results[1][0].client} - ${results[1][0].client_name}`;
-        let providerQuery = `${results[1][0].provider} - ${results[1][0].provider_name}`;
+        doc
+          .fontSize(20)
+          .text("Sua Empresa", 40, 50);
+      }
 
-        results[1].map((item) => {
-          let itemP = [];
-          itemP.push(item.product);
-          itemP.push(item.barcode);
-          itemP.push(item.title);
-          itemP.push(`${item.packing} | ${item.factor}`);
-          itemP.push(item.quantity);
-          itemP.push(
-            item.price.toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            })
-          );
-          itemP.push(
-            item.totalprice.toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            })
-          );
+      doc
+        .fontSize(16)
+        .text("Nota de Negociação", 200, 50, { align: "center" })
+        .fontSize(10)
+        .text(`Data: ${dateStr} Hora: ${timeStr}`, { align: "right" })
+        .moveDown();
 
-          valorTotal += item.totalprice;
+      doc
+        .fontSize(12)
+        .text(`Fornecedor: ${providerInfo}`)
+        .text(`Cliente: ${clientInfo}`)
+        .moveDown(1.5);
 
-          testefull.push(itemP);
-        });
+      // Tabela
+      const headers = [
+        "Produto", "Código de Barras", "Descrição", "Fator",
+        "Quantidade", "Preço", "Valor Total"
+      ];
 
-        let itemP = [];
-        itemP.push("Total");
-        itemP.push("");
-        itemP.push("");
-        itemP.push("");
-        itemP.push("");
-        itemP.push("");
-        itemP.push(
-          valorTotal.toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-          })
-        );
+      const tableTop = doc.y;
+      const cellPadding = 5;
 
-        testefull.push(itemP);
-
-        const chunks = [];
-        doc.on("data", (chunk) => chunks.push(chunk));
-        doc.on("end", () => {
-          const pdfBuffer = Buffer.concat(chunks);
-          res.setHeader("Content-Type", "application/pdf");
-          res.setHeader("Content-Disposition", 'inline; filename="documento.pdf"');
-          res.send(pdfBuffer);
-        });
-
-        // ** CABEÇALHO **
-
-        // Inserir uma imagem no topo (ajuste o caminho conforme necessário)
-        const logoPath = path.join(__dirname, "/src/assets/logo.png"); // Certifique-se de ter um logo na pasta do projeto
-        if (fs.existsSync(logoPath)) {
-          doc.image(logoPath, 20, 20, { width: 100 });
-        }
-
-        // Nome da empresa
+      // Cabeçalho da tabela
+      headers.forEach((header, i) => {
         doc
           .font("Helvetica-Bold")
-          .fontSize(16)
-          .text("Nome da Empresa", 140, 30)
-          .fontSize(10)
-          .text("Rua Exemplo, 123 - Cidade - Estado", 140, 50)
-          .text("Email: contato@empresa.com | Tel: (00) 1234-5678", 140, 65)
-          .moveDown();
+          .fontSize(8)
+          .text(header, 40 + i * 75, tableTop, { width: 75, align: "center" });
+      });
+      doc.moveDown();
 
-        // Linha separadora
-        doc.moveTo(20, 90).lineTo(570, 90).stroke();
-
-        // ** INFORMAÇÕES DO DOCUMENTO **
-
-        // Data e hora
-        const now = new Date().toLocaleString("pt-BR", {
-          timeZone: "America/Sao_Paulo",
+      // Linhas da tabela
+      tableRows.forEach((row) => {
+        row.forEach((cell, i) => {
+          doc
+            .font("Helvetica")
+            .fontSize(8)
+            .text(cell, 40 + i * 75, doc.y, { width: 75, align: "center" });
         });
+        doc.moveDown();
+      });
 
-        doc
-          .font("Helvetica")
-          .fontSize(12)
-          .text(`Data: ${now}`, 420, 100, { align: "right" });
-
-        doc
-          .font("Helvetica-Bold")
-          .fontSize(14)
-          .text("Pedido de Compra", 20, 110)
-          .moveDown(0.5);
-
-        // Cliente e fornecedor
-        doc
-          .font("Helvetica")
-          .fontSize(12)
-          .text(`Fornecedor: ${providerQuery}`, 20, 130)
-          .text(`Cliente: ${clientQuery}`, 20, 145)
-          .moveDown(1);
-
-        // ** LINHA SEPARADORA ANTES DA TABELA **
-        doc.moveTo(20, 170).lineTo(570, 170).stroke();
-
-        // ** TABELA DE PRODUTOS **
-        const table = {
-          headers: [
-            { label: "Produto", property: "name", width: 80 },
-            { label: "Código de barras", property: "barcode", width: 90 },
-            { label: "Descrição", property: "description", width: 160 },
-            { label: "Fator", property: "brand", width: 50 },
-            { label: "Quantidade", property: "quantity", width: 60 },
-            { label: "Preço", property: "price", width: 60 },
-            { label: "Valor Total", property: "total", width: 80 },
-          ],
-          rows: testefull,
-        };
-
-        // Aplicando estilos à tabela
-        doc.table(table, {
-          prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
-          prepareRow: (row, i) => doc.font("Helvetica").fontSize(8),
-        });
-
-        // Finalizar o documento PDF
-        doc.end();
-      };
+      doc.end();
     });
-  },
+  }
+  ,
 
   async getExportPdfBackup(req, res) {
     logger.info("Get Exports Pdf");
