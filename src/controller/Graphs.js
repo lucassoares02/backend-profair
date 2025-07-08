@@ -2,9 +2,7 @@ const { connection } = require("@server");
 const logger = require("@logger");
 const Select = require("@select");
 const Insert = require("@insert");
-// const PDFDocument = require("pdfkit");
 const fs = require("fs");
-// const PDFDocument = require("pdfkit-table");
 const path = require("path");
 
 const PDFDocument = require("pdfkit");
@@ -15,6 +13,7 @@ const Graphs = {
 
   async getExportPdfGPT22(req, res) {
     logger.info("Get Exports Pdf");
+
     const { supplier, negotiation, client } = req.params;
 
     const queryConsult = `
@@ -68,29 +67,43 @@ const Graphs = {
         const providerImage = rows[0].provider_image;
         let providerColorHex = rows[0].provider_color?.replace("0XFF", "#") || "#000000";
 
-        // Valida a cor
         if (!/^#[0-9A-F]{6}$/i.test(providerColorHex)) {
           providerColorHex = "#000000";
         }
 
         let valorTotal = 0;
+
         const tableRows = rows.map((item) => {
           valorTotal += item.totalprice;
-          return [
-            item.product,
-            item.barcode,
-            item.title,
-            `${item.packing} | ${item.factor}`,
-            item.quantity,
-            item.price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }),
-            item.totalprice.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }),
-          ];
+          return {
+            name: item.product,
+            barcode: item.barcode,
+            description: item.title,
+            brand: `${item.packing} | ${item.factor}`,
+            quantity: item.quantity,
+            price: item.price.toLocaleString("pt-BR", {
+              style: "currency",
+              currency: "BRL",
+            }),
+            total: item.totalprice.toLocaleString("pt-BR", {
+              style: "currency",
+              currency: "BRL",
+            }),
+          };
         });
 
-        tableRows.push([
-          "Total", "", "", "", "", "",
-          valorTotal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
-        ]);
+        tableRows.push({
+          name: "TOTAL",
+          barcode: "",
+          description: "",
+          brand: "",
+          quantity: "",
+          price: "",
+          total: valorTotal.toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+          }),
+        });
 
         const doc = new PDFDocument({ margin: 20, size: "A4" });
         const chunks = [];
@@ -99,19 +112,24 @@ const Graphs = {
         doc.on("end", () => {
           const pdfBuffer = Buffer.concat(chunks);
           res.setHeader("Content-Type", "application/pdf");
-          res.setHeader("Content-Disposition", 'inline; filename="nota.pdf"');
+          res.setHeader(
+            "Content-Disposition",
+            'inline; filename="nota.pdf"'
+          );
           res.send(pdfBuffer);
         });
 
-        // 🔷 HEADER
+        // Header com cor
         const headerHeight = 100;
         doc.rect(0, 0, doc.page.width, headerHeight).fill(providerColorHex);
 
-        doc.fillColor("#fff")
+        doc
+          .fillColor("#fff")
           .fontSize(18)
           .text("Nota de Negociação", 40, 30);
 
-        doc.fontSize(10)
+        doc
+          .fontSize(10)
           .text(`Fornecedor: ${providerInfo}`, 40, 50)
           .text(`Cliente: ${clientInfo}`, 40, 65)
           .text(`Data: ${dateStr} Hora: ${timeStr}`, 40, 80);
@@ -119,27 +137,35 @@ const Graphs = {
         // Logo do fornecedor
         if (providerImage) {
           try {
-            const response = await axios.get(providerImage, { responseType: "arraybuffer" });
+            const response = await axios.get(providerImage, {
+              responseType: "arraybuffer",
+            });
             const imageBuffer = Buffer.from(response.data, "binary");
-            doc.image(imageBuffer, doc.page.width - 120, 20, { width: 80, height: 60 });
+            doc.image(imageBuffer, doc.page.width - 120, 20, {
+              width: 80,
+              height: 60,
+            });
           } catch (err) {
-            console.warn("⚠️ Erro ao carregar logo do fornecedor:", err.message);
-            doc.fillColor("#fff")
+            console.warn("⚠️ Erro ao carregar logo:", err.message);
+            doc
+              .fillColor("#fff")
               .fontSize(10)
-              .text("Logo indisponível", doc.page.width - 100, 50, { align: "center", width: 80 });
+              .text("Logo indisponível", doc.page.width - 100, 50, {
+                align: "center",
+                width: 80,
+              });
           }
         }
 
-        doc.moveDown();
+        doc.moveDown(2);
         doc.fillColor("black");
 
-        // 🔷 TABELA
         const table = {
           headers: [
-            { label: "Produto", property: "name", width: 40 },
-            { label: "Código de barras", property: "barcode", width: 70 },
-            { label: "Descrição", property: "description", width: 200 },
-            { label: "Fator", property: "brand", width: 50 },
+            { label: "Produto", property: "name", width: 60 },
+            { label: "Código de Barras", property: "barcode", width: 100 },
+            { label: "Descrição", property: "description", width: 150 },
+            { label: "Fator", property: "brand", width: 80 },
             { label: "Quantidade", property: "quantity", width: 60 },
             { label: "Preço", property: "price", width: 60 },
             { label: "Valor Total", property: "total", width: 80 },
@@ -147,17 +173,15 @@ const Graphs = {
           rows: tableRows,
         };
 
-        doc.moveDown(2);
-
         doc.table(table, {
           prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
+          prepareRow: (row, i) => doc.font("Helvetica").fontSize(8),
         });
 
         doc.end();
 
       } catch (err) {
-        console.error("🟥 Erro detalhado ao gerar PDF:");
-        console.error(err.stack || err);
+        console.error("🟥 Erro ao gerar PDF:", err.stack || err);
         res.status(500).send("Erro interno ao gerar PDF: " + (err.message || err));
       }
     });
