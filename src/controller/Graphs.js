@@ -4,10 +4,10 @@ const Select = require("@select");
 const Insert = require("@insert");
 // const PDFDocument = require("pdfkit");
 const fs = require("fs");
-const PDFDocument = require("pdfkit-table");
+const PDFDocument2 = require("pdfkit-table");
+const PDFDocument = require("pdfkit");
 const path = require("path");
 const axios = require("axios");
-const PDFDocument = require("pdfkit");
 
 const Graphs = {
   async getPercentageClients(req, res) {
