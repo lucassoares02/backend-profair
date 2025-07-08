@@ -2,10 +2,10 @@ const { connection } = require("@server");
 const logger = require("@logger");
 const Select = require("@select");
 const Insert = require("@insert");
-// const PDFDocument = require("pdfkit");
 const fs = require("fs");
-const PDFDocument2 = require("pdfkit-table");
+
 const PDFDocument = require("pdfkit");
+require("pdfkit-table");
 const path = require("path");
 const axios = require("axios");
 
@@ -415,52 +415,55 @@ WHERE
         res.send(pdfBuffer);
       });
 
-      // HEADER
-      if (providerImage) {
-        try {
-          const response = await axios.get(providerImage, { responseType: "arraybuffer" });
-          const imageBuffer = Buffer.from(response.data, "binary");
-          doc.image(imageBuffer, doc.page.width - 120, 20, { width: 100 });
-        } catch (err) {
-          console.error("Erro ao carregar imagem do fornecedor:", err.message);
+      try {
+        // HEADER
+        if (providerImage) {
+          try {
+            const response = await axios.get(providerImage, { responseType: "arraybuffer" });
+            const imageBuffer = Buffer.from(response.data, "binary");
+            doc.image(imageBuffer, doc.page.width - 120, 20, { width: 100 });
+          } catch (err) {
+            console.warn("Logo não carregada:", err.message);
+          }
         }
+
+        doc
+          .fillColor(providerColorHex)
+          .fontSize(20)
+          .text("Nota de Negociação", { align: "left" });
+
+        doc
+          .fillColor("black")
+          .fontSize(10)
+          .text(`Fornecedor: ${providerInfo}`)
+          .text(`Cliente: ${clientInfo}`)
+          .text(`Data: ${dateStr} Hora: ${timeStr}`)
+          .moveDown(1);
+
+        // TABELA
+        const table = {
+          headers: [
+            { label: "Produto", property: "name", width: 40 },
+            { label: "Código de barras", property: "barcode", width: 70 },
+            { label: "Descrição", property: "description", width: 200 },
+            { label: "Fator", property: "brand", width: 50 },
+            { label: "Quantidade", property: "quantity", width: 60 },
+            { label: "Preço", property: "price", width: 60 },
+            { label: "Valor Total", property: "total", width: 80 },
+          ],
+          rows: tableRows,
+        };
+
+        doc.table(table, {
+          prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
+        });
+
+        doc.end();
+
+      } catch (err) {
+        console.error("Erro ao gerar PDF:", err);
+        res.status(500).send("Erro interno ao gerar PDF");
       }
-
-      doc
-        .fillColor(providerColorHex)
-        .fontSize(20)
-        .text("Nota de Negociação", { align: "left" });
-
-      doc
-        .fillColor("black")
-        .fontSize(10)
-        .text(`Fornecedor: ${providerInfo}`)
-        .text(`Cliente: ${clientInfo}`)
-        .text(`Data: ${dateStr} Hora: ${timeStr}`)
-        .moveDown(1);
-
-      // TABELA
-      const table = {
-        title: providerInfo,
-        subtitle: clientInfo,
-        headers: [
-          { label: "Produto", property: "name", width: 40, renderer: null },
-          { label: "Código de barras", property: "barcode", width: 70, renderer: null },
-          { label: "Descrição", property: "description", width: 200, renderer: null },
-          { label: "Fator", property: "brand", width: 50, renderer: null },
-          { label: "Quantidade", property: "quantity", width: 60, renderer: null },
-          { label: "Preço", property: "price", width: 60, renderer: null },
-          { label: "Valor Total", property: "total", width: 80, renderer: null },
-        ],
-        rows: tableRows,
-      };
-
-      // Mantenha a mágica da sua tabela original
-      doc.table(table, {
-        prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
-      });
-
-      doc.end();
     });
   },
 
