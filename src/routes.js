@@ -32,6 +32,7 @@ router.get("/getprovideruser/:code/:type", User.getProviderUser);
 router.get("/getconsultsprovider/:provider", User.getConsultsProvider);
 router.get("/getusersprovidernotinlist", User.getUsersProviderNotInList);
 router.get("/getallusersassociate", User.getAllUsersAssociate);
+router.get("/getnegotiationwindow", User.getNegotiationWindowUser);
 
 router.get("/allacesso", Client.allAccess);
 router.get("/allclient", Client.getAllClient);

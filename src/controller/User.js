@@ -540,6 +540,34 @@ const User = {
     });
     // connection.end();
   },
+
+  async getNegotiationWindowUser(req, res) {
+    logger.info("Get All Users Fair");
+
+    const queryConsult = `SELECT
+      nw.client_id,
+      nw.supplier_id,
+      c.nomeConsult,
+      s.nomeConsult,
+      f.nomeForn,
+      TIMEDIFF(nw.end_at, nw.start_at) AS diff_time,
+      nw.start_at as 'Inicio',
+      nw.end_at as 'Fim'
+      FROM negotiation_windows nw
+      join consultor c on c.codConsult = nw.client_id
+      join consultor s on s.codConsult = nw.consultant_id
+      join fornecedor f on f.codForn = nw.supplier_id
+      where nw.client_id = 4`;
+
+    connection.query(queryConsult, (error, results, fields) => {
+      if (error) {
+        return res.status(400).send(error);
+      } else {
+        return res.json(results);
+      }
+    });
+    // connection.end();
+  },
 };
 
 module.exports = User;
