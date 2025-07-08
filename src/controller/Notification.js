@@ -210,8 +210,8 @@ const Notification = {
   },
 
   async updateNotification(req, res) {
-    logger.info("Insert Notifications");
-    const { title, content, redirect, target, day, month, hour, minute, method, id } = req.body.data;
+    logger.info("Update Notifications");
+    const { title, content, redirect, target, day, month, hour, minute, method, id } = req.body;
 
     try {
 

@@ -196,7 +196,7 @@ router.get("/getwindownegotiations/:client", WindowNegotiation.getWindowNegotiat
 router.get("/notifications", Notification.getNotifications);
 router.get("/notifications/all", Notification.getNotificationsAll);
 router.post("/notification", Notification.insertNotification);
-router.patch("/notification", Notification.updateNotification);
+router.post("/notification/update", Notification.updateNotification);
 router.post("/notification/send", Notification.sendNotification);
 router.post("/notification/opened", Notification.openedNotification);
 router.post("/notification/save/token", Notification.saveTokenNotification);
