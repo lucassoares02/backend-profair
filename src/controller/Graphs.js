@@ -8,7 +8,6 @@ const PDFDocument = require("pdfkit-table");
 const path = require("path");
 
 const Graphs = {
-  
   async getPercentageClients(req, res) {
     logger.info("Get Percentage Clients");
 
@@ -331,6 +330,7 @@ WHERE
     });
   },
 
+
   async getExportPdfTesteLayoutDeep(req, res) {
     logger.info("Get Exports Pdf");
     const { supplier, negotiation, client } = req.params;
@@ -517,6 +517,7 @@ WHERE
       }
     });
   },
+
 
   async getExportPdfTesteLayoutGpt(req, res) {
     logger.info("Get Exports Pdf");
