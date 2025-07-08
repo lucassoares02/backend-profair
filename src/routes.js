@@ -165,7 +165,7 @@ router.get("/totalvalueclients/:codprovider", Graphs.getTotalValueClients);
 router.get("/information", Graphs.getTotalInformations);
 router.get("/exportpdf/:supplier/:negotiation/:client", Graphs.getExportPdf);
 router.get("/exportpdfgpt/:supplier/:negotiation/:client", Graphs.getExportPdfTesteLayoutGpt);
-router.get("/exportpdfgpt2/:supplier/:negotiation/:client", Graphs.getExportPdfGpt2);
+router.get("/exportpdfgpt2/:supplier/:negotiation/:client", Graphs.getExportPdfGPT22);
 
 router.get("getnegotiationmultishow/:category", Graphs.getExportPdf);
 
