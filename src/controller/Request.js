@@ -313,6 +313,7 @@ const Request = {
       fornecedor.nomeForn,
       fornecedor.codForn,
       negociacao.codNegociacao,
+      negociacao.prazo,
       negociacao.descNegociacao,
       sum(pedido.quantMercPedido * mercadoria.precoMercadoria) as 'valor', 
       TIME_FORMAT(SUBTIME(pedido.dataPedido, '03:00:00'),'%H:%i') as 'horas' 
