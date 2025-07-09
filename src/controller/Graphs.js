@@ -755,8 +755,7 @@ const Graphs = {
       SELECT COUNT(*) AS total
 FROM (
   SELECT asd.codAssociado
-  FROM log l
-  JOIN acesso a ON a.codAcesso = l.userAgent
+  FROM acesso a
   JOIN consultor c ON c.codConsult = a.codUsuario
   JOIN relaciona r ON r.codAssocRelaciona = c.codConsult
   JOIN associado asd ON asd.codAssociado = r.codConsultRelaciona
