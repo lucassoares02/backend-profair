@@ -283,38 +283,58 @@ const Notification = {
     logger.info("Opened Notifications");
     const { notificationId, tokenFcm } = req.body;
 
-    console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-    console.log("notificationId:");
-    console.log(notificationId);
-    console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+    if (!notificationId || !tokenFcm) {
+      return res.status(400).send({ message: "notificationId e tokenFcm são obrigatórios" });
+    }
 
-    console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-    console.log("tokenFcm:");
-    console.log(tokenFcm);
-    console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+    // 1) Busca o usuário pelo token
+    const userQuery = 'SELECT codUsuario FROM acesso WHERE token = ? LIMIT 1';
+    connection.query(userQuery, [tokenFcm], (userErr, userRows) => {
+      if (userErr) {
+        logger.error("Erro ao buscar usuário:", userErr);
+        return res.status(500).send({ message: "Erro ao buscar usuário", error: userErr });
+      }
+      if (userRows.length === 0) {
+        return res.status(404).send({ message: "Usuário não encontrado para esse token" });
+      }
 
-    try {
+      const userId = userRows[0].codUsuario;
 
-      const query = `UPDATE user_notifications SET viewed = 1 WHERE notification = ? AND user = ( select codUsuario from acesso where token = ? LIMIT 1);`;
-      const values = [notificationId, tokenFcm];
+      // 2) Tenta dar UPDATE
+      const updateQuery = `
+      UPDATE user_notifications
+      SET viewed = 1
+      WHERE notification = ? AND user = ?
+    `;
+      connection.query(updateQuery, [notificationId, userId], (updateErr, updateRes) => {
+        if (updateErr) {
+          logger.error("Erro ao atualizar notificação:", updateErr);
+          return res.status(500).send({ message: "Erro ao atualizar notificação", error: updateErr });
+        }
 
-      console.log("Query:", query);
-
-      connection.query(query, values, (error, results) => {
-        if (error) {
-          return res.status(400).send(error);
-        } else {
-          return res.status(200).send({
-            message: "Notification Updated Successfully",
+        if (updateRes.affectedRows === 0) {
+          // 3) Se não atualizou ninguém, insere novo registro
+          const insertQuery = `
+          INSERT INTO user_notifications
+            (user, notification, success, viewed, reason)
+          VALUES
+            (?, ?, 1, 1, 'Notification opened')
+        `;
+          connection.query(insertQuery, [userId, notificationId], (insertErr, insertRes) => {
+            if (insertErr) {
+              logger.error("Erro ao inserir notificação:", insertErr);
+              return res.status(500).send({ message: "Erro ao inserir notificação", error: insertErr });
+            }
+            return res.status(200).send({ message: "Notification inserted successfully" });
           });
+        } else {
+          // 4) Se atualizou, devolve sucesso de atualização
+          return res.status(200).send({ message: "Notification updated successfully" });
         }
       });
-
-    } catch (error) {
-      logger.error("Update Notification:", error);
-      return res.status(400).send({ message: "Error update notification", error });
-    }
+    });
   },
+
 
   async sendNotification(title, content, redirect, target, provider, notificationId) {
     logger.info("Send Notifications");
