@@ -73,6 +73,9 @@ router.get("/schedule", Notice.getAllSchedule);
 
 router.get("/providerclient/:codconsultor", Provider.getProviderClient);
 
+router.get("/find-map", Provider.findMap);
+router.get("/suppliersinvoicing", Provider.getProviderSells);
+router.post("/updatedetailsprovider", Provider.updateProviderImageAndColor);
 router.get("/suppliersinvoicing", Provider.getProviderSells);
 router.post("/updatedetailsprovider", Provider.updateProviderImageAndColor);
 router.get("/companies/:type", Provider.getCompanies);

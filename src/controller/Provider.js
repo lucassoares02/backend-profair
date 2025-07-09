@@ -228,6 +228,21 @@ const Provider = {
     // connection.end();
   },
 
+  async findMap(req, res) {
+    logger.info("Get Find Map");
+
+    const query = `select mapa from organizador`;
+
+    connection.query(query, (error, results, fields) => {
+      if (error) {
+        return res.status(400).send(error);
+      } else {
+        return res.json(results);
+      }
+    });
+    // connection.end();
+  },
+
   async postInsertProvider(req, res) {
     logger.info("Post Insert Provider");
 
