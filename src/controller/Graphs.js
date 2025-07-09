@@ -759,6 +759,7 @@ FROM (
   JOIN consultor c ON c.codConsult = a.codUsuario
   JOIN relaciona r ON r.codAssocRelaciona = c.codConsult
   JOIN associado asd ON asd.codAssociado = r.codConsultRelaciona
+  where a.is_present = 1
   GROUP BY asd.codAssociado
 ) AS resultado
       union
