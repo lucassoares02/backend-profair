@@ -8,7 +8,7 @@ const Backup = {
     const backupUrl = process.env.API_BACKUP;
     if (backupUrl) {
       try {
-        const response = await axios.post(backupUrl, req.body);
+        const response = await axios.post(`${backupUrl}/insertrequestnew`, req.body);
         logger.info('Backup remoto bem-sucedido:', {
           status: response.status,
           data: response.data
