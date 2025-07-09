@@ -81,7 +81,7 @@ const Notification = {
 
       // 1) Deleta as referências em user_notifications
       connection.query(
-        'DELETE FROM user_notifications WHERE notification_id = ?',
+        'DELETE FROM user_notifications WHERE notification = ?',
         [id],
         (err) => {
           if (err) {
