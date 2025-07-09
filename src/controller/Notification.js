@@ -71,28 +71,50 @@ const Notification = {
     });
   },
 
-
   async deleteNotifications(req, res) {
-    logger.info("Delete Notifications");
-
     const { id } = req.params;
+    if (!id) return res.status(400).send({ message: "Notification ID is required" });
 
-    if (!id) {
-      return res.status(400).send({ message: "Notification ID is required" });
-    }
+    // Inicia transação
+    connection.beginTransaction(err => {
+      if (err) return res.status(500).send({ message: "Transaction error", err });
 
-    const query = "DELETE FROM notifications WHERE id = ?";
-    const values = [id];
+      // 1) Deleta as referências em user_notifications
+      connection.query(
+        'DELETE FROM user_notifications WHERE notification_id = ?',
+        [id],
+        (err) => {
+          if (err) {
+            return connection.rollback(() => {
+              res.status(400).send({ message: "Erro ao deletar relações", err });
+            });
+          }
 
-    connection.query(query, values, (error, results) => {
-      if (error) {
-        logger.error("Error deleting notification:", error);
-        return res.status(400).send({ message: "Error deleting notification", error });
-      } else {
-        return res.status(200).send({ message: "Notification deleted successfully" });
-      }
+          // 2) Deleta a notificação
+          connection.query(
+            'DELETE FROM notifications WHERE id = ?',
+            [id],
+            (err, results) => {
+              if (err) {
+                return connection.rollback(() => {
+                  res.status(400).send({ message: "Erro ao deletar notificação", err });
+                });
+              }
+
+              // Commit se tudo certo
+              connection.commit(commitErr => {
+                if (commitErr) {
+                  return connection.rollback(() => {
+                    res.status(500).send({ message: "Erro ao confirmar transação", commitErr });
+                  });
+                }
+                res.status(200).send({ message: "Notification deleted successfully" });
+              });
+            }
+          );
+        }
+      );
     });
-
   },
 
   async getNotificationDetails(req, res) {
