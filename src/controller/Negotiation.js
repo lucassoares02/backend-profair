@@ -1161,7 +1161,7 @@ join associado a on a.codAssociado = p.codAssocPedido
   },
 
   async getNegotiationClient(req, res) {
-    logger.info("Get Negotiation to Client");
+    logger.info("getNegotiationClient");
 
     const { codclient, codforn } = req.params;
 
@@ -1170,7 +1170,7 @@ join associado a on a.codAssociado = p.codAssocPedido
       codclient +
       "	where negociacao.codFornNegociacao  = " +
       codforn +
-      " GROUP BY negociacao.codNegociacao ORDER BY prazo desc";
+      " GROUP BY negociacao.codNegociacao ORDER BY prazo";
 
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {
@@ -1183,7 +1183,7 @@ join associado a on a.codAssociado = p.codAssocPedido
   },
 
   async getNegotiationsProviderWithMerchandisePerClient(req, res) {
-    logger.info("Get Negotiation to Client");
+    logger.info("getNegotiationsProviderWithMerchandisePerClient");
 
     const { codclient, codforn } = req.params;
 
@@ -1192,7 +1192,7 @@ join associado a on a.codAssociado = p.codAssocPedido
       codclient +
       "	where negociacao.codFornNegociacao  = " +
       codforn +
-      " GROUP BY negociacao.codNegociacao ORDER BY codNegociacao, observacao desc";
+      " GROUP BY negociacao.codNegociacao ORDER BY prazo";
 
     connection.query(queryConsult, async (error, results, fields) => {
       if (error) {
@@ -1225,7 +1225,7 @@ join associado a on a.codAssociado = p.codAssocPedido
   },
 
   async getNegotiationClientWithPrice(req, res) {
-    logger.info("Get Negotiation to Client");
+    logger.info("getNegotiationClientWithPrice");
 
     const { codclient, codforn } = req.params;
 
@@ -1257,7 +1257,7 @@ join associado a on a.codAssociado = p.codAssocPedido
   },
 
   async getNegotiationClientsWithPriceNotNull(req, res) {
-    logger.info("Get Negotiation to Client");
+    logger.info("getNegotiationClientsWithPriceNotNull");
 
     const { codclient, codforn } = req.params;
 
@@ -1353,7 +1353,7 @@ join associado a on a.codAssociado = p.codAssocPedido
   },
 
   async GetNegotiationsClients(req, res) {
-    logger.info("Get Negotiation to Client");
+    logger.info("GetNegotiationsClients");
 
     const { category } = req.params;
 
