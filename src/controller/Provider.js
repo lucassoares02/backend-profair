@@ -243,6 +243,24 @@ const Provider = {
     // connection.end();
   },
 
+  async getDetailsProviderByUser(req, res) {
+    logger.info("Get Details Provider per User");
+
+    const { consultor } = req.params;
+
+    const query = `select * from fornecedor f join relacionafornecedor rf on rf.codFornecedor = f.codForn where rf.codConsultor = ?`;
+    const values = [consultor]
+
+    connection.query(query, values, (error, results, fields) => {
+      if (error) {
+        return res.status(400).send(error);
+      } else {
+        return res.json(results[0]);
+      }
+    });
+    // connection.end();
+  },
+
   async postInsertProvider(req, res) {
     logger.info("Post Insert Provider");
 
