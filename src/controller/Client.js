@@ -879,12 +879,12 @@ const Client = {
       if (type == 1) {
         dataConsultor.push({
           codConsultor: cod,
-          codFornecedor: empresa.codForn,
+          codFornecedor: empresa,
         })
       } else {
         dataAssociado.push({
           codAssocRelaciona: cod,
-          codConsultRelaciona: empresa.codForn,
+          codConsultRelaciona: empresa,
         });
       }
     }
@@ -918,7 +918,7 @@ const Client = {
   async postInsertUser(req, res) {
     logger.info("Post Insert User");
 
-    const { nome, email, empresas, tel, cpf, type, hash } = req.body;
+    const { nome, email, empresa, tel, cpf, type, hash } = req.body;
 
     let query = "";
     let parseEmpresas = [];
@@ -940,18 +940,18 @@ const Client = {
         `;
 
     } else {
-      parseEmpresas = JSON.parse(empresas);
+      parseEmpresas = JSON.parse(empresa);
 
       query = `START TRANSACTION;
           INSERT INTO consultor 
               (nomeConsult, cpfConsult, telConsult, codFornConsult, emailConsult) 
           VALUES 
-              ('${nome}', '${cpf}', '${tel}', '${parseEmpresas[0].codForn}', '${email}');SET @consultorId = LAST_INSERT_ID();
+              ('${nome}', '${cpf}', '${tel}', '${parseEmpresas[0]}', '${email}');SET @consultorId = LAST_INSERT_ID();
   
           INSERT INTO acesso 
-              (codAcesso, direcAcesso, codUsuario, codOrganization) 
+              (codAcesso, direcAcesso, codUsuario, codOrganization, is_present) 
           VALUES 
-              (${hash}, ${type}, LAST_INSERT_ID(), 158);
+              (${hash}, ${type}, LAST_INSERT_ID(), 158,0);
           COMMIT; SHOW WARNINGS;
           SELECT @consultorId AS consultor; 
         `;

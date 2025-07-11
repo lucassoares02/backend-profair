@@ -7,21 +7,26 @@ const Delete = {
 
     const queryKill = `
     delete from acesso;
-    delete from consultor;
-    delete from negociacao;
-    delete from mercadoria;
-    delete from fornecedor;
     delete from associado;
-    delete from comprador;
-    delete from negociacao_loja;
-    delete from relaciona;
-    delete from relacionafornecedor;
     delete from categoria;
+    delete from cliente;
+    delete from comprador;
+    delete from consultor;
+    delete from fornecedor;
     delete from log;
-    delete from organizador;
+    delete from mercadoria;
+    delete from mercadoriaNova;
+    delete from negociacao;
+    delete from negociacao_loja;
+    delete from negotiation_windows;
     delete from notices;
     delete from pedido;
-    delete from negotiation_windows;
+    delete from relaciona;
+    delete from relacionaMercadoria;
+    delete from relacionafornecedor;
+    delete from schedule;
+    delete from user_notifications;
+    delete from organizador;
     `;
 
     connection.query(queryKill, (error, results, fields) => {
@@ -34,7 +39,7 @@ const Delete = {
     // connection.end();
   },
 
-  
+
   async deleteCompanyToUser(req, res) {
     logger.info("Get Deletes Company to User");
 

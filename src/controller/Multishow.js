@@ -111,7 +111,8 @@ const Notice = {
     logger.info("Get Query Pre Event");
 
     // const queryConsult = "SET sql_mode = ''; select CONCAT('UPDATE multishow_b2b.negociacoes_lojas SET id_loja = ', nl.id_loja, ' WHERE id_negociacao = ', nl.id_negociacao, ' and id_negociacao_loja = ', nl.id_negociacao_loja, ';') as 'query' from log l join acesso a on a.codAcesso = l.userAgent join consultor c on c.codConsult = a.codUsuario join relaciona r on r.codAssocRelaciona = c.codConsult join negociacao_loja nl on nl.id_loja = r.codConsultRelaciona where l.route like '%getusermore%' and a.direcAcesso = 2 and nl.status = 0 group by nl.id_loja, nl.id_negociacao";
-    const queryConsult = "SET sql_mode = ''; select CONCAT( 'UPDATE multishow_b2b.negociacoes_lojas SET id_loja = ', nl.id_loja, ' WHERE id_negociacao = ', nl.id_negociacao, ' and id_negociacao_loja = ', nl.id_negociacao_loja, ';' ) as 'query' from log l join acesso a on a.codAcesso = l.userAgent join consultor c on c.codConsult = a.codUsuario join relaciona r on r.codAssocRelaciona = c.codConsult join associado aa on aa.codAssociado = r.codConsultRelaciona join negociacao_loja nl on nl.id_loja = aa.idLoja where l.route like '%getusermore%' and a.direcAcesso = 2 and nl.status = 0 group by nl.id_loja, nl.id_negociacao;";
+    // const queryConsult = "SET sql_mode = ''; select CONCAT( 'UPDATE multishow_b2b.negociacoes_lojas SET id_loja = ', nl.id_loja, ' WHERE id_negociacao = ', nl.id_negociacao, ' and id_negociacao_loja = ', nl.id_negociacao_loja, ';' ) as 'query' from log l join acesso a on a.codAcesso = l.userAgent join consultor c on c.codConsult = a.codUsuario join relaciona r on r.codAssocRelaciona = c.codConsult join associado aa on aa.codAssociado = r.codConsultRelaciona join negociacao_loja nl on nl.id_loja = aa.idLoja where l.route like '%getusermore%' and a.direcAcesso = 2 and nl.status = 0 group by nl.id_loja, nl.id_negociacao;";
+    const queryConsult = "SET sql_mode = ''; select CONCAT(  'UPDATE multishow_b2b.negociacoes_lojas SET id_loja = ', nl.id_loja, ' WHERE id_negociacao = ', nl.id_negociacao, ' and id_negociacao_loja = ', nl.id_negociacao_loja, ';' ) as 'query' from acesso a join consultor c on c.codConsult = a.codUsuario join relaciona r on r.codAssocRelaciona = c.codConsult join associado aa on aa.codAssociado = r.codConsultRelaciona join negociacao_loja nl on nl.id_loja = aa.idLoja where a.is_present = 1 and a.direcAcesso = 2 and nl.status = 0 group by nl.id_loja, nl.id_negociacao;";
 
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {
@@ -1044,6 +1045,7 @@ group by
         emailOrg: element["cnpj"],
         telOrg: element["id_fornecedor"],
         ativo: 1,
+        mapa: "https://drive.google.com/uc?export=view&id=19sc5ZRsuyCJpgmX1sGzIe-0PQPAMNuZ9"
       });
     }
 
@@ -1109,13 +1111,13 @@ group by
       },
       {
         codNotice: 4,
-        title: "Adega Show - 2025",
-        description: "Uma oportunidade única com condições exclusivas, para conhecer lançamentos e fortalecer parcerias estratégicas",
+        title: "4º Feira de negócios - Multishow",
+        description: "Inteligência Artificial no varejo - Tecnologias que geram resultados.",
         image: "",
         action: "",
         priority: 0,
         primaryColor: "0XFFE21E26",
-        secondaryColor: "0XFFB01F24",
+        secondaryColor: "0XFF1D5A9E",
         stamp: "12/04/2025",
         type: 0
       }
