@@ -439,3 +439,4 @@
 19:58:22 - Error: ER_DUP_ENTRY: Duplicate entry '18309' for key 'fornecedor.PRIMARY'
 19:58:23 - Error: ER_DUP_ENTRY: Duplicate entry '18309' for key 'fornecedor.PRIMARY'
 19:58:24 - Error: ER_DUP_ENTRY: Duplicate entry '30490' for key 'fornecedor.PRIMARY'
+12:46:04 - Error: ER_DUP_ENTRY: Duplicate entry '10103' for key 'fornecedor.PRIMARY'

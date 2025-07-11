@@ -309,6 +309,55 @@ const Notice = {
 
   },
 
+
+  async getOneNegotiation(req, res) {
+
+
+    const { id } = req.params;
+
+    const queryConsult = `SELECT n.*, cn.categoria, f.id_erp as id_erp_fornecedor FROM multishow_b2b.negociacoes n JOIN multishow_b2b.categorias_negociacoes cn on cn.id_categoria_negociacao = n.id_categoria_negociacao join multishow_b2b.fornecedores f on f.id_fornecedor = n.id_fornecedor where n.id_negociacao = ${id}`;
+
+    try {
+
+      connectionMultishow.query(queryConsult, async (error, results, fields) => {
+        if (error) {
+
+          console.log("Error Negotiation Multishow: ", error);
+        } else {
+
+          await Notice.insertNegotiation(results);
+
+          for (let index = 0; index < results.length; index++) {
+
+            try {
+
+              const negotiations = await Notice.getNegotiationClients(results[index]["id_negociacao"]);
+              await Notice.insertNegotiationClients(negotiations, 0);
+
+              const merchandises = await Notice.getMerchandises(results[index]["id_negociacao"]);
+              await Notice.insertMerchandises(merchandises, results[index]["id_negociacao"], results[index]["id_erp_fornecedor"]);
+
+              const provider = await Notice.getProvider(results[index]["id_negociacao"]);
+              await Notice.insertProvider(provider, merchandises[0]["id_comprador"]);
+
+
+              console.log(`${index} - ${results[index]["id_negociacao"]} - ${results[index]["categoria"]}`);
+              console.log(`Fornecedor: ${provider[0]["id_erp"]} - ${provider[0]["fornecedor"]}`)
+              console.log(`Quantidade de mercadorias: ${merchandises.length}`)
+            } catch (error) {
+              console.log("STEP 7");
+              console.log(`Error Get Merchandises: ${error}`);
+            }
+          }
+          return res.json(results);
+        }
+      });
+    } catch (error) {
+      console.log(`Error Connection Multishow: ${error}`);
+    }
+  },
+
+
   async getNegotiations(req, res) {
 
 

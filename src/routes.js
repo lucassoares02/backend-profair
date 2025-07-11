@@ -175,6 +175,7 @@ router.get("/exportpdfdeep/:supplier/:negotiation/:client", Graphs.getExportPdfT
 
 router.get("getnegotiationmultishow/:category", Graphs.getExportPdf);
 
+router.get("/multishow/negotiation/one/:id", Multishow.getOneNegotiation);
 router.post("/multishow/negotiation", Multishow.getNegotiations);
 router.post("/multishow/negotiation/disabled", Multishow.getNegotiationsDisabled);
 router.post("/multishow/negotiation/out/adega", Multishow.getNegotiationsOutAdega);
