@@ -175,7 +175,7 @@ router.get("/exportpdfdeep/:supplier/:negotiation/:client", Graphs.getExportPdfT
 
 router.get("getnegotiationmultishow/:category", Graphs.getExportPdf);
 
-router.post("/multishow/negotiation", Multishow.getNegotiations);
+router.post("/multishow/negotiation", Backup.getNegotiations, Multishow.getNegotiations);
 router.post("/multishow/negotiation/disabled", Multishow.getNegotiationsDisabled);
 router.post("/multishow/negotiation/out/adega", Multishow.getNegotiationsOutAdega);
 router.get("/multishow/merchandiserefresh/:product/:negotiation", Multishow.refreshMerchandise);
@@ -186,7 +186,7 @@ router.get("/multishow/pre/inside", Multishow.getQueryPreInside);
 router.get("/multishow/pos/outside", Multishow.getQueryPosOutiside);
 router.get("/multishow/pos/inside", Multishow.getQueryPosInside);
 
-router.get("/deleteallinformations", Delete.deleteAll);
+router.get("/deleteallinformations", Backup.deleteAll, Delete.deleteAll);
 router.delete("/deletecompanytouser/:company/:user/:type", Delete.deleteCompanyToUser);
 router.get("/insertcompanytouser/:company/:user/:type", Provider.insertCompanyToUser);
 

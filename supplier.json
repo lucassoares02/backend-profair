@@ -1,147 +1,93 @@
 [
-    {
-        "id": 10448,
-        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNiLBIKrl6OhyS_fV5WNEAOuZPacA2l78pXg&s",
-        "color": "0XFFEC1C24"
-    },
-    {
-        "id": 10421,
-        "image": "https://gkpb.com.br/wp-content/uploads/2024/08/novo-logo-perdigao.jpg",
-        "color": "0XFFE4211D"
-    },
-    {
-        "id": 15300,
-        "image": "https://www.liblogo.com/img-logo/ca1294f6de-cargill-logo--cargill-case-study.png",
-        "color": "0XFF008350"
-    },
-    {
-        "id": 10693,
-        "image": "https://procegengenharia.com.br/wp-content/uploads/2024/02/GP-2.png",
-        "color": "0XFFA6A8AB"
-    },
-    {
-        "id": 11410,
-        "image": "https://selita.coop.br/wp-content/uploads/2023/09/logo_selita.png",
-        "color": "0XFFC71918"
-    },
-    {
-        "id": 36293,
-        "image": "https://www.bale.com.sg/cdn/shop/products/Heineken_e81d251a-7fc8-4024-b38d-430bb1f06ea3_1024x.jpg?v=1592006667",
-        "color": "0XFF01772F"
-    },
-    {
-        "id": 12050,
-        "image": "https://i0.wp.com/www.cofril.com.br/wp-content/uploads/2019/02/logo-borda-branca.png?fit=268%2C232&ssl=1",
-        "color": "0XFFFF3434"
-    },
-    {
-        "id": 29793,
-        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5EmBr1ixNRK2tcHmMQTM3La4f02sGiCHzmg&s",
-        "color": "0XFF048C42"
-    },
-    {
-        "id": 14435,
-        "image": "https://d2q79iu7y748jz.cloudfront.net/s/_squarelogo/256x256/64a8ec4115df9f7c7299f1649482a6e2",
-        "color": "0XFF006536"
-    },
-    {
-        "id": 12360,
-        "image": "https://villonialimentos.com.br/wp-content/uploads/2019/03/logo-villoni-alimentos.png",
-        "color": "0XFFFF0B22"
-    },
-    {
-        "id": 26972,
-        "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Oxford_-_logo.svg/1200px-Oxford_-_logo.svg.png",
-        "color": "0XFFEDC6C7"
-    },
-    {
-        "id": 23264,
-        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfbyKtOLNzES0ztim6HX5slbHmPoeRmVZlTg&s",
-        "color": "0XFF011B4C"
-    },
-    {
-        "id": 13544,
-        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcg9iLvvHbGfkheHaXaSCzlZS37tnBPov6IA&s",
-        "color": "0XFF830F10"
-    },
-    {
-        "id": 13048,
-        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTIQmSoijWILYFR9WtP9bRUVHJTsDefV-V7rA&s",
-        "color": "0XFF00792A"
-    },
-    {
-        "id": 19917,
-        "image": "https://azeitonasrivoli.com.br/wpsite2021/wp-content/uploads/2021/01/rivoli-logo.png",
-        "color": "0XFF055C31"
-    },
-    {
-        "id": 19097,
-        "image": "https://saboratta.com/wp-content/uploads/2020/10/logo-footer.png",
-        "color": "0XFFAF1B0F"
-    },
-    {
-        "id": 20524,
-        "image": "https://logodownload.org/wp-content/uploads/2018/08/3-coracoes-cafe-logo.png",
-        "color": "0XFFEE2722"
-    },
-    {
-        "id": 13900,
-        "image": "https://valefertil.com.br/wpsite2021/wp-content/uploads/2021/03/vale-fertil-natural-e-fazer-o-bem.png",
-        "color": "0XFFD01820"
-    },
-    {
-        "id": 22268,
-        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT48Wiec0OUPG3ZVkhy9NvbIUxSiQ1vzvddj0CzBpKUfO6BbbWBIL5W4UEk_hgOgxLZ7qo&usqp=CAU",
-        "color": "0XFFDEB49B"
-    },
-    {
-        "id": 26093,
-        "image": "https://massaleve.com.br/wp-content/uploads/2022/01/logo-massa-leve-1.png",
-        "color": "0XFFE22726"
-    },
-    {
-        "id": 14087,
-        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScKzdWUUv3CIpwAxyvcvSAsOke8D3U-xUqVA&s",
-        "color": "0XFF224236"
-    },
-    {
-        "id": 33332,
-        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShMWi75ulhyidIAR39UmDLoWd4F-esFc7HUhKdB3l99B8vcY1Qd7ok0eA2Vh39SImXiw4&usqp=CAU",
-        "color": "0XFF000000"
-    },
-    {
-        "id": 31569,
-        "image": "https://www.almena.com.uy/web/wp-content/uploads/2015/10/38-Concha-y-Toro.jpg",
-        "color": "0XFF000000"
-    },
-    {
-        "id": 31569,
-        "image": "https://yt3.googleusercontent.com/g53YGpv_IxhV_ffvg1bOolj0AjMXUe295D5WyB78VGp-_VidogoaK6SLdpIGUFK7Zhlt8_kgeQ=s900-c-k-c0x00ffffff-no-rj",
-        "color": "0XFF0089CD"
-    },
-    {
-        "id": 37133,
-        "image": "",
-        "color": "0XFF"
-    },
-
-
-
-
-    {
-        "id": 0,
-        "image": "https://drive.google.com/uc?export=view&id=1fDYGBZ5iy5a4mBYVv2l9S8SpD3MrJuGd",
-        "color": "0XFF"
-    },
-    {
-        "id": "ABERDEN",
-        "image": "https://drive.google.com/uc?export=view&id=",
-        "color": "0XFF"
-    },
-    {
-        "id": 0,
-        "image": "https://drive.google.com/uc?export=view&id=",
-        "color": "0XFF"
-    }
+  {
+    "id": 10103,
+    "color": "0XFF000000",
+    "image": "https://www.assai.com.br/sites/default/files/styles/otimizado/public/logo_toscano_para_vitrine_-_avatar.png?itok=hg2w6vos"
+  },
+  { "id": 35386, "color": "0XFF0AC4CB", "image": "https://www.sindicosmeticospr.com.br/img/associados/full/034-20240430170621.png" },
+  { "id": 30848, "color": "0XFFCA1E3B", "image": "https://sorvetesamaretto.com.br/wp-content/uploads/2019/01/LOGO-pequena-retina.png" },
+  { "id": 19100, "color": "0XFF3366FF", "image": "https://logospng.org/download/ambev/logo-ambev-branca-1024.png" },
+  { "id": 21733, "color": "0XFFF0491E", "image": "https://logodownload.org/wp-content/uploads/2018/08/aurora-logo-1-1.png" },
+  { "id": 26093, "color": "0XFF12A648", "image": "https://www.mundoplusvita.com.br/assets/img/header-logo.png" },
+  { "id": 10022, "color": "0XFFFFF200", "image": "https://logodownload.org/wp-content/uploads/2020/12/bombril-logo.png" },
+  { "id": 10421, "color": "0XFFE64415", "image": "https://diversidademais.test.techwedo.com.br/uploads/0000/1/2022/09/08/logo-brf-512.png" },
+  {
+    "id": 10448,
+    "color": "0XFFEC1C24",
+    "image": "https://lh3.googleusercontent.com/proxy/_GJUfNjKLUyaS3FZMeNetlr2_T2wjd5MyfFGSAZURDiYVrdf9bKnzDGuwqY4VO1DRR8Jv0u5elUckemtF4MNp2axymeI9sVbCCYEj1W0kmDMSRB7pYwfTxZfJ1xWsw"
+  },
+  {
+    "id": 23590,
+    "color": "0XFFD1C2B1",
+    "image": "https://d9hhrg4mnvzow.cloudfront.net/lp.cabanaalimentos.com.br/5c905754-logo_106t03u000000000000000.png"
+  },
+  {
+    "id": 34550,
+    "color": "0XFFFEDE25",
+    "image": "https://www.infomach.com.br/wp-content/uploads/2024/03/7f54bdaa-fac0-494b-b75f-c03854fdd0d3___2ef310af54d319f99f2b2583887f01b1.webp"
+  },
+  { "id": 16403, "color": "0XFF1D376C", "image": "https://camilalimentos.com.br/wp-content/uploads/sites/13/2020/09/logo-alt.png" },
+  { "id": 32824, "color": "0XFFA6A8AB", "image": "https://procegengenharia.com.br/wp-content/uploads/2024/02/GP-2.png" },
+  {
+    "id": 12050,
+    "color": "0XFFDD2120",
+    "image": "https://i0.wp.com/www.cofril.com.br/wp-content/uploads/2019/02/logo-borda-branca.png?fit=268%2C232&ssl=1"
+  },
+  { "id": 22853, "color": "0XFF0F3E64", "image": "https://drive.google.com/uc?export=view&id=1-OkB9dSLRziegtnfNOGeW0xpe-6nRoOi" },
+  { "id": 19348, "color": "0XFF0290C6", "image": "https://drive.google.com/uc?export=view&id=1TvScXYKbfvoo74zfIjWqf-0FKyWU8jy4" },
+  { "id": 24953, "color": "0XFF29298A", "image": "https://docemineiro.ind.br/wp-content/uploads/2022/05/LOGO-PNG-1.png" },
+  { "id": 22225, "color": "0XFFC51114", "image": "https://www.santaedwiges.com/html/assets/images/logo.png" },
+  { "id": 24880, "color": "0XFFDC0C15", "image": "https://anics.com.br/wp-content/uploads/2022/02/6.png" },
+  {
+    "id": 11355,
+    "color": "0XFF3B6898",
+    "image": "https://swisscam.com.br/wp-content/uploads/sites/11/2019/06/nestcrpa-004n00af-190329logotipo-faz-bem-versaao-vertical-cmyk.png"
+  },
+  { "id": 26700, "color": "0XFFF55C6F", "image": "https://abramark.com.br/wp-content/uploads/2022/05/bannernoticias-gtex.png" },
+  { "id": 36293, "color": "0XFF205527", "image": "https://www.theheinekencompany.com/sites/heineken-corp/files/HeinekenLogo.svg" },
+  { "id": 13714, "color": "0XFF1F3331", "image": "https://invicta.vteximg.com.br/arquivos/v1-invicta-header-logo.svg?v=638731742624400000" },
+  {
+    "id": 15342,
+    "color": "0XFF007CC4",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/ITALAC_LOGO_RGB.png/1200px-ITALAC_LOGO_RGB.png"
+  },
+  { "id": 34681, "color": "0XFFA10A0A", "image": "https://lekker.com.br/imagens/logo_topo2.png" },
+  { "id": 28860, "color": "0XFF03246B", "image": "https://mdiasbranco.com.br/wp-content/uploads/2019/05/m-dias-branco-logo_news-1-1.jpg" },
+  { "id": 33189, "color": "0XFF883733", "image": "https://maissabortemperos.com.br/assets/images/logo-mais-sabor-351x157.png" },
+  { "id": 26093, "color": "0XFF242525", "image": "https://www.jbs.com.br/wp-content/uploads/2023/10/massaleve-logo.png" },
+  {
+    "id": 35262,
+    "color": "0XFFF89727",
+    "image": "https://e7.pngegg.com/pngimages/841/642/png-clipart-french-fries-florenceville-mccain-foods-frozen-food-potato-food-company-thumbnail.png"
+  },
+  { "id": 18848, "color": "0XFF023B82", "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReAEJ3CrADi4WVo5xNkTl5Xrx4vdO48XPkzw&s" },
+  { "id": 18309, "color": "0XFF00519A", "image": "https://oifrango.com.br/img/logo/logo.png" },
+  { "id": 19763, "color": "0XFFDF1720", "image": "https://logodownload.org/wp-content/uploads/2020/05/piracanjuba-logo.png" },
+  { "id": 14435, "color": "0XFF004726", "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/LPA_Logo.svg/1200px-LPA_Logo.svg.png" },
+  { "id": 12580, "color": "0XFF019AFF", "image": "https://logodownload.org/wp-content/uploads/2020/11/ype-logo-2.png" },
+  { "id": 13544, "color": "0XFFEDC115", "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfbwbB-QhlQvfKuX73PhkLnxu5-6jvDpXBmg&s" },
+  { "id": 32735, "color": "0XFF00792A", "image": "https://coroa.com.br/wp-content/uploads/2024/05/9bc0e0a2c39e63ea7f92558dab5cad84.webp" },
+  { "id": 19917, "color": "0XFF055C31", "image": "https://azeitonasrivoli.com.br/wpsite2021/wp-content/uploads/2021/01/rivoli-logo.png" },
+  { "id": 19097, "color": "0XFFAF1B0F", "image": "https://saboratta.com/wp-content/uploads/2020/10/logo-footer.png" },
+  { "id": 25461, "color": "0XFF0057A6", "image": "https://drive.google.com/uc?export=view&id=19P8k6ONes2h6ZSZtECu1h1f4vmb0bKr9" },
+  { "id": 11649, "color": "0XFFB72226", "image": "https://saudali.com.br/wp-content/themes/saudali2021/images/logo_topo.png" },
+  { "id": 11410, "color": "0XFFFFD200", "image": "https://selita.coop.br/wp-content/uploads/2023/09/logo_selita.png" },
+  { "id": 23264, "color": "0XFF011B4C", "image": "https://drive.google.com/uc?export=view&id=1RJr3PzDfjrLO385rA0sno0Lb7KnIfjYk" },
+  { "id": 17973, "color": "0XFF22386A", "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFavc3IoIvyT1YMTVU_kafYAJnNLn1GM6tpA&s" },
+  { "id": 13056, "color": "0XFFD10429", "image": "https://www.arrozsepe.com.br/_nuxt/img/logo-1.228f851.png" },
+  { "id": 28606, "color": "0XFFE52229", "image": "https://sobelsuprema.site/wp-content/uploads/2023/10/fotos-do-produtos-suprema-1-1024x1024.png" },
+  { "id": 16446, "color": "0XFF004016", "image": "https://gerenciadorpd.com.br//assets/images/sites/sd_footer.svg" },
+  { "id": 20524, "color": "0XFFE8342A", "image": "https://logodownload.org/wp-content/uploads/2018/08/3-coracoes-cafe-logo.png" },
+  { "id": 13153, "color": "0XFF92B3CE", "image": "https://www.trevolacteos.com.br/wp-content/uploads/2024/01/logo-trevo.svg" },
+  { "id": 30147, "color": "0XFFE39E00", "image": "https://trigomais.com.br/wp-content/uploads/2014/06/Logo-HEADER.png?f8f84f" },
+  { "id": 11134, "color": "0XFFFF1821", "image": "https://www.uniaves.com.br/view/assets/image/logo.png" },
+  { "id": 10049, "color": "0XFF1F36C7", "image": "https://www.unilever.com.br/core-assets/logos/logo-static-dark.svg" },
+  {
+    "id": 13900,
+    "color": "0XFF76923A",
+    "image": "https://valefertil.com.br/wpsite2021/wp-content/uploads/2021/03/vale-fertil-natural-e-fazer-o-bem.png"
+  },
+  { "id": 12360, "color": "0XFF002A56", "image": "https://villonialimentos.com.br/wp-content/uploads/2019/03/logo-villoni-alimentos.png" },
+  { "id": 14095, "color": "0XFF142852", "image": "https://zanlorenzi.com.br/assets/template/img/logo/logo.svg" },
+  { "id": 33685, "color": "0XFF991A86", "image": "https://drive.google.com/uc?export=view&id=1fZ1tFUadcCBHwFL5iPH-C9ebk3uCbAgR" }
 ]
-
