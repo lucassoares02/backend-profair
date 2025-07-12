@@ -365,29 +365,29 @@ const Notice = {
 
 
     try {
-      const buyers = await Notice.getBuyers();
-      await Notice.insertBuyers(buyers);
-      await Notice.insertCategories(buyers);
+      // const buyers = await Notice.getBuyers();
+      // await Notice.insertBuyers(buyers);
+      // await Notice.insertCategories(buyers);
 
-      const stores = await Notice.getStores();
-      await Notice.insertStores(stores);
-      await Notice.insertNotices();
+      // const stores = await Notice.getStores();
+      // await Notice.insertStores(stores);
+      // await Notice.insertNotices();
 
-      const clients = await Notice.getClients();
-      await Notice.insertClients(clients);
-      await Notice.insertAccess(clients, 2);
-
-
-      const organizers = await Notice.getOrganizers();
-      await Notice.insertOrganizers(organizers);
-      await Notice.insertAccess(organizers, 3);
+      // const clients = await Notice.getClients();
+      // await Notice.insertClients(clients);
+      // await Notice.insertAccess(clients, 2);
 
 
-      const organizer = await Notice.getOrganizer();
-      await Notice.insertOrganizer(organizer);
+      // const organizers = await Notice.getOrganizers();
+      // await Notice.insertOrganizers(organizers);
+      // await Notice.insertAccess(organizers, 3);
 
-      const relation = await Notice.getRelationClients();
-      await Notice.insertRelationClients(relation);
+
+      // const organizer = await Notice.getOrganizer();
+      // await Notice.insertOrganizer(organizer);
+
+      // const relation = await Notice.getRelationClients();
+      // await Notice.insertRelationClients(relation);
 
 
     } catch (error) {
@@ -403,7 +403,7 @@ const Notice = {
     // join multishow_b2b.fornecedores f on f.id_fornecedor = n.id_fornecedor 
     // where id_negociacao  in (68444,68445,68446,68447,68448,68449,68450,68451,68452,68453,68454,68455,68456,68457,68458,68459,68460,68461,68462,68463,68464,68465,68466,68467,68468,68469,68470)`;
 
-    const queryConsult = "SELECT n.*, cn.categoria, f.id_erp as id_erp_fornecedor FROM multishow_b2b.negociacoes n JOIN multishow_b2b.categorias_negociacoes cn on cn.id_categoria_negociacao = n.id_categoria_negociacao join multishow_b2b.fornecedores f on f.id_fornecedor = n.id_fornecedor  where n.created_at > '2025-03-31 14:15:15'";
+    // const queryConsult = "SELECT n.*, cn.categoria, f.id_erp as id_erp_fornecedor FROM multishow_b2b.negociacoes n JOIN multishow_b2b.categorias_negociacoes cn on cn.id_categoria_negociacao = n.id_categoria_negociacao join multishow_b2b.fornecedores f on f.id_fornecedor = n.id_fornecedor  where n.created_at > '2025-03-31 14:15:15'";
 
     try {
 
