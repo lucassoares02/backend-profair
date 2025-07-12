@@ -970,7 +970,7 @@ const Client = {
   async postInsertUser(req, res) {
     logger.info("Post Insert User");
 
-    const { nome, email, empresa, tel, cpf, type, hash } = req.body;
+    const { nome, email, empresas, tel, cpf, type, hash } = req.body;
 
     let query = "";
     let parseEmpresas = [];
@@ -992,7 +992,7 @@ const Client = {
         `;
 
     } else {
-      parseEmpresas = JSON.parse(empresa);
+      parseEmpresas = JSON.parse(empresas);
 
       query = `START TRANSACTION;
           INSERT INTO consultor 
