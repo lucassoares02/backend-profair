@@ -863,7 +863,59 @@ const Client = {
 
   },
 
-  insertRelationProvider(cod, empresas, type) {
+    insertRelationProvider(cod, empresas, type) {
+    console.log("Insert Relation Provider");
+
+    console.log("\n---------------------------------------------------");
+    console.log(cod);
+    console.log("---------------------------------------------------\n");
+
+    let dataAssociado = [];
+    let dataConsultor = [];
+
+    for (let index = 0; index < empresas.length; index++) {
+      const empresa = empresas[index];
+
+      if (type == 1) {
+        dataConsultor.push({
+          codConsultor: cod,
+          codFornecedor: empresa.codForn,
+        })
+      } else {
+        dataAssociado.push({
+          codAssocRelaciona: cod,
+          codConsultRelaciona: empresa.codForn,
+        });
+      }
+    }
+
+
+
+    let params = {
+      table: type == 1 ? "relacionafornecedor" : "relaciona",
+      data: type == 1 ? dataConsultor : dataAssociado,
+    };
+
+    console.log(params)
+
+
+    try {
+      return new Promise((resolve, reject) => {
+        return Insert(params)
+          .then(async (resp) => {
+            resolve(resp);
+          })
+          .catch((error) => {
+            res.status(400).send(error);
+          });
+      });
+    } catch (error) {
+      console.log(`Error Insert Negotiation: ${error}`)
+    }
+
+  },
+
+  insertRelationProvider2(cod, empresas, type) {
     console.log("Insert Relation Provider");
 
     console.log("\n---------------------------------------------------");
@@ -972,7 +1024,7 @@ const Client = {
         } else {
           if (type != 3) {
 
-            await Client.insertRelationProvider(results[results.length - 1][0].consultor, parseEmpresas, type);
+            await Client.insertRelationProvider2(results[results.length - 1][0].consultor, parseEmpresas, type);
             return res.json({ "message": "saved" });
 
 
