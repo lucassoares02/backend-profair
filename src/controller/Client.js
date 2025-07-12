@@ -976,8 +976,6 @@ const Client = {
     let parseEmpresas = [];
 
     if (type == 3) {
-
-
       query = `START TRANSACTION;
           INSERT INTO consultor 
               (nomeConsult, cpfConsult, telConsult, codFornConsult, emailConsult) 
@@ -1024,7 +1022,7 @@ const Client = {
         } else {
           if (type != 3) {
 
-            await Client.insertRelationProvider2(results[results.length - 1][0].consultor, parseEmpresas, type);
+            await Client.insertRelationProvider(results[results.length - 1][0].consultor, parseEmpresas, type);
             return res.json({ "message": "saved" });
 
 
