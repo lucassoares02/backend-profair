@@ -93,6 +93,7 @@ const Merchandise = {
     mercadoria.embMercadoria, 
     mercadoria.complemento, 
     mercadoria.marca, 
+    mercadoria.erpcode, 
     mercadoria.fatorMerc,
     mercadoria.precoUnit,
     mercadoria.nego,
