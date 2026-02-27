@@ -18,6 +18,7 @@ const Log = require("@controller/Log");
 const Notification = require("@controller/Notification");
 const WindowNegotiation = require("@controller/WindowNegotiation");
 const Backup = require("@controller/Backup");
+const Mql = require("@controller/Mql");
 
 router.post("/faceline-user", Faceline.insert);
 router.post("/faceline-user-update", Faceline.update);
@@ -211,6 +212,8 @@ router.get("/notification/targets/:notification", Notification.getTargetsNotific
 router.get("/notification/pending", Notification.getPendingNotificationPerUser);
 router.get("/notification/check", Notification.checkNotificationPerUser);
 router.get("/notification/:id", Notification.getNotificationDetails);
+
+router.post('/mql/decision', Mql.insert);
 
 
 module.exports = router;
