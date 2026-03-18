@@ -4,9 +4,6 @@ const Select = require("@select");
 const Insert = require("@insert");
 
 const Client = {
-
-
-
   async allAccess(req, res) {
     logger.info("Get All Clients");
 
@@ -16,17 +13,15 @@ const Client = {
     const queryConsult = "select * from acesso";
 
     try {
-      connection.ping(error => {
+      connection.ping((error) => {
         if (error) {
-          console.error('Conexão perdida. Tentando reconectar...', error);
+          console.error("Conexão perdida. Tentando reconectar...", error);
           connectDatabase(); // Recria a conexão
           reject(error);
           return;
         }
       });
-    } catch (error) {
-
-    }
+    } catch (error) {}
 
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {
@@ -36,7 +31,6 @@ const Client = {
       }
     });
 
-
     // connection.end();
   },
 
@@ -45,8 +39,7 @@ const Client = {
 
     const { code } = req.params;
 
-    const queryConsult =
-      `SELECT EXISTS (SELECT 1 FROM acesso WHERE codAcesso = ${code}) AS exist;`;
+    const queryConsult = `SELECT EXISTS (SELECT 1 FROM acesso WHERE codAcesso = ${code}) AS exist;`;
 
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {
@@ -82,8 +75,7 @@ const Client = {
 
     const { codacesso, consultant_id, supplier_id, client_id, associate_id } = req.params;
 
-    const queryConsult =
-      `SET sql_mode = ''; select acesso.codAcesso,
+    const queryConsult = `SET sql_mode = ''; select acesso.codAcesso,
       acesso.direcAcesso, 
      associado.razaoAssociado AS nomeForn,
       associado.cnpjAssociado AS cnpjForn,
@@ -96,7 +88,7 @@ const Client = {
       JOIN consultor ON acesso.codUsuario = consultor.codConsult 
      JOIN associado ON consultor.codFornConsult = associado.codAssociado 
      join organizador o on o.codOrg = acesso.codOrganization
-     WHERE acesso.codAcesso = ${codacesso};`
+     WHERE acesso.codAcesso = ${codacesso};`;
 
     try {
       connection.query(queryConsult, (error, results, fields) => {
@@ -106,12 +98,10 @@ const Client = {
           return res.json(results[1]);
         }
       });
-
     } catch (error) {
-      logger.error(`Error Select Client: ${error}`)
+      logger.error(`Error Select Client: ${error}`);
     }
   },
-
 
   async getOneClientNew(req, res) {
     logger.info("Get One Clients");
@@ -166,15 +156,12 @@ const Client = {
 
           return res.json(results[1]); // ou results[0], dependendo de como o driver do MySQL retorna múltiplas queries
         });
-      }
-      );
-
+      });
     } catch (error) {
       logger.error(`Erro inesperado: ${error}`);
       return res.status(500).json({ error: "Erro interno do servidor" });
     }
   },
-
 
   async getClientConsult(req, res) {
     logger.info("Get Clients to Consult");
@@ -399,6 +386,57 @@ const Client = {
     // connection.end();
   },
 
+  async getGroupsPresentbyProvider(req, res) {
+    logger.info("Get Groups by Provider");
+
+    const { codprovider } = req.params;
+
+    const queryConsult = `SELECT  
+        g.id AS codAssociado,
+        g.descricao AS razao,
+        NULL AS cnpjAssociado,
+
+        SUM(
+            IF(p.codFornPedido = ${codprovider}, 
+              p.quantMercPedido * m.precoMercadoria, 
+              0)
+        ) AS valorTotal,
+
+        SUM(
+            IF(p.codFornPedido = ${codprovider}, 
+              p.quantMercPedido, 
+              0)
+        ) AS volumeTotal
+
+    FROM (
+        SELECT DISTINCT 
+            g.id,
+            g.descricao
+        FROM acesso ac
+        JOIN consultor c ON c.codConsult = ac.codUsuario
+        JOIN relaciona r ON r.codAssocRelaciona = c.codConsult
+        JOIN associado a ON a.codAssociado = r.codConsultRelaciona
+        JOIN grupos_empresariais g ON g.id = a.id_grupo
+        WHERE ac.is_present = 1
+    ) AS g
+
+    LEFT JOIN associado a ON a.id_grupo = g.id
+    LEFT JOIN pedido p ON p.codAssocPedido = a.codAssociado
+    LEFT JOIN mercadoria m ON m.codMercadoria = p.codMercPedido
+
+    GROUP BY g.id
+    ORDER BY valorTotal DESC;`;
+
+    connection.query(queryConsult, (error, results, fields) => {
+      if (error) {
+        console.log("Error Select Groups by Provider: ", error);
+      } else {
+        return res.json(results);
+      }
+    });
+    // connection.end();
+  },
+
   async getStoresbyProvider(req, res) {
     logger.info("Get Stores by Provider");
 
@@ -454,7 +492,6 @@ const Client = {
     const { cod, hash, name, document, phone, email } = req.body;
 
     if (cod != null) {
-
       const queryUpdate = `START TRANSACTION;
         UPDATE consultor 
         SET nomeConsult = '${name}',
@@ -469,7 +506,6 @@ const Client = {
         COMMIT; SHOW ERRORS;
         `;
 
-
       console.log(queryUpdate);
 
       connection.query(queryUpdate, (error, results, fields) => {
@@ -478,15 +514,13 @@ const Client = {
           return res.status(400).send(`message: ${error}`);
         } else {
           console.log("updated");
-          return res.json({ "message": "updated" });
+          return res.json({ message: "updated" });
         }
       });
     } else {
       return res.status(400).send(`message: Nothing Result!`);
     }
-
   },
-
 
   // Remover
   async updatePerson(req, res) {
@@ -494,7 +528,6 @@ const Client = {
     const { cod, type, hash, name, company, typeUser, document } = req.body;
 
     if (hash != null) {
-
       const queryUpdate = `update acesso set 
       codAcesso = ${hash} where codUsuario = ${cod}`;
 
@@ -506,13 +539,12 @@ const Client = {
           return res.status(400).send(`message: ${error}`);
         } else {
           console.log("updated");
-          return res.json({ "message": "updated" });
+          return res.json({ message: "updated" });
         }
       });
     } else {
       return res.status(400).send(`message: Nothing Result!`);
     }
-
   },
 
   async postInsertPerson(req, res) {
@@ -575,12 +607,11 @@ const Client = {
 
     if (result) {
       await Client.insertRelationUsersProvider(cod, empresa, type);
-      return res.json({ "message": "saved" });
+      return res.json({ message: "saved" });
     } else {
       return res.status(400).send(`message: Nothing Result!`);
     }
   },
-
 
   async insertRelationProviderClient(req, res) {
     logger.info("Post Update Provider Person");
@@ -592,9 +623,7 @@ const Client = {
 
     if (cod != null) {
       await Client.insertRelationProvider(cod, empresa, type);
-      return res.json({ "message": "updated" });
-
-
+      return res.json({ message: "updated" });
     }
   },
 
@@ -668,7 +697,6 @@ const Client = {
     });
     // connection.end();
   },
-
 
   async getAllProvidersGraph(req, res) {
     logger.info("Get All Providers Graphs");
@@ -822,7 +850,6 @@ const Client = {
     // connection.end();
   },
 
-
   insertRelationUsersProvider(cod, empresa, type) {
     console.log("Insert Relation Provider");
 
@@ -835,17 +862,14 @@ const Client = {
     dataConsultor.push({
       codConsultor: cod,
       codFornecedor: empresa,
-    })
-
-
+    });
 
     let params = {
       table: "relacionafornecedor",
       data: dataConsultor,
     };
 
-    console.log(params)
-
+    console.log(params);
 
     try {
       return new Promise((resolve, reject) => {
@@ -858,12 +882,11 @@ const Client = {
           });
       });
     } catch (error) {
-      console.log(`Error Insert Negotiation: ${error}`)
+      console.log(`Error Insert Negotiation: ${error}`);
     }
-
   },
 
-    insertRelationProvider(cod, empresas, type) {
+  insertRelationProvider(cod, empresas, type) {
     console.log("Insert Relation Provider");
 
     console.log("\n---------------------------------------------------");
@@ -880,7 +903,7 @@ const Client = {
         dataConsultor.push({
           codConsultor: cod,
           codFornecedor: empresa.codForn,
-        })
+        });
       } else {
         dataAssociado.push({
           codAssocRelaciona: cod,
@@ -889,15 +912,12 @@ const Client = {
       }
     }
 
-
-
     let params = {
       table: type == 1 ? "relacionafornecedor" : "relaciona",
       data: type == 1 ? dataConsultor : dataAssociado,
     };
 
-    console.log(params)
-
+    console.log(params);
 
     try {
       return new Promise((resolve, reject) => {
@@ -910,9 +930,8 @@ const Client = {
           });
       });
     } catch (error) {
-      console.log(`Error Insert Negotiation: ${error}`)
+      console.log(`Error Insert Negotiation: ${error}`);
     }
-
   },
 
   insertRelationProvider2(cod, empresas, type) {
@@ -932,7 +951,7 @@ const Client = {
         dataConsultor.push({
           codConsultor: cod,
           codFornecedor: empresa,
-        })
+        });
       } else {
         dataAssociado.push({
           codAssocRelaciona: cod,
@@ -941,15 +960,12 @@ const Client = {
       }
     }
 
-
-
     let params = {
       table: type == 1 ? "relacionafornecedor" : "relaciona",
       data: type == 1 ? dataConsultor : dataAssociado,
     };
 
-    console.log(params)
-
+    console.log(params);
 
     try {
       return new Promise((resolve, reject) => {
@@ -962,9 +978,8 @@ const Client = {
           });
       });
     } catch (error) {
-      console.log(`Error Insert Negotiation: ${error}`)
+      console.log(`Error Insert Negotiation: ${error}`);
     }
-
   },
 
   async postInsertUser(req, res) {
@@ -988,7 +1003,6 @@ const Client = {
               (${hash}, ${type}, LAST_INSERT_ID(), 158);
           COMMIT;
         `;
-
     } else {
       parseEmpresas = JSON.parse(empresas);
 
@@ -1005,14 +1019,12 @@ const Client = {
           COMMIT; SHOW WARNINGS;
           SELECT @consultorId AS consultor; 
         `;
-
     }
-
 
     console.log("queryAccess");
     console.log(query);
 
-    console.log("asf")
+    console.log("asf");
 
     try {
       await connection.query(query, async (error, results, fields) => {
@@ -1021,26 +1033,18 @@ const Client = {
           return res.status(400).send(`message: Error Insert!`);
         } else {
           if (type != 3) {
-
             await Client.insertRelationProvider(results[results.length - 1][0].consultor, parseEmpresas, type);
-            return res.json({ "message": "saved" });
-
-
+            return res.json({ message: "saved" });
           } else {
-            return res.json({ "message": "saved" });
-
+            return res.json({ message: "saved" });
           }
           return;
         }
       });
     } catch (error) {
-      console.log(`Error Insert User: ${error}`)
+      console.log(`Error Insert User: ${error}`);
     }
-
-
   },
-
-
 };
 
 module.exports = Client;
