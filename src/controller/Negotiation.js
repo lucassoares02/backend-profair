@@ -1174,27 +1174,30 @@ join associado a on a.codAssociado = p.codAssocPedido
     const { codgroup, codforn } = req.params;
 
     const queryConsult = `SET sql_mode = ''; 
-      SELECT 
-        n.codNegociacao,
-        n.prazo,
-        n.observacao,
-        n.descNegociacao,
-        1 AS confirma
+    SELECT 
+            n.codNegociacao,
+            n.prazo,
+            n.observacao,
+            a.codAssociado,
+            n.descNegociacao,
+            1 AS confirma
 
-    FROM negociacao n
+        FROM negociacao n 
+        join pedido p on p.codNegoPedido = n.codNegociacao
+        join associado a on a.codAssociado = p.codAssocPedido
 
-    WHERE 
-        n.codFornNegociacao = ${codforn}
-        AND EXISTS (
-            SELECT 1
-            FROM pedido p
-            JOIN associado a ON a.codAssociado = p.codAssocPedido
-            WHERE 
-                p.codNegoPedido = n.codNegociacao
-                AND a.id_grupo = ${codgroup}
-        )
-
-    ORDER BY n.prazo;`;
+        WHERE 
+            n.codFornNegociacao = ${codforn}
+            AND EXISTS (
+                SELECT 1
+                FROM pedido p
+                JOIN associado a ON a.codAssociado = p.codAssocPedido
+                WHERE 
+                    p.codNegoPedido = n.codNegociacao
+                    AND a.id_grupo = ${codgroup}
+            )
+      group by n.codNegociacao
+        ORDER BY n.prazo;`;
 
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {
