@@ -151,7 +151,7 @@ const Negotiation = {
             // Configurar os cabeçalhos de resposta para fazer o download
             res.setHeader(
               "Content-Disposition",
-              `attachment; filename=${results[1][0].cliente.replaceAll(" ", "_").toLowerCase()}_${results[1][0].fornecedor.replaceAll(" ", "_").toLowerCase()}.csv`
+              `attachment; filename=${results[1][0].cliente.replaceAll(" ", "_").toLowerCase()}_${results[1][0].fornecedor.replaceAll(" ", "_").toLowerCase()}.csv`,
             );
             res.setHeader("Content-Type", "text/csv");
 
@@ -176,7 +176,6 @@ const Negotiation = {
     console.log(req.params);
 
     const { codeclient, codenegotiation } = req.params;
-
 
     const queryConsult = `
     SET sql_mode = ''; select
@@ -224,13 +223,12 @@ const Negotiation = {
               })
               .join("\n");
 
-
             const dateNow = Date.now();
 
             // Configurar os cabeçalhos de resposta para fazer o download
             res.setHeader(
               "Content-Disposition",
-              `attachment; filename=${results[1][0].cliente.replaceAll(" ", "_").toLowerCase()}_${results[1][0].fornecedor.replaceAll(" ", "_").toLowerCase()}.csv`
+              `attachment; filename=${results[1][0].cliente.replaceAll(" ", "_").toLowerCase()}_${results[1][0].fornecedor.replaceAll(" ", "_").toLowerCase()}.csv`,
             );
             res.setHeader("Content-Type", "text/csv");
 
@@ -255,7 +253,6 @@ const Negotiation = {
     console.log(req.params);
 
     const { codenegotiation } = req.params;
-
 
     const queryConsult = `
     SET sql_mode = '';
@@ -289,14 +286,10 @@ const Negotiation = {
               })
               .join("\n");
 
-
             const dateNow = Date.now();
 
             // Configurar os cabeçalhos de resposta para fazer o download
-            res.setHeader(
-              "Content-Disposition",
-              `attachment; filename=${results[1][0].fornecedor.replaceAll(" ", "_").toLowerCase()}.csv`
-            );
+            res.setHeader("Content-Disposition", `attachment; filename=${results[1][0].fornecedor.replaceAll(" ", "_").toLowerCase()}.csv`);
             res.setHeader("Content-Type", "text/csv");
 
             // Transmitir o arquivo CSV como resposta
@@ -320,7 +313,6 @@ const Negotiation = {
     console.log(req.params);
 
     const { provider } = req.params;
-
 
     const queryConsult = `
       SET sql_mode = '';
@@ -355,14 +347,10 @@ const Negotiation = {
               })
               .join("\n");
 
-
             const dateNow = Date.now();
 
             // Configurar os cabeçalhos de resposta para fazer o download
-            res.setHeader(
-              "Content-Disposition",
-              `attachment; filename=${results[1][0].fornecedor.replaceAll(" ", "_").toLowerCase()}_geral.csv`
-            );
+            res.setHeader("Content-Disposition", `attachment; filename=${results[1][0].fornecedor.replaceAll(" ", "_").toLowerCase()}_geral.csv`);
             res.setHeader("Content-Type", "text/csv");
 
             // Transmitir o arquivo CSV como resposta
@@ -430,7 +418,7 @@ const Negotiation = {
             // Configurar os cabeçalhos de resposta para fazer o download
             res.setHeader(
               "Content-Disposition",
-              `attachment; filename=negociacao${results[1][0].codNegoPedido}_${results[1][0].cliente.replaceAll(" ", "_").toLowerCase()}_${results[1][0].fornecedor.replaceAll(" ", "_").toLowerCase()}.csv`
+              `attachment; filename=negociacao${results[1][0].codNegoPedido}_${results[1][0].cliente.replaceAll(" ", "_").toLowerCase()}_${results[1][0].fornecedor.replaceAll(" ", "_").toLowerCase()}.csv`,
             );
             res.setHeader("Content-Type", "text/csv");
 
@@ -554,8 +542,6 @@ join associado a on a.codAssociado = p.codAssocPedido
                 return ` "${row.codMercadoria_ext}";"${row.nomeMercadoria}";"${row.marca}";"${row.barcode}";"${row.complemento}";"${row.precoUnit}";"${row.precoMercadoria}";"${row.embMercadoria} | ${row.fatorMerc}";"${row.volumeTotal}";"${row.valorTotal}"`; // Substitua com os nomes das colunas do seu banco de dados
               })
               .join("\n");
-
-
 
             const dateNow = Date.now();
 
@@ -1182,6 +1168,46 @@ join associado a on a.codAssociado = p.codAssocPedido
     // connection.end();
   },
 
+  async getNegotiationGroup(req, res) {
+    logger.info("getNegotiationGroup");
+
+    const { codgroup, codforn } = req.params;
+
+    const queryConsult = `SET sql_mode = ''; 
+      SELECT 
+        n.codNegociacao,
+        n.prazo,
+        n.observacao,
+        n.descNegociacao,
+
+        CASE 
+            WHEN EXISTS (
+                SELECT 1
+                FROM pedido p
+                JOIN associado a ON a.codAssociado = p.codAssocPedido
+                WHERE 
+                    p.codNegoPedido = n.codNegociacao
+                    AND a.id_grupo = ${codgroup}
+            ) THEN 1
+            ELSE 0
+        END AS confirma
+
+    FROM negociacao n
+
+    WHERE n.codFornNegociacao = ${codforn}
+
+    ORDER BY n.prazo;`;
+
+    connection.query(queryConsult, (error, results, fields) => {
+      if (error) {
+        console.log("Error Select Negotiation to Client: ", error);
+      } else {
+        return res.json(results[1]);
+      }
+    });
+    // connection.end();
+  },
+
   async getNegotiationsProviderWithMerchandisePerClient(req, res) {
     logger.info("getNegotiationsProviderWithMerchandisePerClient");
 
@@ -1200,23 +1226,25 @@ join associado a on a.codAssociado = p.codAssocPedido
       } else {
         let allResult = [];
         const queryReusult = await new Promise(async (resolve, reject) => {
-          await Promise.all(results[1].map(async (negotiation) => {
-            const queryConsult = `SET sql_mode = ''; select mercadoria.codMercadoria as codMercadoria, mercadoria.nomeMercadoria as nomeMercadoria,mercadoria.complemento, mercadoria.marca, mercadoria.precoUnit, mercadoria.embMercadoria, mercadoria.fatorMerc, mercadoria.precoMercadoria as precoMercadoria, IFNULL(SUM(pedido.quantMercPedido), 0) as quantMercadoria FROM mercadoria left outer JOIN pedido ON(mercadoria.codMercadoria = pedido.codMercPedido) and pedido.codAssocPedido =  ${codclient}  and pedido.codNegoPedido = ${negotiation["codNegociacao"]} where mercadoria.nego = ${negotiation["codNegociacao"]} and mercadoria.codFornMerc = ${codforn} GROUP BY mercadoria.codMercadoria ORDER BY nomeMercadoria, marca`;
+          await Promise.all(
+            results[1].map(async (negotiation) => {
+              const queryConsult = `SET sql_mode = ''; select mercadoria.codMercadoria as codMercadoria, mercadoria.nomeMercadoria as nomeMercadoria,mercadoria.complemento, mercadoria.marca, mercadoria.precoUnit, mercadoria.embMercadoria, mercadoria.fatorMerc, mercadoria.precoMercadoria as precoMercadoria, IFNULL(SUM(pedido.quantMercPedido), 0) as quantMercadoria FROM mercadoria left outer JOIN pedido ON(mercadoria.codMercadoria = pedido.codMercPedido) and pedido.codAssocPedido =  ${codclient}  and pedido.codNegoPedido = ${negotiation["codNegociacao"]} where mercadoria.nego = ${negotiation["codNegociacao"]} and mercadoria.codFornMerc = ${codforn} GROUP BY mercadoria.codMercadoria ORDER BY nomeMercadoria, marca`;
 
-            const queryMerhcandises = await new Promise(async (resolves, reject) => {
-              connection.query(queryConsult, (error, merchandises, fields) => {
-                if (error) {
-                  console.log("Error Select Merchandise Provider If Client: ", error);
-                } else {
-                  negotiation.merchandises = merchandises[1];
-                  allResult.push(negotiation);
-                }
-                resolves();
+              const queryMerhcandises = await new Promise(async (resolves, reject) => {
+                connection.query(queryConsult, (error, merchandises, fields) => {
+                  if (error) {
+                    console.log("Error Select Merchandise Provider If Client: ", error);
+                  } else {
+                    negotiation.merchandises = merchandises[1];
+                    allResult.push(negotiation);
+                  }
+                  resolves();
+                });
               });
-            });
-          }));
+            }),
+          );
           console.log(allResult);
-          resolve()
+          resolve();
         });
         return res.json(allResult);
       }
@@ -1249,7 +1277,6 @@ join associado a on a.codAssociado = p.codAssocPedido
       if (error) {
         console.log("Error Select Negotiation to Client: ", error);
       } else {
-
         return res.json(results[1]);
       }
     });
@@ -1291,7 +1318,6 @@ join associado a on a.codAssociado = p.codAssocPedido
       if (error) {
         console.log("Error Select Negotiation to Client: ", error);
       } else {
-
         return res.json(results[1]);
       }
     });
@@ -1392,7 +1418,7 @@ join associado a on a.codAssociado = p.codAssocPedido
     connection.query(queryUpdate, (error, results, fields) => {
       if (error) {
         console.log("Error Updating Organization Status: ", error);
-        return res.status(500).json({ error: 'Erro ao atualizar status' });
+        return res.status(500).json({ error: "Erro ao atualizar status" });
       } else {
         return res.json(results[1]);
       }
@@ -1407,14 +1433,12 @@ join associado a on a.codAssociado = p.codAssocPedido
     connection.query(queryUpdate, (error, results, fields) => {
       if (error) {
         console.log("Error Get Organization Status: ", error);
-        return res.status(500).json({ error: 'Erro ao pegar status' });
+        return res.status(500).json({ error: "Erro ao pegar status" });
       } else {
         return res.json(results[0]);
       }
     });
-  }
-
-
+  },
 };
 
 module.exports = Negotiation;

@@ -46,6 +46,44 @@ const Graphs = {
     // connection.end();
   },
 
+  async getPercentageGroups(req, res) {
+    logger.info("Get Percentage Clients");
+
+    const { codprovider } = req.params;
+
+    // const queryConsult = `SET sql_mode = ''; SELECT (COUNT(DISTINCT pedido.codAssocPedido) * 100.0) / (SELECT COUNT(*) FROM associado) AS porcentagem, COUNT(DISTINCT pedido.codAssocPedido) AS realizados, (SELECT COUNT(*) FROM associado) AS total FROM pedido WHERE pedido.codFornPedido = ${codprovider}`;
+    const queryConsult = `SET sql_mode = '';
+        SELECT 
+        (COUNT(DISTINCT g.id) * 100.0) / total_grupos.total AS porcentagem,
+        COUNT(DISTINCT g.id) AS realizados,
+        total_grupos.total
+
+    FROM pedido p
+    JOIN associado a ON a.codAssociado = p.codAssocPedido
+    JOIN grupos_empresariais g ON g.id = a.id_grupo
+
+    JOIN (
+        SELECT COUNT(DISTINCT g2.id) AS total
+        FROM acesso ac
+        JOIN consultor c ON c.codConsult = ac.codUsuario
+        JOIN relaciona r ON r.codConsultRelaciona = c.codConsult
+        JOIN associado a2 ON a2.codAssociado = r.codAssocRelaciona
+        JOIN grupos_empresariais g2 ON g2.id = a2.id_grupo
+        WHERE ac.is_present = 1
+    ) AS total_grupos
+
+    WHERE p.codFornPedido = ${codprovider};`;
+
+    connection.query(queryConsult, (error, results, fields) => {
+      if (error) {
+        console.log("Error Select Percentage Clients: ", error);
+      } else {
+        return res.json(results[1]);
+      }
+    });
+    // connection.end();
+  },
+
   async getPercentagePovidersByClients(req, res) {
     logger.info("Get Percentage Providers by Clients");
 
@@ -254,13 +292,13 @@ const Graphs = {
             item.price.toLocaleString("pt-BR", {
               style: "currency",
               currency: "BRL",
-            })
+            }),
           );
           itemP.push(
             item.totalprice.toLocaleString("pt-BR", {
               style: "currency",
               currency: "BRL",
-            })
+            }),
           );
 
           valorTotal += item.totalprice;
@@ -279,7 +317,7 @@ const Graphs = {
           valorTotal.toLocaleString("pt-BR", {
             style: "currency",
             currency: "BRL",
-          })
+          }),
         );
 
         testefull.push(itemP);
@@ -327,7 +365,6 @@ const Graphs = {
       }
     });
   },
-
 
   async getExportPdfTesteLayoutDeep(req, res) {
     logger.info("Get Exports Pdf");
@@ -390,13 +427,13 @@ const Graphs = {
             item.price.toLocaleString("pt-BR", {
               style: "currency",
               currency: "BRL",
-            })
+            }),
           );
           itemP.push(
             item.totalprice.toLocaleString("pt-BR", {
               style: "currency",
               currency: "BRL",
-            })
+            }),
           );
 
           valorTotal += item.totalprice;
@@ -415,60 +452,47 @@ const Graphs = {
           valorTotal.toLocaleString("pt-BR", {
             style: "currency",
             currency: "BRL",
-          })
+          }),
         );
 
         testefull.push(itemP);
 
         const doc = new PDFDocument({ margin: 20, size: "A4" });
-        const fs = require('fs');
+        const fs = require("fs");
 
         // Adicionar cabeçalho personalizado
         function addHeader(doc) {
           // Adicionar imagem (substitua pelo caminho da sua imagem)
-          if (fs.existsSync('/src/assets/logo.png')) {
-            doc.image('/src/assets/logo.png', 20, 20, { width: 100 });
+          if (fs.existsSync("/src/assets/logo.png")) {
+            doc.image("/src/assets/logo.png", 20, 20, { width: 100 });
           }
 
           // Informações da empresa
-          doc.font('Helvetica-Bold')
-            .fontSize(12)
-            .text('Nome da Empresa', 130, 30);
+          doc.font("Helvetica-Bold").fontSize(12).text("Nome da Empresa", 130, 30);
 
-          doc.font('Helvetica')
+          doc
+            .font("Helvetica")
             .fontSize(10)
-            .text('Endereço: Rua Exemplo, 123', 130, 45)
-            .text('Telefone: (11) 1234-5678', 130, 60)
-            .text('CNPJ: 12.345.678/0001-90', 130, 75);
+            .text("Endereço: Rua Exemplo, 123", 130, 45)
+            .text("Telefone: (11) 1234-5678", 130, 60)
+            .text("CNPJ: 12.345.678/0001-90", 130, 75);
 
           // Data e hora atual
           const now = new Date();
-          const dateTimeString = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+          const dateTimeString = now.toLocaleDateString() + " " + now.toLocaleTimeString();
 
-          doc.font('Helvetica-Oblique')
-            .fontSize(8)
-            .text(`Gerado em: ${dateTimeString}`, 400, 30, { align: 'right' });
+          doc.font("Helvetica-Oblique").fontSize(8).text(`Gerado em: ${dateTimeString}`, 400, 30, { align: "right" });
 
           // Linha divisória
-          doc.moveTo(20, 100)
-            .lineTo(580, 100)
-            .stroke();
+          doc.moveTo(20, 100).lineTo(580, 100).stroke();
 
           // Título do documento
-          doc.font('Helvetica-Bold')
-            .fontSize(14)
-            .text('RELATÓRIO DE PRODUTOS', { align: 'center' })
-            .moveDown(0.5);
+          doc.font("Helvetica-Bold").fontSize(14).text("RELATÓRIO DE PRODUTOS", { align: "center" }).moveDown(0.5);
 
           // Informações do fornecedor e cliente
-          doc.font('Helvetica-Bold')
-            .fontSize(10)
-            .text(`Fornecedor: ${providerQuery}`, { align: 'left' });
+          doc.font("Helvetica-Bold").fontSize(10).text(`Fornecedor: ${providerQuery}`, { align: "left" });
 
-          doc.font('Helvetica-Bold')
-            .fontSize(10)
-            .text(`Cliente: ${clientQuery}`, { align: 'left' })
-            .moveDown(1);
+          doc.font("Helvetica-Bold").fontSize(10).text(`Cliente: ${clientQuery}`, { align: "left" }).moveDown(1);
         }
 
         // Chamar a função para adicionar o cabeçalho
@@ -493,13 +517,11 @@ const Graphs = {
           prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
           prepareRow: (row, indexColumn, indexRow, rectRow) => {
             doc.font("Helvetica").fontSize(8);
-          }
+          },
         });
 
         // Adicionar rodapé
-        doc.font('Helvetica-Oblique')
-          .fontSize(8)
-          .text('© 2023 Minha Empresa - Todos os direitos reservados', { align: 'center' });
+        doc.font("Helvetica-Oblique").fontSize(8).text("© 2023 Minha Empresa - Todos os direitos reservados", { align: "center" });
 
         // Criar buffer para o PDF
         const chunks = [];
@@ -515,7 +537,6 @@ const Graphs = {
       }
     });
   },
-
 
   async getExportPdfTesteLayoutGpt(req, res) {
     logger.info("Get Exports Pdf");
@@ -578,13 +599,13 @@ const Graphs = {
             item.price.toLocaleString("pt-BR", {
               style: "currency",
               currency: "BRL",
-            })
+            }),
           );
           itemP.push(
             item.totalprice.toLocaleString("pt-BR", {
               style: "currency",
               currency: "BRL",
-            })
+            }),
           );
 
           valorTotal += item.totalprice;
@@ -603,7 +624,7 @@ const Graphs = {
           valorTotal.toLocaleString("pt-BR", {
             style: "currency",
             currency: "BRL",
-          })
+          }),
         );
 
         testefull.push(itemP);
@@ -645,24 +666,12 @@ const Graphs = {
           timeZone: "America/Sao_Paulo",
         });
 
-        doc
-          .font("Helvetica")
-          .fontSize(12)
-          .text(`Data: ${now}`, 420, 100, { align: "right" });
+        doc.font("Helvetica").fontSize(12).text(`Data: ${now}`, 420, 100, { align: "right" });
 
-        doc
-          .font("Helvetica-Bold")
-          .fontSize(14)
-          .text("Pedido de Compra", 20, 110)
-          .moveDown(0.5);
+        doc.font("Helvetica-Bold").fontSize(14).text("Pedido de Compra", 20, 110).moveDown(0.5);
 
         // Cliente e fornecedor
-        doc
-          .font("Helvetica")
-          .fontSize(12)
-          .text(`Fornecedor: ${providerQuery}`, 20, 130)
-          .text(`Cliente: ${clientQuery}`, 20, 145)
-          .moveDown(1);
+        doc.font("Helvetica").fontSize(12).text(`Fornecedor: ${providerQuery}`, 20, 130).text(`Cliente: ${clientQuery}`, 20, 145).moveDown(1);
 
         // ** LINHA SEPARADORA ANTES DA TABELA **
         doc.moveTo(20, 170).lineTo(570, 170).stroke();
@@ -689,7 +698,7 @@ const Graphs = {
 
         // Finalizar o documento PDF
         doc.end();
-      };
+      }
     });
   },
 
@@ -730,12 +739,20 @@ const Graphs = {
         doc.pipe(res);
 
         // Escrever os dados no PDF
-        doc.font("Helvetica-Bold").fontSize(12).text("ID Negociacao Codigo ERP Codigo de Barras Produto Complemento Marca Quantidade", { align: "left" });
+        doc
+          .font("Helvetica-Bold")
+          .fontSize(12)
+          .text("ID Negociacao Codigo ERP Codigo de Barras Produto Complemento Marca Quantidade", { align: "left" });
 
         results[1].forEach((row) => {
-          doc.fontSize(10).text(`${row.codMercPedido} ${row.codNegoPedido} ${row.erpcode} ${row.barcode} ${row.nomeMercadoria} ${row.complemento} ${row.marca} ${row.quantidade}`, {
-            align: "left",
-          });
+          doc
+            .fontSize(10)
+            .text(
+              `${row.codMercPedido} ${row.codNegoPedido} ${row.erpcode} ${row.barcode} ${row.nomeMercadoria} ${row.complemento} ${row.marca} ${row.quantidade}`,
+              {
+                align: "left",
+              },
+            );
         });
 
         // Finalizar o documento PDF
@@ -772,18 +789,18 @@ FROM (
       from mercadoria;`;
     // const queryConsult = `SET sql_mode = ''; select
     //   sum(pedido.quantMercPedido * mercadoria.precoMercadoria) as total
-    //   from pedido 
-    //   join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido 
-    //   union 
+    //   from pedido
+    //   join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido
+    //   union
     //   select
     //   count(associado.codAssociado) as associados
     //   from associado
     //   union
-    //   select 
+    //   select
     //   count(fornecedor.codForn) as fornecedores
     //   from fornecedor
     //   union
-    //   select 
+    //   select
     //   count(mercadoria.codMercadoria) as mercadorias
     //   from mercadoria;`;
 

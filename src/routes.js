@@ -92,6 +92,7 @@ router.post("/insertprovider", Provider.postInsertProvider);
 
 router.get("/negotiationprovider/:codforn", Negotiation.getNegotiationProvider);
 router.get("/negotiationclient/:codclient/:codforn", Negotiation.getNegotiationClient);
+router.get("/negotiationgroup/:codgroup/:codforn", Negotiation.getNegotiationGroup);
 
 router.get("/negotiationproviderclient/:codclient/:codforn", Negotiation.getNegotiationsProviderWithMerchandisePerClient);
 
@@ -166,6 +167,7 @@ router.post("/insertrequestnew", Log.InsertLog, Backup.InsertSell, Request.postI
 router.get("/allrequestclients", Request.getAllRequests);
 
 router.get("/percentageclients/:codprovider", Graphs.getPercentageClients);
+router.get("/percentagegroups/:codprovider", Graphs.getPercentageGroups);
 router.get("/percentageproviderbyclients/:codbuyer", Graphs.getPercentagePovidersByClients);
 router.get("/percentageclientsorganization", Graphs.getPercentageClientsOrganization);
 router.get("/percentageprovidersorganization", Graphs.getPercentageProvidersOrganization);
