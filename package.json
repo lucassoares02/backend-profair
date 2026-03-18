@@ -2,7 +2,7 @@
   "name": "seller-backend",
   "version": "1.0.0",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=18.0.0"
   },
   "private": true,
   "description": "backend node",
@@ -11,8 +11,8 @@
   "author": "Lucas <lucas.soares02@hotmail.com>",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon --openssl-legacy-provider --trace-uncaught server.js",
-    "start": "node --openssl-legacy-provider server.js"
+    "dev": "nodemon --trace-uncaught server.js",
+    "start": "node server.js"
   },
   "dependencies": {
     "async": "^3.2.0",

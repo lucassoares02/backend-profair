@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:18-alpine
 
 ENV PORT 3001
 EXPOSE 3001
