@@ -2,7 +2,7 @@ const { connection } = require("@server");
 const logger = require("@logger");
 const Select = require("@select");
 const Insert = require("@insert");
-const saveLogs = require('@logs');
+const saveLogs = require("@logs");
 
 const User = {
   async getUserDoubleCompany(req, res) {
@@ -15,7 +15,6 @@ const User = {
     } catch (error) {
       console.log(`Error Save Logs: ${error}`);
     }
-
 
     const queryConsult = "select codAcesso, codOrganization, direcAcesso from acesso where codAcesso = " + codacesso;
 
@@ -104,20 +103,20 @@ const User = {
               ORDER BY valorPedido DESC;
             `;
             // const queryClient = `
-            //   SET sql_mode = ''; 
+            //   SET sql_mode = '';
             //   SELECT acesso.codAcesso,
             //   acesso.direcAcesso,
             //   associado.razaoAssociado AS nomeForn,
             //   associado.cnpjAssociado AS cnpjForn,
-            //   acesso.codUsuario, 
+            //   acesso.codUsuario,
             //   associado.codAssociado AS codForn,
-            //   consultor.nomeConsult, consultor.cpfConsult, 
-            //   FORMAT(IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0), 2, 'de_DE') as valorPedido 
+            //   consultor.nomeConsult, consultor.cpfConsult,
+            //   FORMAT(IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0), 2, 'de_DE') as valorPedido
             //   FROM acesso
-            //   join consultor on acesso.codUsuario = consultor.codConsult 
+            //   join consultor on acesso.codUsuario = consultor.codConsult
             //   join relaciona on relaciona.codAssocRelaciona = consultor.codConsult
             //   join associado on associado.codAssociado = relaciona.codConsultRelaciona
-            //   left join pedido on pedido.codAssocPedido = associado.codAssociado 
+            //   left join pedido on pedido.codAssocPedido = associado.codAssociado
             //   left join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido
             //   WHERE acesso.codAcesso = '${codacesso}'
             //   group by associado.codAssociado
@@ -192,11 +191,13 @@ const User = {
         return res.status(400).send(error);
       } else {
         if (results.length > 0) {
-
           // add token in table acesso in field token
           const queryUpdate = `UPDATE acesso SET is_present = 1 WHERE codAcesso = ${codacesso}`;
           await connection.query(queryUpdate, (error, resultsUpdate) => {
-            if (error) { console.log(`Error insert token acesso: ${error}`) } else { }
+            if (error) {
+              console.log(`Error insert token acesso: ${error}`);
+            } else {
+            }
           });
 
           if (results[0].direcAcesso == 1) {
@@ -313,7 +314,7 @@ const User = {
 
           connection.query(queryProvider, (error, results) => {
             if (error) {
-              return "Error Insert User Client: ", error;
+              return ("Error Insert User Client: ", error);
             } else {
               return res.json(results[1]);
             }
@@ -326,7 +327,7 @@ const User = {
 
           connection.query(queryClient, (error, results) => {
             if (error) {
-              return "Error Update User Client: ", error;
+              return ("Error Update User Client: ", error);
             } else {
               return res.json(results[1]);
             }
@@ -350,7 +351,7 @@ const User = {
 
           connection.query(queryOrganization, (error, results) => {
             if (error) {
-              return "Error Update User Client: ", error;
+              return ("Error Update User Client: ", error);
             } else {
               return res.json(results[1]);
             }
@@ -437,7 +438,6 @@ const User = {
       FROM fornecedor f
       JOIN relacionafornecedor r ON r.codFornecedor = f.codForn
       WHERE r.codConsultor = ${code}`;
-
     } else if (type == 2) {
       queryConsult = `    SELECT f.codAssociado as 'codForn', concat(f.codAssociado, " - ",f.razaoAssociado) AS 'razao', 
         f.cnpjAssociado as 'cnpjForn'

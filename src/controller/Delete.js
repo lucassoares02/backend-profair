@@ -13,6 +13,7 @@ const Delete = {
     delete from comprador;
     delete from consultor;
     delete from fornecedor;
+    delete from grupos_empresariais;
     delete from log;
     delete from mercadoria;
     delete from mercadoriaNova;
@@ -39,14 +40,12 @@ const Delete = {
     // connection.end();
   },
 
-
   async deleteCompanyToUser(req, res) {
     logger.info("Get Deletes Company to User");
 
     const { company, user, type } = req.params;
 
     console.log(company, user, type);
-
 
     let queryKill = "";
 
@@ -68,9 +67,6 @@ const Delete = {
     });
     // connection.end();
   },
-
-
-
 };
 
 module.exports = Delete;
