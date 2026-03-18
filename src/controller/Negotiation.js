@@ -1179,22 +1179,20 @@ join associado a on a.codAssociado = p.codAssocPedido
         n.prazo,
         n.observacao,
         n.descNegociacao,
-
-        CASE 
-            WHEN EXISTS (
-                SELECT 1
-                FROM pedido p
-                JOIN associado a ON a.codAssociado = p.codAssocPedido
-                WHERE 
-                    p.codNegoPedido = n.codNegociacao
-                    AND a.id_grupo = ${codgroup}
-            ) THEN 1
-            ELSE 0
-        END AS confirma
+        1 AS confirma
 
     FROM negociacao n
 
-    WHERE n.codFornNegociacao = ${codforn}
+    WHERE 
+        n.codFornNegociacao = ${codforn}
+        AND EXISTS (
+            SELECT 1
+            FROM pedido p
+            JOIN associado a ON a.codAssociado = p.codAssocPedido
+            WHERE 
+                p.codNegoPedido = n.codNegociacao
+                AND a.id_grupo = ${codgroup}
+        )
 
     ORDER BY n.prazo;`;
 
