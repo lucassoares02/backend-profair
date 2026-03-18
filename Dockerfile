@@ -1,8 +1,5 @@
 FROM node:20-alpine
 
-# Uncomment if use of `process.dlopen` is necessary
-# RUN apk add --no-cache libc6-compat
-
 ENV PORT 3001
 EXPOSE 3001
 
@@ -14,4 +11,4 @@ COPY package.json ./
 RUN yarn install
 COPY . .
 
-CMD [ "yarn", "start" ]
+CMD [ "node", "--openssl-legacy-provider", "server.js" ]

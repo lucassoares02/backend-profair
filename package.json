@@ -11,8 +11,8 @@
   "author": "Lucas <lucas.soares02@hotmail.com>",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon --trace-uncaught server.js",
-    "start": "node server.js"
+    "dev": "nodemon --openssl-legacy-provider --trace-uncaught server.js",
+    "start": "node --openssl-legacy-provider server.js"
   },
   "dependencies": {
     "async": "^3.2.0",
