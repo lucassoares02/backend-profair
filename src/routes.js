@@ -112,7 +112,6 @@ router.get("/exportnegotiationperclient/:codeclient/:codenegotiation", Negotiati
 router.get("/exportnegotiationper/:codenegotiation", Negotiation.GetExportNegotiationsPerNegotiation);
 router.get("/exportnegotiationperprovider/:codeclient/:codenegotiation", Negotiation.GetExportNegotiationPerProvider);
 
-
 router.get("/ExportNegotiationsPerProvider/:provider", Negotiation.ExportNegotiationsPerProvider);
 
 router.get("/exportproductnegotiationperprovider/:provider", Negotiation.exportProductsPerNegotiationPerProvider);
@@ -126,13 +125,15 @@ router.get("/buyers", Buyer.getAllBuyers);
 router.get("/statusnegotiation", Negotiation.negotiationStatus);
 router.get("/statusnegotiation/:code", Negotiation.changeNegotiationStatus);
 
-
 router.patch("/merchandise/:codMercadoria", Merchandise.patchMerchandise);
 router.get("/merchandiseclientprovidernegotiation/:codclient/:codprovider/:codnegotiation", Merchandise.getMerchandiseClientProviderNegotiation);
 router.get("/merchandiseprovider/:codprovider", Merchandise.getMerchandiseProvider);
 router.get("/merchandisetoptenprovider/:codprovider", Merchandise.getTopTenMerchandiseProvider);
 router.get("/merchandiseproviderifclient/:codclient/:codprovider/:codnegotiation", Merchandise.getMerchandiseProviderIfClientLimitNegotiation);
-router.get("/merchandiseproviderifclientlimitnegotiation/:codclient/:codprovider/:codnegotiation", Merchandise.getMerchandiseProviderIfClientLimitNegotiation);
+router.get(
+  "/merchandiseproviderifclientlimitnegotiation/:codclient/:codprovider/:codnegotiation",
+  Merchandise.getMerchandiseProviderIfClientLimitNegotiation,
+);
 
 router.get("/merchandisenegotiationprovider/:codprovider/:codnegotiation", Merchandise.getMerchandiseNegotiationProvider);
 router.get("/merchandisenegotiationproviderifClient/:codprovider/:codnegotiation", Merchandise.getMerchandiseNegotiationProviderIfClient);
@@ -150,7 +151,6 @@ router.get("/requesttonegotiationsperprovider/:codprovider", Request.getRequestN
 
 router.get("/requestsprovider/:codprovider", Request.getRequestsProvider);
 router.get("/exportrequestsprovider/:provider", Request.ExportClientsPerProvider);
-
 
 router.get("/requestsprovidernegotiation/:codenegotiation", Request.getRequestsNegotiation);
 
@@ -192,7 +192,6 @@ router.get("/deleteallinformations", Delete.deleteAll);
 router.delete("/deletecompanytouser/:company/:user/:type", Delete.deleteCompanyToUser);
 router.get("/insertcompanytouser/:company/:user/:type", Provider.insertCompanyToUser);
 
-
 router.get("/wedding/get", Wedding.get);
 router.get("/wedding/confirm", Wedding.confirm);
 router.get("/wedding/desconfirm", Wedding.disconfirm);
@@ -213,7 +212,8 @@ router.get("/notification/pending", Notification.getPendingNotificationPerUser);
 router.get("/notification/check", Notification.checkNotificationPerUser);
 router.get("/notification/:id", Notification.getNotificationDetails);
 
-router.post('/mql/decision', Mql.insert);
+router.post("/mql/decision", Mql.insert);
 
+// router.get("/portalflex/negotiations/:negociacao", Integration.negotiations);
 
 module.exports = router;

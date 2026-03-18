@@ -20,7 +20,6 @@ function initializeFirebase() {
 }
 
 const Notification = {
-
   async getNotifications(req, res) {
     logger.info("Get Notifications Per User");
 
@@ -75,15 +74,17 @@ const Notification = {
     const { id } = req.params;
     if (!id) return res.status(400).send({ message: "Notification ID is required" });
 
-    // Inicia transação
-    connection.beginTransaction(err => {
-      if (err) return res.status(500).send({ message: "Transaction error", err });
+    connection.getConnection((err, connection) => {
+      if (err) {
+        console.error("Erro ao iniciar transação:", err);
+        return res.status(500).json({ error: "Erro interno do servidor" });
+      }
 
-      // 1) Deleta as referências em user_notifications
-      connection.query(
-        'DELETE FROM user_notifications WHERE notification = ?',
-        [id],
-        (err) => {
+      connection.beginTransaction((err) => {
+        if (err) return res.status(500).send({ message: "Transaction error", err });
+
+        // 1) Deleta as referências em user_notifications
+        connection.query("DELETE FROM user_notifications WHERE notification = ?", [id], (err) => {
           if (err) {
             return connection.rollback(() => {
               res.status(400).send({ message: "Erro ao deletar relações", err });
@@ -91,29 +92,25 @@ const Notification = {
           }
 
           // 2) Deleta a notificação
-          connection.query(
-            'DELETE FROM notifications WHERE id = ?',
-            [id],
-            (err, results) => {
-              if (err) {
-                return connection.rollback(() => {
-                  res.status(400).send({ message: "Erro ao deletar notificação", err });
-                });
-              }
-
-              // Commit se tudo certo
-              connection.commit(commitErr => {
-                if (commitErr) {
-                  return connection.rollback(() => {
-                    res.status(500).send({ message: "Erro ao confirmar transação", commitErr });
-                  });
-                }
-                res.status(200).send({ message: "Notification deleted successfully" });
+          connection.query("DELETE FROM notifications WHERE id = ?", [id], (err, results) => {
+            if (err) {
+              return connection.rollback(() => {
+                res.status(400).send({ message: "Erro ao deletar notificação", err });
               });
             }
-          );
-        }
-      );
+
+            // Commit se tudo certo
+            connection.commit((commitErr) => {
+              if (commitErr) {
+                return connection.rollback(() => {
+                  res.status(500).send({ message: "Erro ao confirmar transação", commitErr });
+                });
+              }
+              res.status(200).send({ message: "Notification deleted successfully" });
+            });
+          });
+        });
+      });
     });
   },
 
@@ -122,7 +119,8 @@ const Notification = {
 
     const { id } = req.params;
 
-    const query = "SELECT n.*, CASE WHEN n.provider != 0 THEN f.nomeForn ELSE NULL END AS nomeForn, CASE WHEN n.provider != 0 THEN f.color ELSE NULL END AS color, CASE WHEN n.provider != 0 THEN f.image ELSE NULL END AS image FROM notifications n LEFT JOIN fornecedor f ON n.provider = f.codForn WHERE n.id = ?;";
+    const query =
+      "SELECT n.*, CASE WHEN n.provider != 0 THEN f.nomeForn ELSE NULL END AS nomeForn, CASE WHEN n.provider != 0 THEN f.color ELSE NULL END AS color, CASE WHEN n.provider != 0 THEN f.image ELSE NULL END AS image FROM notifications n LEFT JOIN fornecedor f ON n.provider = f.codForn WHERE n.id = ?;";
     const values = [id];
 
     connection.query(query, values, (error, results, fields) => {
@@ -171,7 +169,7 @@ const Notification = {
   async getNotificationsAll(req, res) {
     logger.info("Get Notifications");
 
-    const query = 'select * from notifications order by id desc';
+    const query = "select * from notifications order by id desc";
 
     connection.query(query, (error, results, fields) => {
       if (error) {
@@ -187,9 +185,10 @@ const Notification = {
 
     const { notification } = req.params;
 
-    console.log(`Notificação: ${notification}`)
+    console.log(`Notificação: ${notification}`);
 
-    const query = 'select un.*, c.codConsult, c.nomeConsult  from user_notifications un join consultor c on c.codConsult = un.user where un.notification = ?';
+    const query =
+      "select un.*, c.codConsult, c.nomeConsult  from user_notifications un join consultor c on c.codConsult = un.user where un.notification = ?";
     const values = [notification];
 
     connection.query(query, values, (error, results, fields) => {
@@ -235,11 +234,18 @@ const Notification = {
     try {
       const resp = await Insert(params);
 
-      console.log(resp[1][0]["LAST_INSERT_ID()"])
+      console.log(resp[1][0]["LAST_INSERT_ID()"]);
 
       let result = { success: true, message: "" };
       if (data.method == 1) {
-        result = await Notification.sendNotification(data.title, data.content, data.redirect, data.target, data.provider, resp[1][0]["LAST_INSERT_ID()"]);
+        result = await Notification.sendNotification(
+          data.title,
+          data.content,
+          data.redirect,
+          data.target,
+          data.provider,
+          resp[1][0]["LAST_INSERT_ID()"],
+        );
       }
 
       return res.status(200).send({
@@ -247,7 +253,6 @@ const Notification = {
         insertData: resp[0],
         result,
       });
-
     } catch (error) {
       logger.error("Insert Notification failed:", error);
       return res.status(400).send({ message: "Error inserting notification", error });
@@ -259,7 +264,6 @@ const Notification = {
     const { title, content, redirect, target, day, month, hour, minute, method, id } = req.body;
 
     try {
-
       const query = `UPDATE notifications SET title = ?, content = ?, redirect = ?, target = ?, day = ?, month = ?, hour = ?, minute = ?, method = ? WHERE id = ?`;
       const values = [title, content, redirect, target, day, month, hour, minute, method, id];
 
@@ -272,7 +276,6 @@ const Notification = {
           });
         }
       });
-
     } catch (error) {
       logger.error("Update Notification:", error);
       return res.status(400).send({ message: "Error update notification", error });
@@ -288,7 +291,7 @@ const Notification = {
     }
 
     // 1) Busca o usuário pelo token
-    const userQuery = 'SELECT codUsuario FROM acesso WHERE token = ? LIMIT 1';
+    const userQuery = "SELECT codUsuario FROM acesso WHERE token = ? LIMIT 1";
     connection.query(userQuery, [tokenFcm], (userErr, userRows) => {
       if (userErr) {
         logger.error("Erro ao buscar usuário:", userErr);
@@ -335,7 +338,6 @@ const Notification = {
     });
   },
 
-
   async sendNotification(title, content, redirect, target, provider, notificationId) {
     logger.info("Send Notifications");
 
@@ -363,14 +365,13 @@ const Notification = {
 
       console.log("Results:", results);
 
-      const tokens = results.map(row => row.token);
-      const users = results.map(row => row.user_id);
+      const tokens = results.map((row) => row.token);
+      const users = results.map((row) => row.user_id);
 
       console.log("Provider:", provider);
 
-
-      let imageUrlString = 'https://play-lh.googleusercontent.com/6FINLIOgGm5UN2MuqBIYnqhydb71JlO55aOG1ox_S7WtSGvo-72p5pWkL2OufnIjBbY=w240-h480-rw';
-      if (provider != null || provider != undefined || provider != '' || provider != 0 || provider != '0') {
+      let imageUrlString = "https://play-lh.googleusercontent.com/6FINLIOgGm5UN2MuqBIYnqhydb71JlO55aOG1ox_S7WtSGvo-72p5pWkL2OufnIjBbY=w240-h480-rw";
+      if (provider != null || provider != undefined || provider != "" || provider != 0 || provider != "0") {
         let queryProviders = `select image from fornecedor where codForn = ${provider}`;
         const resultProvider = await query(queryProviders);
         if (resultProvider.length > 0) {
@@ -403,8 +404,8 @@ const Notification = {
         apns: {
           payload: {
             aps: {
-              'mutable-content': 1,
-              'content-available': 1,
+              "mutable-content": 1,
+              "content-available": 1,
             },
           },
           fcm_options: {
@@ -415,20 +416,19 @@ const Notification = {
 
       console.log("Message:", message);
 
-
       const response = await admin.messaging().sendEachForMulticast(message);
-
 
       const updateNotifications = `update notifications set sent = 1 where id = ${notificationId}`;
 
       await query(updateNotifications);
 
-
-      const insertValues = results.map((row, index) => {
-        const res = response.responses[index];
-        console.log("Response:", res);
-        return `(${users[index]}, ${notificationId}, ${res.success ? 1 : 0}, 0, '${res.success ? "Sent" : res.error.message}')`;
-      }).join(', ');
+      const insertValues = results
+        .map((row, index) => {
+          const res = response.responses[index];
+          console.log("Response:", res);
+          return `(${users[index]}, ${notificationId}, ${res.success ? 1 : 0}, 0, '${res.success ? "Sent" : res.error.message}')`;
+        })
+        .join(", ");
 
       console.log("Insert Values:", insertValues);
 
@@ -442,9 +442,7 @@ const Notification = {
       await query(insertQuery);
 
       if (response.failureCount > 0) {
-        const failedTokens = response.responses
-          .map((res, idx) => !res.success ? tokens[idx] : null)
-          .filter(t => t !== null);
+        const failedTokens = response.responses.map((res, idx) => (!res.success ? tokens[idx] : null)).filter((t) => t !== null);
 
         logger.error("Failed to send notifications to tokens:", failedTokens);
         return {
@@ -456,13 +454,11 @@ const Notification = {
 
       logger.info("Notification sent successfully", { successCount: response.successCount });
       return { success: true, message: "Notification sent", response };
-
     } catch (error) {
       logger.info("Error sending notification:", error);
       return { success: false, message: "Error sending notification", error };
     }
-  }
-
+  },
 };
 
 module.exports = Notification;

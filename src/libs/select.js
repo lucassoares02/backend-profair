@@ -16,18 +16,14 @@ async function Select(params) {
   var concatWhere = "";
   if (where != "") {
     var i = 1;
-    concatWhere =
-      " where " + columnsWhere[0] + " LIKE '" + valuesWhere[0] + "'";
+    concatWhere = " where " + columnsWhere[0] + " LIKE '" + valuesWhere[0] + "'";
 
     for (i; i < columnsWhere.length; i++) {
-      concatWhere +=
-        " AND " + columnsWhere[i] + " LIKE '" + valuesWhere[i] + "'";
+      concatWhere += " AND " + columnsWhere[i] + " LIKE '" + valuesWhere[i] + "'";
     }
   }
 
   const query = "SET sql_mode = ''; select * FROM " + table + concatWhere;
-  
-
 
   return new Promise(function (resolve, reject) {
     connection.query(query, valuesData, function (error, results, fields) {
@@ -35,8 +31,7 @@ async function Select(params) {
         logger.error(error);
         return reject(error);
       }
-      
-      logger.info(results);
+
       return resolve(results);
     });
   });

@@ -11,7 +11,7 @@
   "author": "Lucas <lucas.soares02@hotmail.com>",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon server.js",
+    "dev": "nodemon --trace-uncaught server.js",
     "start": "node server.js"
   },
   "dependencies": {

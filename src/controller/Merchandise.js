@@ -8,17 +8,7 @@ const Merchandise = {
     logger.info("Patch Merchandise");
 
     const { codMercadoria } = req.params;
-    const {
-      nomeMercadoria,
-      embMercadoria,
-      fatorMerc,
-      complemento,
-      barcode,
-      marca,
-      nego,
-      precoUnit,
-      precoMercadoria
-    } = req.body;
+    const { nomeMercadoria, embMercadoria, fatorMerc, complemento, barcode, marca, nego, precoUnit, precoMercadoria } = req.body;
 
     const queryUpdateMercadoria = `
       UPDATE mercadoria 
@@ -33,29 +23,32 @@ const Merchandise = {
       WHERE codMercPedido = ? AND codNegoPedido = ?;
     `;
 
-    connection.beginTransaction((err) => {
+    connection.getConnection((err, connection) => {
       if (err) {
         console.error("Erro ao iniciar transação:", err);
         return res.status(500).json({ error: "Erro interno do servidor" });
       }
 
-      // Atualizar tabela mercadoria
-      connection.query(
-        queryUpdateMercadoria,
-        [nomeMercadoria, embMercadoria, fatorMerc, complemento, barcode, marca, nego, precoUnit, precoMercadoria, codMercadoria],
-        (error, results) => {
-          if (error) {
-            return connection.rollback(() => {
-              console.error("Erro ao atualizar mercadoria:", error);
-              res.status(500).json({ error: "Erro ao atualizar mercadoria" });
-            });
-          }
+      connection.beginTransaction((err) => {
+        if (err) {
+          console.error("Erro ao iniciar transação:", err);
+          return res.status(500).json({ error: "Erro interno do servidor" });
+        }
 
-          // Atualizar tabela pedido
-          connection.query(
-            queryUpdatePedido,
-            [codMercadoria, nego, codMercadoria, nego],
-            (error, results) => {
+        // Atualizar tabela mercadoria
+        connection.query(
+          queryUpdateMercadoria,
+          [nomeMercadoria, embMercadoria, fatorMerc, complemento, barcode, marca, nego, precoUnit, precoMercadoria, codMercadoria],
+          (error, results) => {
+            if (error) {
+              return connection.rollback(() => {
+                console.error("Erro ao atualizar mercadoria:", error);
+                res.status(500).json({ error: "Erro ao atualizar mercadoria" });
+              });
+            }
+
+            // Atualizar tabela pedido
+            connection.query(queryUpdatePedido, [codMercadoria, nego, codMercadoria, nego], (error, results) => {
               if (error) {
                 return connection.rollback(() => {
                   console.error("Erro ao atualizar pedido:", error);
@@ -74,10 +67,10 @@ const Merchandise = {
 
                 res.json({ message: "Atualização bem-sucedida" });
               });
-            }
-          );
-        }
-      );
+            });
+          },
+        );
+      });
     });
   },
 
@@ -108,24 +101,24 @@ const Merchandise = {
     desc`;
 
     //     const queryConsult = `
-    //     SET sql_mode = ''; select 
-    //     mercadoria.codMercadoria, 
-    //     mercadoria.codFornMerc, 
-    //     mercadoria.nomeMercadoria, 
-    //     mercadoria.embMercadoria, 
-    //     mercadoria.complemento, 
-    //     mercadoria.marca, 
+    //     SET sql_mode = ''; select
+    //     mercadoria.codMercadoria,
+    //     mercadoria.codFornMerc,
+    //     mercadoria.nomeMercadoria,
+    //     mercadoria.embMercadoria,
+    //     mercadoria.complemento,
+    //     mercadoria.marca,
     //     mercadoria.fatorMerc,
     //     mercadoria.precoUnit,
-    //     mercadoria.precoMercadoria as precoMercadoria, 
-    //     IFNULL(SUM(pedido.quantMercPedido),  0) as quantMercadoria, 
-    //     IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0) as 'valorTotal' 
-    //     from mercadoria 
-    //     join fornecedor on mercadoria.codFornMerc = fornecedor.codForn 
-    //     left outer join pedido on mercadoria.codMercadoria = pedido.codMercPedido 
+    //     mercadoria.precoMercadoria as precoMercadoria,
+    //     IFNULL(SUM(pedido.quantMercPedido),  0) as quantMercadoria,
+    //     IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0) as 'valorTotal'
+    //     from mercadoria
+    //     join fornecedor on mercadoria.codFornMerc = fornecedor.codForn
+    //     left outer join pedido on mercadoria.codMercadoria = pedido.codMercPedido
     //     where codFornMerc = ${codprovider} and pedido.codNegoPedido = ${codnegotiation}
     //     group by mercadoria.codMercadoria
-    //     order by sum(mercadoria.precoMercadoria*pedido.quantMercPedido) 
+    //     order by sum(mercadoria.precoMercadoria*pedido.quantMercPedido)
     //     desc
     // `;
 
