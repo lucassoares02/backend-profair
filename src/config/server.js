@@ -10,11 +10,12 @@ var connection = mysql.createConnection({
   password: process.env.MYSQL_PASSWORD,
   database: process.env.MYSQL_DATABASE,
   charset: "utf8mb4",
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  // ssl: {
+  //   rejectUnauthorized: false,
+  // },
   // insecureAuth: true,
   // connectionLimit: 10,
+  ssl: false,
   multipleStatements: true,
 });
 
