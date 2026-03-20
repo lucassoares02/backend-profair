@@ -1179,6 +1179,7 @@ join associado a on a.codAssociado = p.codAssocPedido
             n.prazo,
             n.observacao,
             a.codAssociado,
+            a.razaoAssociado,
             n.descNegociacao,
             1 AS confirma
 
