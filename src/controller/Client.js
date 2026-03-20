@@ -392,7 +392,8 @@ const Client = {
     const { codprovider } = req.params;
 
     const queryConsult = `SELECT  
-        g.id AS codAssociado,
+        g.id AS codGrupo,
+        a.codAssociado,
         g.descricao AS razao,
         NULL AS cnpjAssociado,
 
