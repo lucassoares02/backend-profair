@@ -19,6 +19,7 @@ const Notification = require("@controller/Notification");
 const WindowNegotiation = require("@controller/WindowNegotiation");
 const Backup = require("@controller/Backup");
 const Mql = require("@controller/Mql");
+const ExportPdf = require("@controller/ExportPdf");
 
 router.post("/faceline-user", Faceline.insert);
 router.post("/faceline-user-update", Faceline.update);
@@ -173,7 +174,7 @@ router.get("/percentageclientsorganization", Graphs.getPercentageClientsOrganiza
 router.get("/percentageprovidersorganization", Graphs.getPercentageProvidersOrganization);
 router.get("/totalvalueclients/:codprovider", Graphs.getTotalValueClients);
 router.get("/information", Graphs.getTotalInformations);
-router.get("/exportpdf/:supplier/:negotiation/:client", Graphs.getExportPdf);
+router.get("/exportpdf/:supplier/:negotiation/:client", ExportPdf.getExportPdf);
 router.get("/exportpdfgpt/:supplier/:negotiation/:client", Graphs.getExportPdfTesteLayoutGpt);
 router.get("/exportpdfdeep/:supplier/:negotiation/:client", Graphs.getExportPdfTesteLayoutDeep);
 

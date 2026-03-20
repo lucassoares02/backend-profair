@@ -2,7 +2,7 @@ const { connection } = require("@server");
 const logger = require("@logger");
 const Select = require("@select");
 const Insert = require("@insert");
-// const PDFDocument = require("pdfkit");
+
 const fs = require("fs");
 const PDFDocument = require("pdfkit-table");
 const path = require("path");
@@ -160,6 +160,7 @@ const Graphs = {
     });
     // connection.end();
   },
+
   async getExportPdfOld(req, res) {
     logger.info("Get Exports Pdf");
 
@@ -236,40 +237,40 @@ const Graphs = {
     const { supplier, negotiation, client } = req.params;
 
     let queryConsult = `
-    SET sql_mode = ''; SELECT 
+    SET sql_mode = ''; SELECT
     mercadoria.codMercadoria as product,
     mercadoria.nomeMercadoria as title,
     mercadoria.barcode,
     mercadoria.embMercadoria as packing,
     mercadoria.fatorMerc as factor,
     mercadoria.complemento as  complement,
-    mercadoria.marca as brand,  
+    mercadoria.marca as brand,
     a.codAssociado  as client,
     a.razaoAssociado as client_name,
     f.codForn as provider,
     f.nomeForn as provider_name,
-    IFNULL(SUM(pedido.quantMercPedido), 0) as 'quantity', 
+    IFNULL(SUM(pedido.quantMercPedido), 0) as 'quantity',
     mercadoria.precoMercadoria as price,
     mercadoria.precoUnit as unitprice,
-    IFNULL(SUM(mercadoria.precoMercadoria * pedido.quantMercPedido), 0) as 'totalprice' 
-    FROM 
-        mercadoria 
-    JOIN 
-        pedido ON pedido.codMercPedido = mercadoria.codMercadoria 
+    IFNULL(SUM(mercadoria.precoMercadoria * pedido.quantMercPedido), 0) as 'totalprice'
+    FROM
+        mercadoria
     JOIN
-    	associado a ON pedido.codAssocPedido = a.codAssociado 
-    JOIN 
-    	fornecedor f ON pedido.codFornPedido = f.codForn 
-    WHERE 
+        pedido ON pedido.codMercPedido = mercadoria.codMercadoria
+    JOIN
+    	associado a ON pedido.codAssocPedido = a.codAssociado
+    JOIN
+    	fornecedor f ON pedido.codFornPedido = f.codForn
+    WHERE
         pedido.codAssocPedido = ${client}
-        AND pedido.codfornpedido =  ${supplier} 
-        AND pedido.codNegoPedido =  ${negotiation}  
-    GROUP BY 
+        AND pedido.codfornpedido =  ${supplier}
+        AND pedido.codNegoPedido =  ${negotiation}
+    GROUP BY
         mercadoria.codMercadoria
-        
-    HAVING 
+
+    HAVING
     totalprice != 0
-    ORDER BY 
+    ORDER BY
         quantMercPedido;`;
 
     connection.query(queryConsult, (error, results, fields) => {
