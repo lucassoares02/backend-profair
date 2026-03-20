@@ -1174,7 +1174,7 @@ join associado a on a.codAssociado = p.codAssocPedido
     const { codgroup, codforn } = req.params;
 
     const queryConsult = `SET sql_mode = ''; 
-    SELECT 
+        SELECT 
             n.codNegociacao,
             n.prazo,
             n.observacao,
@@ -1187,7 +1187,7 @@ join associado a on a.codAssociado = p.codAssocPedido
         join associado a on a.codAssociado = p.codAssocPedido
 
         WHERE 
-            n.codFornNegociacao = ${codforn}
+            n.codFornNegociacao = ${codforn} and a.id_grupo = ${codgroup}
             AND EXISTS (
                 SELECT 1
                 FROM pedido p
@@ -1196,7 +1196,7 @@ join associado a on a.codAssociado = p.codAssocPedido
                     p.codNegoPedido = n.codNegociacao
                     AND a.id_grupo = ${codgroup}
             )
-      group by n.codNegociacao
+      group by n.codNegociacao, p.codAssocPedido
         ORDER BY n.prazo;`;
 
     connection.query(queryConsult, (error, results, fields) => {
