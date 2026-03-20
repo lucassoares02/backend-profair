@@ -324,7 +324,6 @@ async function getExportPdf(req, res) {
     const doc = new PDFDocument({
       margin: MX,
       size: "A4",
-      bufferPages: true,
       info: {
         Title: `Pedido — ${ctx.nomeForn || supplier}`,
         Author: "Sistema de Pedidos",
@@ -334,28 +333,32 @@ async function getExportPdf(req, res) {
     // ── Cabeçalho completo ──
     let curY = await drawHeader(doc, ctx, imgBuffer);
 
-    // ── Monta linhas da tabela de produtos ──
+    // ── Monta linhas da tabela de produtos (filtra itens vazios) ──
     let valorTotal = 0;
     let qtdTotal = 0;
     const rows = [];
 
-    orders.forEach((item, i) => {
-      valorTotal += item.totalprice;
-      qtdTotal += item.quantity;
-      rows.push([
-        String(i + 1),
-        String(item.product),
-        item.barcode || "—",
-        item.title,
-        `${item.packing} | ${item.factor}`,
-        String(item.quantity),
-        brl(item.price),
-        brl(item.totalprice),
-      ]);
-    });
+    orders
+      .filter((item) => item.quantity > 0 && item.totalprice !== 0)
+      .forEach((item, i) => {
+        valorTotal += item.totalprice;
+        qtdTotal += item.quantity;
+        rows.push([
+          String(i + 1),
+          String(item.product),
+          item.barcode || "—",
+          item.title,
+          `${item.packing} | ${item.factor}`,
+          String(item.quantity),
+          brl(item.price),
+          brl(item.totalprice),
+        ]);
+      });
 
-    // Linha de total
-    rows.push(["", "", "", `TOTAL (${orders.length} itens)`, "", String(qtdTotal), "", brl(valorTotal)]);
+    // Linha de total — conta apenas os itens efetivamente listados
+    const totalLabel = `TOTAL (${rows.length} itens)`;
+    rows.push(["", "", "", totalLabel, "", String(qtdTotal), "", brl(valorTotal)]);
+    const totalRowIdx = rows.length - 1;
 
     // ── Tabela ──
     const table = {
@@ -379,16 +382,12 @@ async function getExportPdf(req, res) {
       hideHeader: false,
       headerColor: "#FFFFFF",
       prepareHeader: () => doc.font(FONT_B).fontSize(7.5).fillColor(TEXT_COLOR),
-      prepareRow: (_row, _col, rowIdx, rectRow) => {
-        const isTotal = rowIdx === rows.length - 1;
+      prepareRow: (_row, _col, rowIdx) => {
+        const isTotal = rowIdx === totalRowIdx;
         if (isTotal) {
           doc.font(FONT_B).fontSize(8).fillColor(TEXT_COLOR);
         } else {
           doc.font(FONT_R).fontSize(7.5).fillColor(TEXT_COLOR);
-          // zebra sutil em cinza bem claro
-          if (rowIdx % 2 === 0) {
-            doc.rect(rectRow.x, rectRow.y, rectRow.width, rectRow.height).fill("#F5F5F5");
-          }
         }
       },
       divider: {
@@ -397,22 +396,18 @@ async function getExportPdf(req, res) {
       },
     });
 
-    // ── Rodapé em todas as páginas ──
-    const range = doc.bufferedPageRange();
-    for (let i = 0; i < range.count; i++) {
-      doc.switchToPage(i);
-      const ph = doc.page.height;
-      const pw = doc.page.width;
+    // ── Rodapé (na página corrente, após a tabela) ──
+    const ph = doc.page.height;
+    const pw = doc.page.width;
 
-      hLine(doc, ph - 36, MX, pw - MX, 0.5);
+    hLine(doc, ph - 36, MX, pw - MX, 0.5);
 
-      doc.font(FONT_R).fontSize(6.5).fillColor(MUTED);
-      doc.text(`Documento gerado automaticamente — ${new Date().toLocaleDateString("pt-BR")}`, MX, ph - 28, { width: pw - 120, align: "left" });
-      doc.text(`Página ${i + 1} de ${range.count}`, pw - 100, ph - 28, {
-        width: 72,
-        align: "right",
-      });
-    }
+    doc.font(FONT_R).fontSize(6.5).fillColor(MUTED);
+    doc.text(`Documento gerado automaticamente — ${new Date().toLocaleDateString("pt-BR")}`, MX, ph - 28, { width: pw - 120, align: "left" });
+    doc.text(`Página 1`, pw - 100, ph - 28, {
+      width: 72,
+      align: "right",
+    });
 
     // ── Envia o PDF ──
     const chunks = [];
