@@ -53,26 +53,33 @@ const Graphs = {
 
     // const queryConsult = `SET sql_mode = ''; SELECT (COUNT(DISTINCT pedido.codAssocPedido) * 100.0) / (SELECT COUNT(*) FROM associado) AS porcentagem, COUNT(DISTINCT pedido.codAssocPedido) AS realizados, (SELECT COUNT(*) FROM associado) AS total FROM pedido WHERE pedido.codFornPedido = ${codprovider}`;
     const queryConsult = `SET sql_mode = '';
-        SELECT 
-        (COUNT(DISTINCT g.id) * 100.0) / total_grupos.total AS porcentagem,
-        COUNT(DISTINCT g.id) AS realizados,
-        total_grupos.total
+    SELECT
+      IFNULL(
+          (realizados_query.realizados * 100.0) / NULLIF(total_presentes.total, 0),
+          0
+      ) AS porcentagem,
 
-    FROM pedido p
-    JOIN associado a ON a.codAssociado = p.codAssocPedido
-    JOIN grupos_empresariais g ON g.id = a.id_grupo
+      IFNULL(realizados_query.realizados, 0) AS realizados,
 
-    JOIN (
-        SELECT COUNT(DISTINCT g2.id) AS total
-        FROM acesso ac
-        JOIN consultor c ON c.codConsult = ac.codUsuario
-        JOIN relaciona r ON r.codConsultRelaciona = c.codConsult
-        JOIN associado a2 ON a2.codAssociado = r.codAssocRelaciona
-        JOIN grupos_empresariais g2 ON g2.id = a2.id_grupo
-        WHERE ac.is_present = 1
-    ) AS total_grupos
+      IFNULL(total_presentes.total, 0) AS total
 
-    WHERE p.codFornPedido = ${codprovider};`;
+  FROM (
+      SELECT COUNT(DISTINCT a_ped.id_grupo) AS realizados
+      FROM pedido p
+      JOIN associado a_ped ON a_ped.codAssociado = p.codAssocPedido
+      WHERE p.codFornPedido = ${codprovider}
+        AND a_ped.id_grupo IS NOT NULL
+  ) AS realizados_query
+
+  CROSS JOIN (
+      SELECT COUNT(DISTINCT a_rel.id_grupo) AS total
+      FROM consultor co
+      JOIN acesso ac ON ac.codUsuario = co.codConsult
+      JOIN relaciona r ON r.codAssocRelaciona  = co.codConsult
+      JOIN associado a_rel ON a_rel.codAssociado = r.codConsultRelaciona 
+      WHERE ac.is_present = 1
+        AND a_rel.id_grupo IS NOT NULL
+  ) AS total_presentes;`;
 
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {
