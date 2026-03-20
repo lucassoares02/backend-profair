@@ -393,7 +393,6 @@ const Client = {
 
     const queryConsult = `SELECT  
         g.id AS codGrupo,
-        a.codAssociado,
         g.descricao AS razao,
         NULL AS cnpjAssociado,
 
