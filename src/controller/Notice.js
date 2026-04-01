@@ -63,7 +63,7 @@ const Notice = {
   async getNoticeById(req, res) {
     logger.info("Get Notice By Id");
     const { id } = req.params;
-    const queryConsult = `select * from notices where id = ${id}`;
+    const queryConsult = `select * from notices where codNotice = ${id}`;
 
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {
