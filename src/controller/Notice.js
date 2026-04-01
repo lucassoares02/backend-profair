@@ -14,6 +14,7 @@ const Notice = {
   // String? secondaryColor;
   // String? stamp;
   // int? type;
+  // int? provider;
 
   async getAllNotice(req, res) {
     logger.info("Get All Notices");
@@ -47,9 +48,9 @@ const Notice = {
 
   async insertNotice(req, res) {
     logger.info("Insert Notice");
-    const { title, description, image, action, priority, primaryColor, secondaryColor, stamp, type } = req.body;
+    const { title, description, image, action, priority, primaryColor, secondaryColor, stamp, type, provider } = req.body;
 
-    const queryInsert = `insert into notices (title, description, image, action, priority, primaryColor, secondaryColor, stamp, type) values ('${title}', '${description}', '${image}', '${action}', ${priority}, '${primaryColor}', '${secondaryColor}', '${stamp}', ${type})`;
+    const queryInsert = `insert into notices (title, description, image, action, priority, primaryColor, secondaryColor, stamp, type, provider) values ('${title}', '${description}', '${image}', '${action}', ${priority}, '${primaryColor}', '${secondaryColor}', '${stamp}', ${type}, ${provider})`;
     connection.query(queryInsert, (error, results, fields) => {
       if (error) {
         console.log("Error Insert Notice: ", error);
@@ -77,8 +78,8 @@ const Notice = {
   // create notice
   async createNotice(req, res) {
     logger.info("Create Notice");
-    const { title, description, image, action, priority, primaryColor, secondaryColor, stamp, type } = req.body;
-    const queryInsert = `insert into notices (title, description, image, action, priority, primaryColor, secondaryColor, stamp, type) values ('${title}', '${description}', '${image}', '${action}', ${priority}, '${primaryColor}', '${secondaryColor}', '${stamp}', ${type})`;
+    const { title, description, image, action, priority, primaryColor, secondaryColor, stamp, type, provider } = req.body;
+    const queryInsert = `insert into notices (title, description, image, action, priority, primaryColor, secondaryColor, stamp, type, provider) values ('${title}', '${description}', '${image}', '${action}', ${priority}, '${primaryColor}', '${secondaryColor}', '${stamp}', ${type}, ${provider})`;
     connection.query(queryInsert, (error, results, fields) => {
       if (error) {
         console.log("Error Insert Notice: ", error);
@@ -92,8 +93,8 @@ const Notice = {
   async updateNotice(req, res) {
     logger.info("Update Notice");
     const { id } = req.params;
-    const { title, description, image, action, priority, primaryColor, secondaryColor, stamp, type } = req.body;
-    const queryUpdate = `update notices set title = '${title}', description = '${description}', image = '${image}', action = '${action}', priority = ${priority}, primaryColor = '${primaryColor}', secondaryColor = '${secondaryColor}', stamp = '${stamp}', type = ${type} where codNotice = ${id}`;
+    const { title, description, image, action, priority, primaryColor, secondaryColor, stamp, type, provider } = req.body;
+    const queryUpdate = `update notices set title = '${title}', description = '${description}', image = '${image}', action = '${action}', priority = ${priority}, primaryColor = '${primaryColor}', secondaryColor = '${secondaryColor}', stamp = '${stamp}', type = ${type}, provider = ${provider} where codNotice = ${id}`;
     connection.query(queryUpdate, (error, results, fields) => {
       if (error) {
         console.log("Error Update Notice: ", error);
