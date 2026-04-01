@@ -75,7 +75,7 @@ router.get("/categoriesconsult/:codconsult", Category.getCategoryConsult);
 
 router.get("/notices", Notice.getAllNotice);
 router.get("/schedule", Notice.getAllSchedule);
-router.post("/notices", Notice.insertNotice);
+router.post("/insertnotice", Notice.insertNotice);
 router.get("/notice/:id", Notice.getNoticeById);
 router.patch("/notice/:id", Notice.updateNotice);
 router.delete("/notice/:id", Notice.deleteNotice);
@@ -93,7 +93,7 @@ router.get("/providerscategories/:codbuyer", Provider.getProvidersCategories);
 router.get("/providersconsult/:codconsultclient", Provider.getProvidersClient);
 router.get("/providerconsult/:codconsult", Provider.getProviderConsult);
 
-router.get("/providerdetails/:codforn", Provider.getProviderDetails);
+router.get("/allproviderdetails/:codforn", Provider.getProviderDetails);
 
 router.post("/insertprovider", Provider.postInsertProvider);
 
