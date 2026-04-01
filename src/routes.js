@@ -68,6 +68,7 @@ router.get("/valuefair", Client.getValueTotalFair);
 router.get("/storesbyprovider/:codprovider", Client.getStoresbyProvider);
 router.get("/storespresentbyprovider/:codprovider", Client.getStoresPresentbyProvider);
 router.get("/groupspresentbyprovider/:codprovider", Client.getGroupsPresentbyProvider);
+router.get("/groupspresentbygroup/:codgroup", Client.getGroupsPresentbyGroup);
 router.get("/groupspresent", Client.getGroupsPresent);
 
 router.get("/categoriesconsult/:codconsult", Category.getCategoryConsult);
