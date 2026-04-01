@@ -386,6 +386,44 @@ const Client = {
     // connection.end();
   },
 
+  async getGroupsPresent(req, res) {
+    logger.info("Get Groups Present");
+
+    const queryConsult = `SELECT  
+        g.id AS codGrupo,
+        g.descricao AS razao,
+        NULL AS cnpjAssociado,
+        SUM(p.quantMercPedido * m.precoMercadoria) AS valorTotal,
+        SUM(p.quantMercPedido) AS volumeTotal
+    FROM (
+        SELECT DISTINCT 
+            g.id,
+            g.descricao
+        FROM acesso ac
+        JOIN consultor c ON c.codConsult = ac.codUsuario
+        JOIN relaciona r ON r.codAssocRelaciona = c.codConsult
+        JOIN associado a ON a.codAssociado = r.codConsultRelaciona
+        JOIN grupos_empresariais g ON g.id = a.id_grupo
+        WHERE ac.is_present = 1
+    ) AS g
+
+    LEFT JOIN associado a ON a.id_grupo = g.id
+    LEFT JOIN pedido p ON p.codAssocPedido = a.codAssociado
+    LEFT JOIN mercadoria m ON m.codMercadoria = p.codMercPedido
+
+    GROUP BY g.id
+    ORDER BY valorTotal DESC;`;
+
+    connection.query(queryConsult, (error, results, fields) => {
+      if (error) {
+        console.log("Error Select Groups by Provider: ", error);
+      } else {
+        return res.json(results);
+      }
+    });
+    // connection.end();
+  },
+
   async getGroupsPresentbyProvider(req, res) {
     logger.info("Get Groups by Provider");
 
