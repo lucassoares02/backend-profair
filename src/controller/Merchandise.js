@@ -23,54 +23,47 @@ const Merchandise = {
       WHERE codMercPedido = ? AND codNegoPedido = ?;
     `;
 
-    connection.getConnection((err, connection) => {
+    connection.beginTransaction((err) => {
       if (err) {
         console.error("Erro ao iniciar transação:", err);
         return res.status(500).json({ error: "Erro interno do servidor" });
       }
 
-      connection.beginTransaction((err) => {
-        if (err) {
-          console.error("Erro ao iniciar transação:", err);
-          return res.status(500).json({ error: "Erro interno do servidor" });
-        }
+      // Atualizar tabela mercadoria
+      connection.query(
+        queryUpdateMercadoria,
+        [nomeMercadoria, embMercadoria, fatorMerc, complemento, barcode, marca, nego, precoUnit, precoMercadoria, codMercadoria],
+        (error, results) => {
+          if (error) {
+            return connection.rollback(() => {
+              console.error("Erro ao atualizar mercadoria:", error);
+              res.status(500).json({ error: "Erro ao atualizar mercadoria" });
+            });
+          }
 
-        // Atualizar tabela mercadoria
-        connection.query(
-          queryUpdateMercadoria,
-          [nomeMercadoria, embMercadoria, fatorMerc, complemento, barcode, marca, nego, precoUnit, precoMercadoria, codMercadoria],
-          (error, results) => {
+          // Atualizar tabela pedido
+          connection.query(queryUpdatePedido, [codMercadoria, nego, codMercadoria, nego], (error, results) => {
             if (error) {
               return connection.rollback(() => {
-                console.error("Erro ao atualizar mercadoria:", error);
-                res.status(500).json({ error: "Erro ao atualizar mercadoria" });
+                console.error("Erro ao atualizar pedido:", error);
+                res.status(500).json({ error: "Erro ao atualizar pedido" });
               });
             }
 
-            // Atualizar tabela pedido
-            connection.query(queryUpdatePedido, [codMercadoria, nego, codMercadoria, nego], (error, results) => {
-              if (error) {
+            // Commit se tudo der certo
+            connection.commit((err) => {
+              if (err) {
                 return connection.rollback(() => {
-                  console.error("Erro ao atualizar pedido:", error);
-                  res.status(500).json({ error: "Erro ao atualizar pedido" });
+                  console.error("Erro ao confirmar transação:", err);
+                  res.status(500).json({ error: "Erro ao salvar alterações" });
                 });
               }
 
-              // Commit se tudo der certo
-              connection.commit((err) => {
-                if (err) {
-                  return connection.rollback(() => {
-                    console.error("Erro ao confirmar transação:", err);
-                    res.status(500).json({ error: "Erro ao salvar alterações" });
-                  });
-                }
-
-                res.json({ message: "Atualização bem-sucedida" });
-              });
+              res.json({ message: "Atualização bem-sucedida" });
             });
-          },
-        );
-      });
+          });
+        },
+      );
     });
   },
 
