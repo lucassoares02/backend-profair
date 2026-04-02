@@ -27,16 +27,22 @@ const Delete = {
     delete from relacionafornecedor;
     delete from schedule;
     delete from user_notifications;
+    delete from notifications;
     delete from organizador;
     `;
 
-    connection.query(queryKill, (error, results, fields) => {
-      if (error) {
-        console.log("Error Delete All Informations: ", error);
-      } else {
-        return res.json({ message: "All Informations Deleted" });
-      }
-    });
+    try {
+      connection.query(queryKill, (error, results, fields) => {
+        if (error) {
+          console.log("Error Delete All Informations: ", error);
+        } else {
+          return res.json({ message: "All Informations Deleted" });
+        }
+      });
+    } catch (error) {
+      console.log("Error Delete All Informations: ", error);
+      return res.status(400).send(`message: ${error}`);
+    }
     // connection.end();
   },
 

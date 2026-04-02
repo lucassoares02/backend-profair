@@ -179,7 +179,6 @@ const Provider = {
     // connection.end();
   },
 
-
   async updateProviderImageAndColor(req, res) {
     logger.info("Update Image and Color Provider");
 
@@ -222,7 +221,7 @@ const Provider = {
       if (error) {
         return res.status(400).send(error);
       } else {
-        return res.json(results[1]);
+        return res.json(results);
       }
     });
     // connection.end();
@@ -249,7 +248,7 @@ const Provider = {
     const { consultor } = req.params;
 
     const query = `select * from fornecedor f join relacionafornecedor rf on rf.codFornecedor = f.codForn where rf.codConsultor = ?`;
-    const values = [consultor]
+    const values = [consultor];
 
     connection.query(query, values, (error, results, fields) => {
       if (error) {
@@ -296,12 +295,10 @@ const Provider = {
     // connection.end();
   },
 
-
   insertCompanyToUser(req, res) {
     logger.info("Insert Company to User");
 
     const { company, user, type } = req.params;
-
 
     let dataAssociado = [];
     let dataConsultor = [];
@@ -310,14 +307,13 @@ const Provider = {
       dataConsultor.push({
         codConsultor: user,
         codFornecedor: company,
-      })
+      });
     } else {
       dataAssociado.push({
         codAssocRelaciona: user,
         codConsultRelaciona: company,
       });
     }
-
 
     let params = {
       table: type == 1 ? "relacionafornecedor" : "relaciona",
@@ -335,14 +331,9 @@ const Provider = {
           });
       });
     } catch (error) {
-      console.log(`Error Insert Negotiation: ${error}`)
+      console.log(`Error Insert Negotiation: ${error}`);
     }
-
   },
-
-
-
-
 };
 
 module.exports = Provider;
