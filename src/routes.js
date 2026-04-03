@@ -93,6 +93,8 @@ router.get("/providerscategories/:codbuyer", Provider.getProvidersCategories);
 router.get("/providersconsult/:codconsultclient", Provider.getProvidersClient);
 router.get("/providerconsult/:codconsult", Provider.getProviderConsult);
 
+router.patch("/provider/:provider", Provider.updateProvider);
+
 router.get("/allproviderdetails/:codforn", Provider.getProviderDetails);
 
 router.post("/insertprovider", Provider.postInsertProvider);

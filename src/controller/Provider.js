@@ -4,6 +4,25 @@ const Select = require("@select");
 const Insert = require("@insert");
 
 const Provider = {
+  async updateProvider(req, res) {
+    logger.info("Update Provider");
+
+    const { provider } = req.params;
+
+    const { nomeForn, razao, cnpjForn, codCategoria, codComprFornecedor, image, color } = req.body;
+
+    const queryUpdate = `UPDATE fornecedor SET nomeForn = ?, razaoForn = ?, cnpjForn = ?, codCategoria = ?, codComprFornecedor = ?, image = ?, color = ? WHERE codForn = ?`;
+    const values = [nomeForn, razao, cnpjForn, codCategoria, codComprFornecedor, image, color, provider];
+
+    connection.query(queryUpdate, values, (error, results) => {
+      if (error) {
+        return res.status(400).send(error);
+      } else {
+        return res.status(200).send(`message: Update Success!`);
+      }
+    });
+  },
+
   async getProviderClient(req, res) {
     logger.info("Get Provider Client");
 
@@ -213,9 +232,7 @@ const Provider = {
 
     const { codforn } = req.params;
 
-    const queryConsult = `select * from fornecedor
-    join consultor on consultor.codFornConsult = fornecedor.codForn
-    where codForn = ${codforn}`;
+    const queryConsult = `select * from fornecedor where codForn = ${codforn}`;
 
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {
