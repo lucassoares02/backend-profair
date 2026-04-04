@@ -211,7 +211,15 @@ router.get("/wedding/confirm", Wedding.confirm);
 router.get("/wedding/desconfirm", Wedding.disconfirm);
 router.get("/wedding/getallguests", Wedding.getAllGuests);
 
-router.get("/getwindownegotiations/:client", WindowNegotiation.getWindowNegotiation);
+router.get("/getwindownegotiations/:client", WindowNegotiation.getWindowNegotiationByClient);
+router.get("/getwindownegotiations", WindowNegotiation.getWindowNegotiations);
+router.get("/getwindownegotiationsbyprovider/:provider", WindowNegotiation.getWindowNegotiationsByProvider);
+router.get("/getwindownegotiationsbyproviderandclient/:provider/:client", WindowNegotiation.getWindowNegotiationsByProviderAndClient);
+router.get(
+  "/getwindownegotiationsbyproviderandclientbyconsult/:provider/:client/:consultant",
+  WindowNegotiation.getWindowNegotiationsByProviderAndClientByConsult,
+);
+router.get("/getwindownegotiationsbyproviderbyconsult/:provider/:consultant", WindowNegotiation.getWindowNegotiationsByProviderByConsult);
 
 router.delete("/notification/:id", Notification.deleteNotifications);
 router.get("/notifications", Notification.getNotifications);
