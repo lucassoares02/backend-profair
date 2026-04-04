@@ -1,4 +1,7 @@
 const router = require("express").Router();
+const multer = require("multer");
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 const Merchandise = require("@controller/Merchandise");
 const Negotiation = require("@controller/Negotiation");
@@ -96,6 +99,7 @@ router.get("/providersconsult/:codconsultclient", Provider.getProvidersClient);
 router.get("/providerconsult/:codconsult", Provider.getProviderConsult);
 
 router.patch("/provider/:provider", Provider.updateProvider);
+router.post("/provider/:codeProvider/image", upload.single("file"), Provider.uploadImage);
 
 router.get("/allproviderdetails/:codforn", Provider.getProviderDetails);
 

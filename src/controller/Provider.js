@@ -2,6 +2,7 @@ const { connection } = require("@server");
 const logger = require("@logger");
 const Select = require("@select");
 const Insert = require("@insert");
+const { uploadFile } = require("@controller/Minio");
 
 const Provider = {
   async updateProvider(req, res) {
@@ -349,6 +350,36 @@ const Provider = {
       });
     } catch (error) {
       console.log(`Error Insert Negotiation: ${error}`);
+    }
+  },
+  async uploadImage(req, res) {
+    logger.info("Upload Provider Image");
+
+    const { codeProvider } = req.params;
+
+    if (!req.file) {
+      return res.status(400).json({ message: "Arquivo não enviado" });
+    }
+
+    try {
+      const ext = req.file.originalname.split(".").pop();
+      const fileName = `providers/${codeProvider}/image.${ext}`;
+      const { url } = await uploadFile(req.file.buffer, fileName, req.file.mimetype);
+
+      connection.query(
+        "UPDATE fornecedor SET image = ? WHERE codForn = ?",
+        [url, codeProvider],
+        (error) => {
+          if (error) {
+            logger.error(`Erro ao atualizar imagem do fornecedor: ${error.message}`);
+            return res.status(400).send(error);
+          }
+          return res.status(200).json({ url });
+        }
+      );
+    } catch (error) {
+      logger.error(`Erro no upload da imagem: ${error.message}`);
+      return res.status(500).json({ message: "Erro ao fazer upload da imagem" });
     }
   },
 };

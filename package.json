@@ -26,6 +26,7 @@
     "firebase-admin": "^13.4.0",
     "minio": "^8.0.7",
     "module-alias": "^2.2.2",
+    "multer": "^2.1.1",
     "mysql": "^2.18.1",
     "mysql2": "^2.2.5",
     "newrelic": "^11.22.0",

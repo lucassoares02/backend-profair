@@ -7,6 +7,7 @@ const Delete = {
 
     const queryKill = `
     delete from user_notifications;
+    delete from notice_interactions;
     delete from acesso;
     delete from associado;
     delete from categoria;
