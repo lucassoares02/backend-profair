@@ -20,6 +20,8 @@ const WindowNegotiation = require("@controller/WindowNegotiation");
 const Backup = require("@controller/Backup");
 const Mql = require("@controller/Mql");
 const ExportPdf = require("@controller/ExportPdf");
+const NoticeInteractions = require("@controller/NoticeInteractions");
+("");
 
 router.post("/faceline-user", Faceline.insert);
 router.post("/faceline-user-update", Faceline.update);
@@ -225,6 +227,8 @@ router.get("/notification/check", Notification.checkNotificationPerUser);
 router.get("/notification/:id", Notification.getNotificationDetails);
 
 router.post("/mql/decision", Mql.insert);
+
+router.post("/notices/interactions", NoticeInteractions.InsertNoticeInteraction);
 
 // router.get("/portalflex/negotiations/:negociacao", Integration.negotiations);
 

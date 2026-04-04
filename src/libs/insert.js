@@ -26,8 +26,8 @@ async function Insert(params) {
       try {
         connection.query(query, (error, results, fields) => {
           if (error) {
-            logger.error(error);
-            fs.writeFileSync(logs, `${new Date().toLocaleTimeString()} - ${error}\n`, { encoding: "utf8", flag: "a" });
+            logger.error(`: ${error} - Query: ${query}`);
+            fs.writeFileSync(logs, `${new Date().toLocaleTimeString()} - ${error} - Query: ${query}\n`, { encoding: "utf8", flag: "a" });
             return resolve();
           }
           // for (let index = 0; index < results.length; index++) {

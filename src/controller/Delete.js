@@ -6,6 +6,7 @@ const Delete = {
     logger.info("Get Deletes All Informations");
 
     const queryKill = `
+    delete from user_notifications;
     delete from acesso;
     delete from associado;
     delete from categoria;
@@ -26,7 +27,6 @@ const Delete = {
     delete from relacionaMercadoria;
     delete from relacionafornecedor;
     delete from schedule;
-    delete from user_notifications;
     delete from notifications;
     delete from organizador;
     `;

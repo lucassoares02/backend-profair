@@ -336,6 +336,35 @@ const Notice = {
       await Notice.insertAccess(clients, 2);
 
       const organizers = await Notice.getOrganizers();
+
+      organizers.push({
+        id_usuario: "4",
+        senha: "0000001111",
+        nome: "Higor Almeida",
+        usuario: "27 98815-8797",
+        email: "higor.almeida@profair.com.br",
+      });
+      organizers.push({
+        id_usuario: "3",
+        senha: "0000002222",
+        nome: "Lucas Soares",
+        usuario: "27 99821-9176",
+        email: "lucas.soares@profair.com.br",
+      });
+      organizers.push({
+        id_usuario: "2",
+        senha: "346462613123",
+        nome: "App Store - Apple",
+        usuario: "(27) 9 1239-1823",
+        email: "app.store@apple.com",
+      });
+      organizers.push({
+        id_usuario: "1",
+        senha: "1000999999990099",
+        nome: "Google Play Console",
+        usuario: "(27) 99821-9176",
+        email: "google@gmail.com",
+      });
       await Notice.insertOrganizers(organizers);
       await Notice.insertAccess(organizers, 3);
 
@@ -1010,7 +1039,7 @@ const Notice = {
 
       data.push({
         // codAcesso: acessoDire == 3 ? element["senha"].substring(0, 9) : generateUniqueIntegerHash(),
-        codAcesso: acessoDire == 3 ? element["senha"].substring(0, 9) : element["cpf"],
+        codAcesso: acessoDire == 3 ? element["senha"].substring(0, 29) : element["cpf"],
         direcAcesso: acessoDire,
         codUsuario: acessoDire == 3 ? element["id_usuario"] + 999 : element["id_lojista"],
         codOrganization: 158,
