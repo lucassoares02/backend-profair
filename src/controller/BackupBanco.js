@@ -2,7 +2,7 @@ const axios = require("axios");
 const logger = require("@logger");
 const { connection } = require("./../config/server");
 
-const CHUNK_SIZE = 500;
+const CHUNK_SIZE = 100;
 
 function queryAsync(sql, params = []) {
   return new Promise((resolve, reject) => {
