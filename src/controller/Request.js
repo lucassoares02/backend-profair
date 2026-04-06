@@ -628,8 +628,11 @@ const Request = {
 
     const { codAssociado, codFornecedor, codComprador, codNegociacao, codOrganizacao, items, codeConsult } = req.body;
 
+    const priority = process.env.API_PRIORITY || 1;
+
     // Flag para evitar loop de espelhamento
-    const isMirror = req.headers["x-mirror-request"] === "true";
+    // const isMirror = req.headers["x-mirror-request"] === "true";
+    const isMirror = priority == 0;
 
     let values = items
       .map(
@@ -667,6 +670,7 @@ const Request = {
 
         // Espelha para a segunda API apenas se não for uma requisição espelho
         if (!isMirror && process.env.MIRROR_API_URL) {
+          console.log("Mirroring request to:", process.env.MIRROR_API_URL);
           mirrorRequest(req.body, process.env.MIRROR_API_URL).catch((err) => logger.error("Mirror request failed (non-blocking):", err.message));
         }
 
