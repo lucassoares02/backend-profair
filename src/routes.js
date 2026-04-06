@@ -177,7 +177,8 @@ router.get("/requestsnegotiationclientororg/:client/:provider", Request.getReque
 router.get("/requestsclients/:codconsult", Request.getRequestsClients);
 router.post("/insertrequest", Request.postInsertRequest);
 
-router.post("/insertrequestnew", Log.InsertLog, Backup.InsertSell, Request.postInserRequestNew);
+// router.post("/insertrequestnew", Log.InsertLog, Backup.InsertSell, Request.postInserRequestNew);
+router.post("/insertrequestnew", Log.InsertLog, Request.postInserRequestNew);
 
 router.get("/allrequestclients", Request.getAllRequests);
 
