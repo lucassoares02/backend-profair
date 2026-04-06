@@ -2,6 +2,8 @@ const axios = require("axios");
 const logger = require("@logger");
 const { connection } = require("./../config/server");
 
+const CHUNK_SIZE = 500;
+
 function queryAsync(sql) {
   return new Promise((resolve, reject) => {
     connection.query(sql, (err, results) => {
@@ -15,9 +17,17 @@ function isValidTableName(name) {
   return /^[a-zA-Z0-9_]+$/.test(name);
 }
 
+function splitIntoChunks(array, size) {
+  const chunks = [];
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+  return chunks.length > 0 ? chunks : [[]];
+}
+
 const BackupBanco = {
   /**
-   * Puxa os dados das tabelas informadas e envia para o ambiente espelho.
+   * Puxa os dados das tabelas informadas e envia para o ambiente espelho em chunks.
    * Body: { tables: ["tabela1", "tabela2", ...] }
    */
   async sendBackup(req, res) {
@@ -38,31 +48,25 @@ const BackupBanco = {
     }
 
     try {
-      const data = {};
+      const counts = {};
 
       for (const table of tables) {
         logger.info(`BackupBanco.sendBackup – lendo tabela: ${table}`);
         const rows = await queryAsync(`SELECT * FROM \`${table}\``);
-        data[table] = rows;
         logger.info(`BackupBanco.sendBackup – ${rows.length} registros lidos de '${table}'`);
+
+        const chunks = splitIntoChunks(rows, CHUNK_SIZE);
+        logger.info(`BackupBanco.sendBackup – '${table}' particionada em ${chunks.length} chunk(s)`);
+
+        for (let i = 0; i < chunks.length; i++) {
+          await axios.post(`${backupUrl}/backup/receive`, { table, rows: chunks[i], truncate: i === 0 }, { timeout: 30000 });
+          logger.info(`BackupBanco.sendBackup – '${table}' chunk ${i + 1}/${chunks.length} enviado`);
+        }
+
+        counts[table] = rows.length;
       }
 
-      logger.info("BackupBanco.sendBackup – enviando dados para o ambiente espelho");
-      const response = await axios.post(
-        `${backupUrl}/backup/receive`,
-        { data },
-        {
-          // headers: { "x-mirror-request": "true" },
-          timeout: 30000,
-        },
-      );
-
-      logger.info(`BackupBanco.sendBackup – resposta do espelho: ${response.status}`);
-      return res.status(200).json({
-        message: "Backup enviado com sucesso.",
-        tables: Object.keys(data),
-        counts: Object.fromEntries(Object.entries(data).map(([t, rows]) => [t, rows.length])),
-      });
+      return res.status(200).json({ message: "Backup enviado com sucesso.", tables, counts });
     } catch (error) {
       logger.error(`BackupBanco.sendBackup – erro: ${error.message}`);
       return res.status(500).json({ error: "Falha ao enviar o backup.", detail: error.message });
@@ -70,50 +74,31 @@ const BackupBanco = {
   },
 
   /**
-   * Recebe os dados do ambiente principal e replica nas tabelas locais.
-   * Body: { data: { tabela1: [...], tabela2: [...] } }
-   * Estratégia: TRUNCATE + INSERT para manter espelho fiel.
+   * Recebe um chunk de dados e replica na tabela local.
+   * Body: { table: "nome", rows: [...], truncate: true|false }
+   * - truncate: true  → limpa a tabela antes de inserir (primeiro chunk)
+   * - truncate: false → apenas insere (chunks subsequentes)
    */
   async receiveBackup(req, res) {
-    const { data } = req.body;
+    const { table, rows, truncate } = req.body;
 
-    if (!data || typeof data !== "object" || Array.isArray(data)) {
-      return res.status(400).json({ error: "Informe o campo 'data' com o mapeamento { tabela: [...registros] }." });
+    if (!table || !isValidTableName(table)) {
+      return res.status(400).json({ error: "Campo 'table' ausente ou inválido." });
     }
 
-    const tables = Object.keys(data);
-    if (tables.length === 0) {
-      return res.status(400).json({ error: "Nenhuma tabela encontrada no payload." });
+    if (!Array.isArray(rows)) {
+      return res.status(400).json({ error: "Campo 'rows' deve ser um array." });
     }
-
-    const invalidTables = tables.filter((t) => !isValidTableName(t));
-    if (invalidTables.length > 0) {
-      return res.status(400).json({ error: `Nome(s) de tabela inválido(s): ${invalidTables.join(", ")}` });
-    }
-
-    const result = {};
 
     try {
       await queryAsync("SET FOREIGN_KEY_CHECKS = 0");
 
-      for (const table of tables) {
-        const rows = data[table];
-
-        if (!Array.isArray(rows)) {
-          logger.warn(`BackupBanco.receiveBackup – '${table}' ignorada: valor não é array`);
-          result[table] = { status: "skipped", reason: "valor não é array" };
-          continue;
-        }
-
+      if (truncate) {
         logger.info(`BackupBanco.receiveBackup – limpando tabela '${table}'`);
         await queryAsync(`TRUNCATE TABLE \`${table}\``);
+      }
 
-        if (rows.length === 0) {
-          logger.info(`BackupBanco.receiveBackup – tabela '${table}' esvaziada, sem registros para inserir`);
-          result[table] = { status: "ok", inserted: 0 };
-          continue;
-        }
-
+      if (rows.length > 0) {
         const columns = Object.keys(rows[0])
           .map((col) => `\`${col}\``)
           .join(", ");
@@ -127,21 +112,17 @@ const BackupBanco = {
         );
 
         const insertQuery = `INSERT INTO \`${table}\` (${columns}) VALUES ${values.join(", ")}`;
-
         logger.info(`BackupBanco.receiveBackup – inserindo ${rows.length} registros em '${table}'`);
         await queryAsync(insertQuery);
-
-        result[table] = { status: "ok", inserted: rows.length };
       }
 
       await queryAsync("SET FOREIGN_KEY_CHECKS = 1");
 
-      logger.info("BackupBanco.receiveBackup – backup recebido com sucesso");
-      return res.status(200).json({ message: "Backup recebido e aplicado com sucesso.", result });
+      return res.status(200).json({ message: "Chunk recebido e aplicado.", table, inserted: rows.length });
     } catch (error) {
       await queryAsync("SET FOREIGN_KEY_CHECKS = 1").catch(() => {});
       logger.error(`BackupBanco.receiveBackup – erro: ${error.message}`);
-      return res.status(500).json({ error: "Falha ao aplicar o backup.", detail: error.message });
+      return res.status(500).json({ error: "Falha ao aplicar o chunk.", detail: error.message });
     }
   },
 };
