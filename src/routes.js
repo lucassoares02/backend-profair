@@ -1,4 +1,5 @@
-const router = require("express").Router();
+const express = require("express");
+const router = express.Router();
 const multer = require("multer");
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -242,8 +243,9 @@ router.get("/notification/:id", Notification.getNotificationDetails);
 
 router.post("/mql/decision", Mql.insert);
 
+const backupJsonParser = express.json({ limit: "10mb" });
 router.post("/backup/send", BackupBanco.sendBackup);
-router.post("/backup/receive", BackupBanco.receiveBackup);
+router.post("/backup/receive", backupJsonParser, BackupBanco.receiveBackup);
 
 router.post("/notices/interactions", NoticeInteractions.InsertNoticeInteraction);
 
