@@ -2,8 +2,11 @@ const { connection } = require("@server");
 const logger = require("@logger");
 const Select = require("@select");
 const Insert = require("@insert");
-const axios = require('axios');
+const axios = require("axios");
 const { response } = require("express");
+const https = require("https");
+const http = require("http");
+const { URL } = require("url");
 
 const Request = {
   async getRequestProviderClient(req, res) {
@@ -120,7 +123,7 @@ const Request = {
     });
     // connection.end();
   },
-  
+
   async getRequestNegotiationsPerProvider(req, res) {
     logger.info("Get Top Providers per Client");
 
@@ -187,14 +190,12 @@ const Request = {
     // connection.end();
   },
 
-
   async ExportClientsPerProvider(req, res) {
     logger.info("Get Export Negotiation ");
 
     console.log(req.params);
 
     const { provider } = req.params;
-
 
     const queryConsult = `
     SET sql_mode = ''; 
@@ -232,13 +233,12 @@ const Request = {
               })
               .join("\n");
 
-
             const dateNow = Date.now();
 
             // Configurar os cabeçalhos de resposta para fazer o download
             res.setHeader(
               "Content-Disposition",
-              `attachment; filename=${results[1][0].codigo_fornecedor}_${results[1][0].fornecedor.replaceAll(" ", "_").toLowerCase()}_geral.csv`
+              `attachment; filename=${results[1][0].codigo_fornecedor}_${results[1][0].fornecedor.replaceAll(" ", "_").toLowerCase()}_geral.csv`,
             );
             res.setHeader("Content-Type", "text/csv");
 
@@ -301,7 +301,7 @@ const Request = {
     console.log("Client: ", client);
     console.log("Provider: ", provider);
 
-    var queryConsult = '';
+    var queryConsult = "";
 
     if (client != 0) {
       queryConsult = `
@@ -354,7 +354,6 @@ const Request = {
       desc
       `;
     }
-
 
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {
@@ -530,7 +529,7 @@ const Request = {
 
     connection.query(queryConsult, async (error, results, fields) => {
       if (error) {
-        return "Error Insert Request: ", error;
+        return ("Error Insert Request: ", error);
       } else {
         if (results == "") {
           // Insert
@@ -553,7 +552,7 @@ const Request = {
 
           connection.query(queryInsert, (error, results) => {
             if (error) {
-              return "Error Insert Request Client: ", error;
+              return ("Error Insert Request Client: ", error);
             } else {
               return res.json(results[1]);
             }
@@ -572,7 +571,7 @@ const Request = {
 
           connection.query(queryUpdate, (error, results) => {
             if (error) {
-              return "Error Update Request Client: ", error;
+              return ("Error Update Request Client: ", error);
             } else {
               return res.json(results[1]);
             }
@@ -584,19 +583,63 @@ const Request = {
     // connection.end();
   },
 
+  async mirrorRequest(body, mirrorUrl) {
+    const url = new URL(mirrorUrl);
+    const payload = JSON.stringify(body);
+
+    const options = {
+      hostname: url.hostname,
+      port: url.port || (url.protocol === "https:" ? 443 : 80),
+      path: url.pathname,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Length": Buffer.byteLength(payload),
+        "x-mirror-request": "true", // <-- flag anti-loop
+      },
+    };
+
+    return new Promise((resolve, reject) => {
+      const transport = url.protocol === "https:" ? https : http;
+
+      const mirrorReq = transport.request(options, (mirrorRes) => {
+        let data = "";
+        mirrorRes.on("data", (chunk) => (data += chunk));
+        mirrorRes.on("end", () => {
+          logger.info(`Mirror response: ${mirrorRes.statusCode}`);
+          resolve(data);
+        });
+      });
+
+      mirrorReq.on("error", reject);
+
+      mirrorReq.setTimeout(5000, () => {
+        mirrorReq.destroy();
+        reject(new Error("Mirror request timed out"));
+      });
+
+      mirrorReq.write(payload);
+      mirrorReq.end();
+    });
+  },
 
   async postInserRequestNew(req, res) {
     logger.info("POST INSERT REQUEST NEW");
 
     const { codAssociado, codFornecedor, codComprador, codNegociacao, codOrganizacao, items, codeConsult } = req.body;
 
-    let values = items.map(item =>
-      `(${item["codMercadoria"]}, ${codNegociacao}, ${codAssociado}, ${codFornecedor}, ${codeConsult}, ${codComprador}, ${item["quantMercadoria"]}, ${codOrganizacao})`
-    ).join(',');
+    // Flag para evitar loop de espelhamento
+    const isMirror = req.headers["x-mirror-request"] === "true";
 
-    const queryConsult =
-      `INSERT INTO pedido (codMercPedido, codNegoPedido, codAssocPedido, codFornPedido, codConsultPedido, codComprPedido, quantMercPedido, codOrganizador) VALUES ${values}
-       ON DUPLICATE KEY UPDATE quantMercPedido = VALUES(quantMercPedido)`;
+    let values = items
+      .map(
+        (item) =>
+          `(${item["codMercadoria"]}, ${codNegociacao}, ${codAssociado}, ${codFornecedor}, ${codeConsult}, ${codComprador}, ${item["quantMercadoria"]}, ${codOrganizacao})`,
+      )
+      .join(",");
+
+    const queryConsult = `INSERT INTO pedido (codMercPedido, codNegoPedido, codAssocPedido, codFornPedido, codConsultPedido, codComprPedido, quantMercPedido, codOrganizador) VALUES ${values}
+     ON DUPLICATE KEY UPDATE quantMercPedido = VALUES(quantMercPedido)`;
 
     connection.query(queryConsult, (error, results) => {
       if (error) {
@@ -604,7 +647,7 @@ const Request = {
         return res.status(400).json({
           response: 400,
           message: "Failed to insert data",
-          error: error.message
+          error: error.message,
         });
       }
 
@@ -616,20 +659,69 @@ const Request = {
           return res.status(400).json({
             response: 400,
             message: "Failed to update negotiation_windows",
-            error: error.message
+            error: error.message,
           });
         }
 
         logger.info("Update negotiation_windows", results);
 
+        // Espelha para a segunda API apenas se não for uma requisição espelho
+        if (!isMirror && process.env.MIRROR_API_URL) {
+          mirrorRequest(req.body, process.env.MIRROR_API_URL).catch((err) => logger.error("Mirror request failed (non-blocking):", err.message));
+        }
+
         return res.status(200).json({
           response: 200,
-          message: "Data inserted and negotiation window updated successfully"
+          message: "Data inserted and negotiation window updated successfully",
         });
       });
     });
-  }
+  },
 
+  // async postInserRequestNew(req, res) { ÚLTIMA VERSÃO UTILIZADA PARA TESTES, NÃO DELETAR
+  //   logger.info("POST INSERT REQUEST NEW");
+
+  //   const { codAssociado, codFornecedor, codComprador, codNegociacao, codOrganizacao, items, codeConsult } = req.body;
+
+  //   let values = items.map(item =>
+  //     `(${item["codMercadoria"]}, ${codNegociacao}, ${codAssociado}, ${codFornecedor}, ${codeConsult}, ${codComprador}, ${item["quantMercadoria"]}, ${codOrganizacao})`
+  //   ).join(',');
+
+  //   const queryConsult =
+  //     `INSERT INTO pedido (codMercPedido, codNegoPedido, codAssocPedido, codFornPedido, codConsultPedido, codComprPedido, quantMercPedido, codOrganizador) VALUES ${values}
+  //      ON DUPLICATE KEY UPDATE quantMercPedido = VALUES(quantMercPedido)`;
+
+  //   connection.query(queryConsult, (error, results) => {
+  //     if (error) {
+  //       logger.error(error);
+  //       return res.status(400).json({
+  //         response: 400,
+  //         message: "Failed to insert data",
+  //         error: error.message
+  //       });
+  //     }
+
+  //     const insertUpdate = `UPDATE negotiation_windows SET end_at = NOW() WHERE supplier_id = ${codFornecedor} AND client_id = ${codComprador}`;
+
+  //     connection.query(insertUpdate, (error, results) => {
+  //       if (error) {
+  //         logger.error(error);
+  //         return res.status(400).json({
+  //           response: 400,
+  //           message: "Failed to update negotiation_windows",
+  //           error: error.message
+  //         });
+  //       }
+
+  //       logger.info("Update negotiation_windows", results);
+
+  //       return res.status(200).json({
+  //         response: 200,
+  //         message: "Data inserted and negotiation window updated successfully"
+  //       });
+  //     });
+  //   });
+  // }
 
   // async postInserRequestNew(req, res) {
   //   logger.info("POST INSERT REQUEST NEW");
@@ -662,8 +754,6 @@ const Request = {
   //       });
   //     } else {
 
-
-
   //       const insertUpdate = `update negotiation_windows set end_at=now() where supplier_id = ${codFornecedor} and client_id = ${codComprador}`;
 
   //       connection.query(insertUpdate, (error, resultsss, fields) => {
@@ -694,8 +784,6 @@ const Request = {
   //   return 0;
   //   // connection.end();
   // },
-
-
 };
 
 module.exports = Request;
