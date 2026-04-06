@@ -628,11 +628,11 @@ const Request = {
 
     const { codAssociado, codFornecedor, codComprador, codNegociacao, codOrganizacao, items, codeConsult } = req.body;
 
-    const priority = process.env.API_PRIORITY || 1;
+    const priority = process.env.INDEX_API || 2;
 
     // Flag para evitar loop de espelhamento
     // const isMirror = req.headers["x-mirror-request"] === "true";
-    const isMirror = priority == 0;
+    const isMirror = priority == 1;
 
     let values = items
       .map(
