@@ -21,6 +21,7 @@ const Log = require("@controller/Log");
 const Notification = require("@controller/Notification");
 const WindowNegotiation = require("@controller/WindowNegotiation");
 const Backup = require("@controller/Backup");
+const BackupBanco = require("@controller/BackupBanco");
 const Mql = require("@controller/Mql");
 const ExportPdf = require("@controller/ExportPdf");
 const NoticeInteractions = require("@controller/NoticeInteractions");
@@ -240,6 +241,9 @@ router.get("/notification/check", Notification.checkNotificationPerUser);
 router.get("/notification/:id", Notification.getNotificationDetails);
 
 router.post("/mql/decision", Mql.insert);
+
+router.post("/backup/send", BackupBanco.sendBackup);
+router.post("/backup/receive", BackupBanco.receiveBackup);
 
 router.post("/notices/interactions", NoticeInteractions.InsertNoticeInteraction);
 
