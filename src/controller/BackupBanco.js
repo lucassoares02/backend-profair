@@ -4,9 +4,9 @@ const { connection } = require("./../config/server");
 
 const CHUNK_SIZE = 500;
 
-function queryAsync(sql) {
+function queryAsync(sql, params = []) {
   return new Promise((resolve, reject) => {
-    connection.query(sql, (err, results) => {
+    connection.query(sql, params, (err, results) => {
       if (err) return reject(err);
       resolve(results);
     });
@@ -17,17 +17,10 @@ function isValidTableName(name) {
   return /^[a-zA-Z0-9_]+$/.test(name);
 }
 
-function splitIntoChunks(array, size) {
-  const chunks = [];
-  for (let i = 0; i < array.length; i += size) {
-    chunks.push(array.slice(i, i + size));
-  }
-  return chunks.length > 0 ? chunks : [[]];
-}
-
 const BackupBanco = {
   /**
-   * Puxa os dados das tabelas informadas e envia para o ambiente espelho em chunks.
+   * Puxa os dados das tabelas em batches (LIMIT/OFFSET) e envia para o espelho chunk a chunk,
+   * evitando carregar tabelas grandes inteiras na memória.
    * Body: { tables: ["tabela1", "tabela2", ...] }
    */
   async sendBackup(req, res) {
@@ -51,19 +44,36 @@ const BackupBanco = {
       const counts = {};
 
       for (const table of tables) {
-        logger.info(`BackupBanco.sendBackup – lendo tabela: ${table}`);
-        const rows = await queryAsync(`SELECT * FROM \`${table}\``);
-        logger.info(`BackupBanco.sendBackup – ${rows.length} registros lidos de '${table}'`);
+        logger.info(`BackupBanco.sendBackup – iniciando tabela: ${table}`);
 
-        const chunks = splitIntoChunks(rows, CHUNK_SIZE);
-        logger.info(`BackupBanco.sendBackup – '${table}' particionada em ${chunks.length} chunk(s)`);
+        let offset = 0;
+        let firstChunk = true;
+        let totalRows = 0;
 
-        for (let i = 0; i < chunks.length; i++) {
-          await axios.post(`${backupUrl}/backup/receive`, { table, rows: chunks[i], truncate: i === 0 }, { timeout: 30000 });
-          logger.info(`BackupBanco.sendBackup – '${table}' chunk ${i + 1}/${chunks.length} enviado`);
+        while (true) {
+          const rows = await queryAsync(`SELECT * FROM \`${table}\` LIMIT ? OFFSET ?`, [CHUNK_SIZE, offset]);
+
+          if (firstChunk && rows.length === 0) {
+            // Tabela vazia: envia sinal de truncate sem registros
+            await axios.post(`${backupUrl}/backup/receive`, { table, rows: [], truncate: true }, { timeout: 30000 });
+            logger.info(`BackupBanco.sendBackup – '${table}' vazia, truncate enviado`);
+            break;
+          }
+
+          if (rows.length === 0) break;
+
+          await axios.post(`${backupUrl}/backup/receive`, { table, rows, truncate: firstChunk }, { timeout: 30000 });
+          logger.info(`BackupBanco.sendBackup – '${table}' offset ${offset} → ${offset + rows.length} enviado`);
+
+          totalRows += rows.length;
+          offset += rows.length;
+          firstChunk = false;
+
+          if (rows.length < CHUNK_SIZE) break; // último batch
         }
 
-        counts[table] = rows.length;
+        counts[table] = totalRows;
+        logger.info(`BackupBanco.sendBackup – '${table}' concluída: ${totalRows} registros`);
       }
 
       return res.status(200).json({ message: "Backup enviado com sucesso.", tables, counts });
