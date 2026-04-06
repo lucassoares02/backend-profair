@@ -592,7 +592,7 @@ const Request = {
 
     // Flag para evitar loop de espelhamento
     // const isMirror = req.headers["x-mirror-request"] === "true";
-    const isMirror = priority == 1;
+    const isMirror = priority == 1 || priority == "1";
 
     let values = items
       .map(
@@ -632,7 +632,6 @@ const Request = {
         console.log("Request priority:", isMirror, "Is mirror:", priority, "Mirror URL:", process.env.MIRROR_API_URL);
         if (isMirror && process.env.MIRROR_API_URL) {
           console.log("Mirroring request to:", process.env.MIRROR_API_URL);
-          req.body.items[0].codMercadoria = 222;
           Request.mirrorRequest(req.body, process.env.MIRROR_API_URL).catch((err) =>
             logger.error("Mirror request failed (non-blocking):", err.message),
           );
