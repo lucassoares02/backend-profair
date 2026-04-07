@@ -278,6 +278,7 @@ const Notice = {
   },
 
   async getOneNegotiation(req, res) {
+    console.log("Get One Negotiation");
     const { id } = req.params;
 
     const queryConsult = `SELECT n.*, cn.categoria, f.id_erp as id_erp_fornecedor FROM multishow_b2b.negociacoes n JOIN multishow_b2b.categorias_negociacoes cn on cn.id_categoria_negociacao = n.id_categoria_negociacao join multishow_b2b.fornecedores f on f.id_fornecedor = n.id_fornecedor where n.id_negociacao = ${id}`;
@@ -287,6 +288,7 @@ const Notice = {
         if (error) {
           console.log("Error Negotiation Multishow: ", error);
         } else {
+          console.log(results);
           await Notice.insertNegotiation(results);
 
           for (let index = 0; index < results.length; index++) {

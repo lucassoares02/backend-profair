@@ -116,7 +116,14 @@ const BackupBanco = {
           (row) =>
             "(" +
             Object.values(row)
-              .map((v) => (v === null ? "NULL" : `'${String(v).replace(/'/g, "\\'")}'`))
+              .map((v) => {
+                if (v === null || v === undefined) return "NULL";
+                if (v instanceof Date) return `'${v.toISOString().slice(0, 19).replace("T", " ")}'`;
+                if (typeof v === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(v)) {
+                  return `'${v.slice(0, 19).replace("T", " ")}'`;
+                }
+                return `'${String(v).replace(/'/g, "\\'")}'`;
+              })
               .join(", ") +
             ")",
         );

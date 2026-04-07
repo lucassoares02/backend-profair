@@ -33,6 +33,7 @@ const User = {
               fornecedor.nomeForn,
               fornecedor.cnpjForn,
               acesso.codUsuario,
+              acesso.history,
               fornecedor.codForn,
               consultor.nomeConsult,
               consultor.cpfConsult,
