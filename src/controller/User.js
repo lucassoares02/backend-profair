@@ -34,6 +34,8 @@ const User = {
               fornecedor.cnpjForn,
               acesso.codUsuario,
               acesso.history,
+              fornecedor.color,
+              fornecedor.image,
               fornecedor.codForn,
               consultor.nomeConsult,
               consultor.cpfConsult,
