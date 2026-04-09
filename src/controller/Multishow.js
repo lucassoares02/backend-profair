@@ -1093,6 +1093,7 @@ const Notice = {
         direcAcesso: acessoDire,
         codUsuario: acessoDire == 3 ? element["id_usuario"] + 999 : element["id_lojista"],
         codOrganization: 158,
+        history: 0,
       });
     }
 
