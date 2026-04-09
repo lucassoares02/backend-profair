@@ -281,6 +281,26 @@ const Notice = {
     console.log("Get One Negotiation");
     const { id } = req.params;
 
+    const queryCheckExists = `SELECT codNegociacao FROM negociacao WHERE codNegociacao = ${id} LIMIT 1`;
+
+    try {
+      const alreadyExists = await new Promise((resolve, reject) => {
+        connection.query(queryCheckExists, (error, results) => {
+          if (error) return reject(error);
+          resolve(results.length > 0);
+        });
+      });
+
+      if (alreadyExists) {
+        return res.json({
+          message: "Negociação já existe no banco local",
+        });
+      }
+    } catch (error) {
+      console.log(`Error checking local DB: ${error}`);
+      return res.status(500).json({ error: "Erro ao verificar banco local" });
+    }
+
     const queryConsult = `SELECT n.*, cn.categoria, f.id_erp as id_erp_fornecedor FROM multishow_b2b.negociacoes n JOIN multishow_b2b.categorias_negociacoes cn on cn.id_categoria_negociacao = n.id_categoria_negociacao join multishow_b2b.fornecedores f on f.id_fornecedor = n.id_fornecedor where n.id_negociacao = ${id}`;
 
     try {
@@ -289,6 +309,9 @@ const Notice = {
           console.log("Error Negotiation Multishow: ", error);
         } else {
           console.log(results);
+          if (results.length === 0) {
+            return res.json({ message: "Negociação não encontrada em Multishow" });
+          }
           await Notice.insertNegotiation(results);
 
           for (let index = 0; index < results.length; index++) {
@@ -302,9 +325,9 @@ const Notice = {
               const provider = await Notice.getProvider(results[index]["id_negociacao"]);
               await Notice.insertProvider(provider, merchandises[0]["id_comprador"]);
 
-              console.log(`${index} - ${results[index]["id_negociacao"]} - ${results[index]["categoria"]}`);
-              console.log(`Fornecedor: ${provider[0]["id_erp"]} - ${provider[0]["fornecedor"]}`);
-              console.log(`Quantidade de mercadorias: ${merchandises.length}`);
+              const comands = await Notice.getNegotiationStore(id);
+
+              return res.json({ negotiation: results, comands: comands });
             } catch (error) {
               console.log("STEP 7");
               console.log(`Error Get Merchandises: ${error}`);
@@ -318,8 +341,8 @@ const Notice = {
     }
   },
 
-  async getNegotiations(req, res) {
-    const { query } = req.body;
+  async insertDataAll() {
+    logger.info("Insert Data All");
 
     try {
       const buyers = await Notice.getBuyers();
@@ -378,6 +401,10 @@ const Notice = {
     } catch (error) {
       console.log(`Error Intial Inserts: ${error}`);
     }
+  },
+
+  async getNegotiations(req, res) {
+    const { query } = req.body;
 
     // const queryConsult = "SELECT n.*, cn.categoria, f.id_erp as id_erp_fornecedor FROM multishow_b2b.negociacoes n JOIN multishow_b2b.categorias_negociacoes cn on cn.id_categoria_negociacao = n.id_categoria_negociacao join multishow_b2b.fornecedores f on f.id_fornecedor = n.id_fornecedor where n.id_categoria_negociacao = 25 or n.id_categoria_negociacao = 26";
     // const queryConsult = `
@@ -559,6 +586,25 @@ const Notice = {
         }
       });
     });
+  },
+
+  async getNegotiationStore(id_negociacao) {
+    logger.info("Get Negotiation Store");
+
+    const queryConsult =
+      "select CONCAT('UPDATE multishow_b2b.negociacoes_lojas SET id_loja = 322 WHERE id_negociacao = ', codNegociacao, ';') as 'query' from negociacao where codNegociacao = ?";
+
+    return new Promise((resolve, reject) => {
+      connection.query(queryConsult, [id_negociacao], (error, results) => {
+        if (error) {
+          console.log("Error Query Pre Event: ", error);
+          reject(error);
+        } else {
+          resolve(results);
+        }
+      });
+    });
+    // connection.end();
   },
 
   getAllProvider(negotiation) {
