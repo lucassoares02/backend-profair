@@ -341,7 +341,7 @@ const Notice = {
     }
   },
 
-  async insertDataAll() {
+  async insertDataAll(req, res) {
     logger.info("Insert Data All");
 
     try {
@@ -400,7 +400,9 @@ const Notice = {
       await Notice.insertRelationClients(relation);
     } catch (error) {
       console.log(`Error Intial Inserts: ${error}`);
+      res.status(400).send(error);
     }
+    return res.json({ message: "success" });
   },
 
   async getNegotiations(req, res) {
