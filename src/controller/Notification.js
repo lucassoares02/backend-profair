@@ -128,7 +128,7 @@ const Notification = {
         return res.status(400).send(error);
       } else {
         results[0].image = results[0].image ? results[0].image : "https://files.profair.click/profair/iconadega.png";
-        console.log("Results:", results[0].image);
+        results[0].color = results[0].color ? results[0].color : "#5E1C6E";
         return res.json(results);
       }
     });
