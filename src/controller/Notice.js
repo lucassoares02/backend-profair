@@ -50,7 +50,10 @@ const Notice = {
     logger.info("Insert Notice");
     const { title, description, image, action, priority, primaryColor, secondaryColor, stamp, type, provider } = req.body;
 
-    const queryInsert = `insert into notices (title, description, image, action, priority, primaryColor, secondaryColor, stamp, type, provider) values ('${title}', '${description}', '${image}', '${action}', ${priority}, '${primaryColor}', '${secondaryColor}', '${stamp}', ${type}, ${provider})`;
+    // provider pode ser null, entao tem que ser tratado
+    const providerValue = provider ? provider : "NULL";
+
+    const queryInsert = `insert into notices (title, description, image, action, priority, primaryColor, secondaryColor, stamp, type, provider) values ('${title}', '${description}', '${image}', '${action}', ${priority}, '${primaryColor}', '${secondaryColor}', '${stamp}', ${type}, ${providerValue})`;
     connection.query(queryInsert, (error, results, fields) => {
       if (error) {
         console.log("Error Insert Notice: ", error);
@@ -94,7 +97,8 @@ const Notice = {
     logger.info("Update Notice");
     const { id } = req.params;
     const { title, description, image, action, priority, primaryColor, secondaryColor, stamp, type, provider } = req.body;
-    const queryUpdate = `update notices set title = '${title}', description = '${description}', image = '${image}', action = '${action}', priority = ${priority}, primaryColor = '${primaryColor}', secondaryColor = '${secondaryColor}', stamp = '${stamp}', type = ${type}, provider = ${provider} where codNotice = ${id}`;
+    const providerValue = provider ? provider : "NULL";
+    const queryUpdate = `update notices set title = '${title}', description = '${description}', image = '${image}', action = '${action}', priority = ${priority}, primaryColor = '${primaryColor}', secondaryColor = '${secondaryColor}', stamp = '${stamp}', type = ${type}, provider = ${providerValue} where codNotice = ${id}`;
     connection.query(queryUpdate, (error, results, fields) => {
       if (error) {
         console.log("Error Update Notice: ", error);
