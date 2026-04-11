@@ -10,10 +10,10 @@ const Provider = {
 
     const { provider } = req.params;
 
-    const { nomeForn, razao, cnpjForn, codCategoria, codComprFornecedor, image, color } = req.body;
+    const { nomeForn, razao, cnpjForn, image, color } = req.body;
 
-    const queryUpdate = `UPDATE fornecedor SET nomeForn = ?, razaoForn = ?, cnpjForn = ?, codCategoria = ?, codComprFornecedor = ?, image = ?, color = ? WHERE codForn = ?`;
-    const values = [nomeForn, razao, cnpjForn, codCategoria, codComprFornecedor, image, color, provider];
+    const queryUpdate = `UPDATE fornecedor SET nomeForn = ?, razaoForn = ?, cnpjForn = ?, image = ?, color = ? WHERE codForn = ?`;
+    const values = [nomeForn, razao, cnpjForn, image, color, provider];
 
     connection.query(queryUpdate, values, (error, results) => {
       if (error) {
@@ -366,17 +366,13 @@ const Provider = {
       const fileName = `providers/${codeProvider}/image.${ext}`;
       const { url } = await uploadFile(req.file.buffer, fileName, req.file.mimetype);
 
-      connection.query(
-        "UPDATE fornecedor SET image = ? WHERE codForn = ?",
-        [url, codeProvider],
-        (error) => {
-          if (error) {
-            logger.error(`Erro ao atualizar imagem do fornecedor: ${error.message}`);
-            return res.status(400).send(error);
-          }
-          return res.status(200).json({ url });
+      connection.query("UPDATE fornecedor SET image = ? WHERE codForn = ?", [url, codeProvider], (error) => {
+        if (error) {
+          logger.error(`Erro ao atualizar imagem do fornecedor: ${error.message}`);
+          return res.status(400).send(error);
         }
-      );
+        return res.status(200).json({ url });
+      });
     } catch (error) {
       logger.error(`Erro no upload da imagem: ${error.message}`);
       return res.status(500).json({ message: "Erro ao fazer upload da imagem" });
