@@ -126,14 +126,15 @@ const Client = {
     consultor.nomeConsult, 
     relaciona.codConsultRelaciona,
     associado.razaoAssociado,
-    associado.cnpjAssociado as cnpj, 
+    associado.cnpjAssociado as cnpj,
+    associado.cidade as cidade,
     IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido),0) as 'valor',
     IFNULL(sum(pedido.quantMercPedido), 0) as 'volume'
     from consultor
     inner join relaciona on consultor.codConsult = relaciona.codAssocRelaciona
-    inner join associado on associado.codAssociado = relaciona.codConsultRelaciona 
-    left join pedido on pedido.codAssocPedido = relaciona.codConsultRelaciona 
-    left join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido 
+    inner join associado on associado.codAssociado = relaciona.codConsultRelaciona
+    left join pedido on pedido.codAssocPedido = relaciona.codConsultRelaciona
+    left join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido
     where relaciona.codAssocRelaciona = ${user}
     group by relaciona.codConsultRelaciona 
     order by valor 
