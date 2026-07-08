@@ -1216,11 +1216,11 @@ join associado a on a.codAssociado = p.codAssocPedido
     const { codclient, codforn } = req.params;
 
     const queryConsult =
-      "SET sql_mode = ''; select codNegociacao,prazo, observacao, descNegociacao, (pedido.codNegoPedido) as 'confirma' from negociacao left outer join pedido on (negociacao.codNegociacao = pedido.codNegoPedido) and pedido.codAssocPedido = " +
+      "SET sql_mode = ''; select codNegociacao,prazo, observacao, descNegociacao, negociacao.sort_order, (pedido.codNegoPedido) as 'confirma' from negociacao left outer join pedido on (negociacao.codNegociacao = pedido.codNegoPedido) and pedido.codAssocPedido = " +
       codclient +
       "	where negociacao.codFornNegociacao  = " +
       codforn +
-      " GROUP BY negociacao.codNegociacao ORDER BY prazo";
+      " GROUP BY negociacao.codNegociacao ORDER BY negociacao.sort_order IS NULL, negociacao.sort_order ASC, prazo";
 
     connection.query(queryConsult, async (error, results, fields) => {
       if (error) {
