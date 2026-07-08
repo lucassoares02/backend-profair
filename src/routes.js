@@ -26,7 +26,7 @@ const BackupBanco = require("@controller/BackupBanco");
 const Mql = require("@controller/Mql");
 const ExportPdf = require("@controller/ExportPdf");
 const NoticeInteractions = require("@controller/NoticeInteractions");
-("");
+const Integration = require("@controller/Integration");
 
 router.post("/faceline-user", Faceline.insert);
 router.post("/faceline-user-update", Faceline.update);
@@ -117,6 +117,8 @@ router.get("/negotiationclientwithprice/:codclient/:codforn", Negotiation.getNeg
 router.get("/negotiationclientwithpricenotnull/:codclient/:codforn", Negotiation.getNegotiationClientsWithPriceNotNull);
 
 router.post("/insertnegotiation", Negotiation.PostInsertNegotiation);
+
+router.post("/negotiationsorder", Negotiation.updateNegotiationsOrder);
 
 router.post("/insertnegotiationrelacionamercadoria", Negotiation.PostInsertNegotiationRelacionaMercadoria);
 
@@ -250,6 +252,9 @@ router.post("/backup/receive", backupJsonParser, BackupBanco.receiveBackup);
 
 router.post("/notices/interactions", NoticeInteractions.InsertNoticeInteraction);
 
-// router.get("/portalflex/negotiations/:negociacao", Integration.negotiations);
+router.get("/portalflex/negotiation/:negociacao", Integration.products);
+router.get("/portalflex/negotiations", Integration.negotiations);
+router.get("/portalflex/provider/:provider", Integration.provider);
+router.get("/portalflex/clients", Integration.clients);
 
 module.exports = router;

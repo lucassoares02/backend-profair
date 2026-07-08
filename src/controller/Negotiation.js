@@ -34,9 +34,9 @@ const Negotiation = {
     from negociacao 
     left join pedido on pedido.codNegoPedido = negociacao.codNegociacao 
     left join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido 
-    where negociacao.codFornNegociacao = ${codforn} 
-    group by negociacao.codNegociacao 
-    order by sum(mercadoria.precoMercadoria*pedido.quantMercPedido) 
+    where negociacao.codFornNegociacao = ${codforn}
+    group by negociacao.codNegociacao
+    order by negociacao.sort_order is null, negociacao.sort_order asc, sum(mercadoria.precoMercadoria*pedido.quantMercPedido)
     desc`;
 
     connection.query(queryConsult, (error, results, fields) => {
@@ -369,7 +369,7 @@ const Negotiation = {
   },
 
   async GetExportNegotiationPerProvider(req, res) {
-    logger.info("Get Export Negotiation ");
+    logger.info("Get Export Negotiation GetExportNegotiationPerProvider");
 
     const { codeclient, codenegotiation } = req.params;
 
@@ -1438,6 +1438,51 @@ join associado a on a.codAssociado = p.codAssocPedido
         return res.status(500).json({ error: "Erro ao pegar status" });
       } else {
         return res.json(results[0]);
+      }
+    });
+  },
+
+  async updateNegotiationsOrder(req, res) {
+    logger.info("Update Negotiations Order");
+
+    let orders = req.body.orders;
+
+    // O corpo pode chegar como string JSON (form-urlencoded) ou como array (json)
+    if (typeof orders === "string") {
+      try {
+        orders = JSON.parse(orders);
+      } catch (e) {
+        return res.status(400).json({ error: "Payload de ordenação inválido" });
+      }
+    }
+
+    if (!Array.isArray(orders) || orders.length === 0) {
+      return res.status(400).json({ error: "É necessário enviar a lista de ordenação" });
+    }
+
+    const codes = [];
+    let cases = "";
+
+    for (const item of orders) {
+      const cod = parseInt(item.codNegociacao);
+      const order = parseInt(item.sortOrder);
+      if (isNaN(cod) || isNaN(order)) continue;
+      cases += ` WHEN ${cod} THEN ${order}`;
+      codes.push(cod);
+    }
+
+    if (codes.length === 0) {
+      return res.status(400).json({ error: "Nenhuma negociação válida para ordenar" });
+    }
+
+    const queryUpdate = `UPDATE negociacao SET sort_order = CASE codNegociacao${cases} END WHERE codNegociacao IN (${codes.join(",")})`;
+
+    connection.query(queryUpdate, (error, results, fields) => {
+      if (error) {
+        console.log("Error Updating Negotiations Order: ", error);
+        return res.status(500).json({ error: "Erro ao atualizar ordem das negociações" });
+      } else {
+        return res.status(200).json({ message: "Ordem atualizada com sucesso" });
       }
     });
   },
