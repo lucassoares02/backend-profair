@@ -157,6 +157,7 @@ router.get(
 );
 
 router.get("/merchandisenegotiationprovider/:codprovider/:codnegotiation", Merchandise.getMerchandiseNegotiationProvider);
+router.post("/merchandisehighlight", Merchandise.updateMerchandiseHighlight);
 router.get("/merchandisenegotiationproviderifClient/:codprovider/:codnegotiation", Merchandise.getMerchandiseNegotiationProviderIfClient);
 
 router.get("/merchandisepercustomer/:codclient/:codeprovider", Merchandise.getMerchandisePerCustomer);

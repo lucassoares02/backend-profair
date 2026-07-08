@@ -83,11 +83,12 @@ const Merchandise = {
     mercadoria.fatorMerc,
     mercadoria.precoUnit,
     mercadoria.nego,
-    mercadoria.precoMercadoria as precoMercadoria, 
-    IFNULL(SUM(pedido.quantMercPedido),  0) as quantMercadoria, 
-    IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0) as 'valorTotal' 
-    from mercadoria 
-    left join pedido on mercadoria.codMercadoria = pedido.codMercPedido 
+    mercadoria.highlight,
+    mercadoria.precoMercadoria as precoMercadoria,
+    IFNULL(SUM(pedido.quantMercPedido),  0) as quantMercadoria,
+    IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0) as 'valorTotal'
+    from mercadoria
+    left join pedido on mercadoria.codMercadoria = pedido.codMercPedido
     where mercadoria.nego = ${codnegotiation}
     group by mercadoria.codMercadoria
     order by sum(mercadoria.precoMercadoria*pedido.quantMercPedido) 
@@ -438,6 +439,40 @@ SET sql_mode = ''; SELECT
         res.status(400).send(error);
       });
     connection.end();
+  },
+
+  async updateMerchandiseHighlight(req, res) {
+    logger.info("Update Merchandise Highlight");
+
+    let codes = req.body.codes;
+
+    // O corpo pode chegar como string JSON (form-urlencoded) ou como array (json)
+    if (typeof codes === "string") {
+      try {
+        codes = JSON.parse(codes);
+      } catch (e) {
+        return res.status(400).json({ error: "Payload de produtos inválido" });
+      }
+    }
+
+    const highlight = parseInt(req.body.highlight) === 1 ? 1 : 0;
+
+    const ids = (Array.isArray(codes) ? codes : []).map((c) => parseInt(c)).filter((c) => !isNaN(c));
+
+    if (ids.length === 0) {
+      return res.status(400).json({ error: "É necessário enviar ao menos um produto" });
+    }
+
+    const queryUpdate = `UPDATE mercadoria SET highlight = ${highlight} WHERE codMercadoria IN (${ids.join(",")})`;
+
+    connection.query(queryUpdate, (error, results, fields) => {
+      if (error) {
+        console.log("Error Updating Merchandise Highlight: ", error);
+        return res.status(500).json({ error: "Erro ao atualizar destaque dos produtos" });
+      } else {
+        return res.status(200).json({ message: "Destaque atualizado com sucesso" });
+      }
+    });
   },
 };
 
