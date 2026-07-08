@@ -84,6 +84,7 @@ const Merchandise = {
     mercadoria.precoUnit,
     mercadoria.nego,
     mercadoria.highlight,
+    mercadoria.tag,
     mercadoria.precoMercadoria as precoMercadoria,
     IFNULL(SUM(pedido.quantMercPedido),  0) as quantMercadoria,
     IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0) as 'valorTotal'
@@ -471,6 +472,42 @@ SET sql_mode = ''; SELECT
         return res.status(500).json({ error: "Erro ao atualizar destaque dos produtos" });
       } else {
         return res.status(200).json({ message: "Destaque atualizado com sucesso" });
+      }
+    });
+  },
+
+  async updateMerchandiseTag(req, res) {
+    logger.info("Update Merchandise Tag");
+
+    let codes = req.body.codes;
+
+    // O corpo pode chegar como string JSON (form-urlencoded) ou como array (json)
+    if (typeof codes === "string") {
+      try {
+        codes = JSON.parse(codes);
+      } catch (e) {
+        return res.status(400).json({ error: "Payload de produtos inválido" });
+      }
+    }
+
+    const ids = (Array.isArray(codes) ? codes : []).map((c) => parseInt(c)).filter((c) => !isNaN(c));
+
+    if (ids.length === 0) {
+      return res.status(400).json({ error: "É necessário enviar ao menos um produto" });
+    }
+
+    // tag pode ser nula/vazia (remove a tag). Limita a 20 caracteres (varchar(20)).
+    let tag = req.body.tag;
+    tag = tag == null || `${tag}`.trim() === "" ? null : `${tag}`.trim().substring(0, 20);
+
+    const queryUpdate = `UPDATE mercadoria SET tag = ? WHERE codMercadoria IN (${ids.join(",")})`;
+
+    connection.query(queryUpdate, [tag], (error, results, fields) => {
+      if (error) {
+        console.log("Error Updating Merchandise Tag: ", error);
+        return res.status(500).json({ error: "Erro ao atualizar tag dos produtos" });
+      } else {
+        return res.status(200).json({ message: "Tag atualizada com sucesso" });
       }
     });
   },
