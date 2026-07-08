@@ -232,18 +232,20 @@ const Merchandise = {
     mercadoria.barcode,
     mercadoria.nego,                                      
     mercadoria.codMercadoria_ext,                                      
-    mercadoria.complemento, 
-    mercadoria.fatorMerc, 
-    mercadoria.precoMercadoria as precoMercadoria, 
+    mercadoria.complemento,
+    mercadoria.fatorMerc,
+    mercadoria.highlight,
+    mercadoria.tag,
+    mercadoria.precoMercadoria as precoMercadoria,
     mercadoria.precoUnit as precoUnit,
-    IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0) as 'valorTotal', 
-    IFNULL(sum(pedido.quantMercPedido),0) as 'volumeTotal' 
-    from mercadoria 
-    join fornecedor on mercadoria.codFornMerc = fornecedor.codForn 
+    IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0) as 'valorTotal',
+    IFNULL(sum(pedido.quantMercPedido),0) as 'volumeTotal'
+    from mercadoria
+    join fornecedor on mercadoria.codFornMerc = fornecedor.codForn
     left join pedido on pedido.codMercPedido = mercadoria.codMercadoria
     where fornecedor.codForn = ${codprovider}
     group by mercadoria.codMercadoria
-    order by mercadoria.nomeMercadoria  
+    order by mercadoria.nomeMercadoria
     asc
 `;
     // order by valorTotal
@@ -349,8 +351,10 @@ const Merchandise = {
     mercadoria.complemento,
     mercadoria.precoUnit ,
     mercadoria.nego,
+    mercadoria.highlight,
+    mercadoria.tag,
     mercadoria.precoMercadoria as precoMercadoria,
-    IFNULL(SUM(pedido.quantMercPedido), 0) as volumeTotal 
+    IFNULL(SUM(pedido.quantMercPedido), 0) as volumeTotal
     FROM mercadoria 
     left outer JOIN pedido ON(mercadoria.codMercadoria = pedido.codMercPedido) 
     and pedido.codAssocPedido = ${codclient}
@@ -370,8 +374,10 @@ SET sql_mode = ''; SELECT
     mercadoria.complemento,
     mercadoria.precoUnit ,
     mercadoria.nego,
+    mercadoria.highlight,
+    mercadoria.tag,
     mercadoria.precoMercadoria as precoMercadoria,
-    IFNULL(SUM(pedido.quantMercPedido), 0) as volumeTotal 
+    IFNULL(SUM(pedido.quantMercPedido), 0) as volumeTotal
     FROM mercadoria 
     left outer JOIN pedido ON(mercadoria.codMercadoria = pedido.codMercPedido)     
     where mercadoria.codFornMerc = ${codeprovider}
