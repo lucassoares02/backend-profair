@@ -27,6 +27,14 @@ const Mql = require("@controller/Mql");
 const ExportPdf = require("@controller/ExportPdf");
 const NoticeInteractions = require("@controller/NoticeInteractions");
 const Integration = require("@controller/Integration");
+const Stand = require("@controller/Stand");
+
+// === Mapa do evento / Stands ===
+router.get("/stands/:codOrg", Stand.getStands);
+router.post("/stands/:codOrg/batch", Stand.saveStandsBatch);
+router.post("/stand", Stand.createStand);
+router.put("/stand/:codStand", Stand.updateStand);
+router.delete("/stand/:codStand", Stand.deleteStand);
 
 router.post("/faceline-user", Faceline.insert);
 router.post("/faceline-user-update", Faceline.update);

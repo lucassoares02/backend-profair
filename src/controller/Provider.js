@@ -248,7 +248,7 @@ const Provider = {
   async findMap(req, res) {
     logger.info("Get Find Map");
 
-    const query = `select mapa from organizador`;
+    const query = `select codOrg, mapa from organizador`;
 
     connection.query(query, (error, results, fields) => {
       if (error) {
