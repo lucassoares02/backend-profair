@@ -49,11 +49,11 @@ const Provider = {
 
     const { type } = req.params;
 
-    const queryConsult = `SELECT cnpjAssociado AS cnpjForn, concat(codAssociado, " - ",razaoAssociado) AS razao, codAssociado AS codForn, NULL AS color
+    const queryConsult = `SELECT cnpjAssociado AS cnpjForn, concat(codAssociado, " - ",razaoAssociado) AS razao, codAssociado AS codForn, NULL AS color, NULL AS image
     FROM associado
     WHERE ${type} = 2
     UNION ALL
-    SELECT cnpjForn, concat(codForn, " - ", razaoForn) AS razao, codForn, color
+    SELECT cnpjForn, concat(codForn, " - ", razaoForn) AS razao, codForn, color, image
     FROM fornecedor
     WHERE ${type} = 1;`;
 
