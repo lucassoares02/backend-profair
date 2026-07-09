@@ -420,6 +420,7 @@ const Request = {
       pedido.codPedido,
       pedido.dataPedido,
       DATE_FORMAT(SUBTIME(pedido.dataPedido, '03:00:00'), '%Y-%m-%d') AS dia,
+      TIME_FORMAT(SUBTIME(pedido.dataPedido, '03:00:00'), '%H:%i') AS hora,
       fornecedor.codForn,
       fornecedor.nomeForn,
       fornecedor.image AS fornImage,
