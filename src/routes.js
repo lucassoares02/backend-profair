@@ -186,6 +186,7 @@ router.get("/exportrequestsprovider/:provider", Request.ExportClientsPerProvider
 router.get("/requestsprovidernegotiation/:codenegotiation", Request.getRequestsNegotiation);
 
 router.get("/requestsnegotiationbyclient/:codebranch", Request.getRequestsClientsWithNegotiation);
+router.get("/clientpurchasedetails/:codassoc/:codprovider", Request.getClientPurchaseDetails);
 router.get("/requestsnegotiationclientororg/:client/:provider", Request.getRequestsClientsOrOrg);
 
 router.get("/requestsclients/:codconsult", Request.getRequestsClients);

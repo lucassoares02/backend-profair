@@ -405,6 +405,50 @@ const Request = {
     // connection.end();
   },
 
+  // Detalhamento das compras de um cliente (itens de pedido), para o dashboard
+  // de detalhes. codprovider = 0 traz todos os fornecedores; > 0 filtra por um.
+  async getClientPurchaseDetails(req, res) {
+    logger.info("Get Client Purchase Details");
+
+    const { codassoc, codprovider } = req.params;
+
+    const providerFilter = codprovider && parseInt(codprovider) > 0 ? `AND pedido.codFornPedido = ${parseInt(codprovider)}` : "";
+
+    const queryConsult = `
+    SET sql_mode = '';
+    SELECT
+      pedido.codPedido,
+      pedido.dataPedido,
+      DATE_FORMAT(SUBTIME(pedido.dataPedido, '03:00:00'), '%Y-%m-%d') AS dia,
+      fornecedor.codForn,
+      fornecedor.nomeForn,
+      fornecedor.image AS fornImage,
+      fornecedor.color AS fornColor,
+      negociacao.codNegociacao,
+      negociacao.descNegociacao,
+      mercadoria.codMercadoria,
+      mercadoria.nomeMercadoria,
+      mercadoria.marca,
+      mercadoria.precoMercadoria AS preco,
+      pedido.quantMercPedido AS quant,
+      (pedido.quantMercPedido * mercadoria.precoMercadoria) AS total
+    FROM pedido
+    JOIN fornecedor ON fornecedor.codForn = pedido.codFornPedido
+    JOIN negociacao ON negociacao.codNegociacao = pedido.codNegoPedido
+    JOIN mercadoria ON pedido.codMercPedido = mercadoria.codMercadoria
+    WHERE pedido.codAssocPedido = ${parseInt(codassoc)} ${providerFilter}
+    ORDER BY pedido.dataPedido`;
+
+    connection.query(queryConsult, (error, results, fields) => {
+      if (error) {
+        console.log("Error Select Client Purchase Details: ", error);
+        return res.status(500).json({ error: "Erro ao buscar detalhes das compras" });
+      } else {
+        return res.json(results[1]);
+      }
+    });
+  },
+
   async getRequestsClients(req, res) {
     logger.info("Get Requests Provider");
 
