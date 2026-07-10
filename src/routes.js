@@ -247,6 +247,7 @@ router.get("/notifications", Notification.getNotifications);
 router.get("/notifications/all", Notification.getNotificationsAll);
 router.post("/notification", Notification.insertNotification);
 router.post("/notification/update", Notification.updateNotification);
+router.post("/notification/image/upload", upload.single("file"), Notification.uploadImageGeneric);
 router.post("/notification/:id/image", upload.single("file"), Notification.uploadImage);
 router.post("/notification/send", Notification.sendNotification);
 router.post("/notification/opened", Notification.openedNotification);

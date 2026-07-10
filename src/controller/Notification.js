@@ -285,6 +285,26 @@ const Notification = {
     }
   },
 
+  // Upload sem id (usado na criação): apenas armazena o arquivo e devolve a URL,
+  // que é salva no corpo do create/update.
+  async uploadImageGeneric(req, res) {
+    logger.info("Upload Notification Image (generic)");
+
+    if (!req.file) {
+      return res.status(400).json({ message: "Arquivo não enviado" });
+    }
+
+    try {
+      const ext = req.file.originalname.split(".").pop();
+      const fileName = `notifications/tmp/${Date.now()}.${ext}`;
+      const { url } = await uploadFile(req.file.buffer, fileName, req.file.mimetype);
+      return res.status(200).json({ url });
+    } catch (error) {
+      logger.error(`Erro no upload da imagem da notificação: ${error.message}`);
+      return res.status(500).json({ message: "Erro ao fazer upload da imagem" });
+    }
+  },
+
   async uploadImage(req, res) {
     logger.info("Upload Notification Image");
 
