@@ -1156,7 +1156,7 @@ join associado a on a.codAssociado = p.codAssocPedido
       codclient +
       "	where negociacao.codFornNegociacao  = " +
       codforn +
-      " GROUP BY negociacao.codNegociacao ORDER BY prazo";
+      " GROUP BY negociacao.codNegociacao ORDER BY negociacao.sort_order IS NULL, negociacao.sort_order ASC, prazo";
 
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {

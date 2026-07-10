@@ -2,6 +2,7 @@ const Insert = require("@insert");
 const logger = require("@logger");
 const admin = require("firebase-admin");
 const { connection } = require("@server");
+const { uploadFile } = require("@controller/Minio");
 const util = require("util");
 const { getMonth } = require("date-fns");
 const { image } = require("pdfkit");
@@ -263,11 +264,11 @@ const Notification = {
 
   async updateNotification(req, res) {
     logger.info("Update Notifications");
-    const { title, content, redirect, target, day, month, hour, minute, method, id } = req.body;
+    const { title, content, redirect, target, day, month, hour, minute, method, id, image } = req.body;
 
     try {
-      const query = `UPDATE notifications SET title = ?, content = ?, redirect = ?, target = ?, day = ?, month = ?, hour = ?, minute = ?, method = ? WHERE id = ?`;
-      const values = [title, content, redirect, target, day, month, hour, minute, method, id];
+      const query = `UPDATE notifications SET title = ?, content = ?, redirect = ?, target = ?, day = ?, month = ?, hour = ?, minute = ?, method = ?, image = ? WHERE id = ?`;
+      const values = [title, content, redirect, target, day, month, hour, minute, method, image ?? null, id];
 
       connection.query(query, values, (error, results) => {
         if (error) {
@@ -281,6 +282,33 @@ const Notification = {
     } catch (error) {
       logger.error("Update Notification:", error);
       return res.status(400).send({ message: "Error update notification", error });
+    }
+  },
+
+  async uploadImage(req, res) {
+    logger.info("Upload Notification Image");
+
+    const { id } = req.params;
+
+    if (!req.file) {
+      return res.status(400).json({ message: "Arquivo não enviado" });
+    }
+
+    try {
+      const ext = req.file.originalname.split(".").pop();
+      const fileName = `notifications/${id}/image.${ext}`;
+      const { url } = await uploadFile(req.file.buffer, fileName, req.file.mimetype);
+
+      connection.query("UPDATE notifications SET image = ? WHERE id = ?", [url, id], (error) => {
+        if (error) {
+          logger.error(`Erro ao atualizar imagem da notificação: ${error.message}`);
+          return res.status(400).send(error);
+        }
+        return res.status(200).json({ url });
+      });
+    } catch (error) {
+      logger.error(`Erro no upload da imagem da notificação: ${error.message}`);
+      return res.status(500).json({ message: "Erro ao fazer upload da imagem" });
     }
   },
 
@@ -384,24 +412,38 @@ const Notification = {
         }
       }
 
+      // Imagem própria da notificação (upload). Quando diferente de null, tem
+      // prioridade sobre a imagem do fornecedor.
+      let notificationImage = "";
+      if (notificationId) {
+        const resultImage = await query(`select image from notifications where id = ${notificationId}`);
+        if (resultImage.length > 0 && resultImage[0].image) {
+          notificationImage = resultImage[0].image;
+        }
+      }
+
+      // Imagem exibida: prioriza a da notificação; senão a do fornecedor/fallback.
+      const displayImage = notificationImage && notificationImage.length > 0 ? notificationImage : imageUrlString;
+
       const message = {
         notification: {
           title,
           body: content,
-          image: imageUrlString,
+          image: displayImage,
         },
         data: {
           notificationId: notificationId.toString(),
           direct: redirect.toString(),
           provider: provider.toString(),
           imageUrl: imageUrlString,
+          notificationImage: notificationImage,
           title,
           body: content,
         },
         tokens,
         android: {
           notification: {
-            imageUrl: imageUrlString,
+            imageUrl: displayImage,
           },
         },
         apns: {
@@ -412,7 +454,7 @@ const Notification = {
             },
           },
           fcm_options: {
-            image: imageUrlString,
+            image: displayImage,
           },
         },
       };
