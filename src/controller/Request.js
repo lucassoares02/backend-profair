@@ -8,6 +8,25 @@ const https = require("https");
 const http = require("http");
 const { URL } = require("url");
 
+const insertOrderObservation = (body, callback) => {
+  const { codAssociado, codFornecedor, codComprador, codeConsult, observacao } = body;
+  const observation = String(observacao ?? "").trim();
+
+  if (!observation) {
+    callback(null);
+    return;
+  }
+
+  const query = `INSERT INTO pedido_observacao
+      (codAssociado, codFornecedor, codConsultVendedor, codConsultComprador, observacao)
+    VALUES (?, ?, ?, ?, ?)
+    ON DUPLICATE KEY UPDATE
+      observacao = VALUES(observacao),
+      atualizadoEm = CURRENT_TIMESTAMP`;
+
+  connection.query(query, [codAssociado, codFornecedor, codeConsult, codComprador, observation], callback);
+};
+
 const Request = {
   async getRequestProviderClient(req, res) {
     logger.info("Get Associate Supliers Orders");
@@ -673,18 +692,29 @@ const Request = {
 
         logger.info("Update negotiation_windows", results);
 
-        // Espelha para a segunda API apenas se não for uma requisição espelho
-        console.log("Request priority:", isMirror, "Is mirror:", priority, "Mirror URL:", process.env.MIRROR_API_URL);
-        if (isMirror && process.env.MIRROR_API_URL) {
-          console.log("Mirroring request to:", process.env.MIRROR_API_URL);
-          Request.mirrorRequest(req.body, process.env.MIRROR_API_URL).catch((err) =>
-            logger.error("Mirror request failed (non-blocking):", err.message),
-          );
-        }
+        insertOrderObservation(req.body, (error) => {
+          if (error) {
+            logger.error(error);
+            return res.status(400).json({
+              response: 400,
+              message: "Failed to insert order observation",
+              error: error.message,
+            });
+          }
 
-        return res.status(200).json({
-          response: 200,
-          message: "Data inserted and negotiation window updated successfully",
+          // Espelha para a segunda API apenas se não for uma requisição espelho
+          console.log("Request priority:", isMirror, "Is mirror:", priority, "Mirror URL:", process.env.MIRROR_API_URL);
+          if (isMirror && process.env.MIRROR_API_URL) {
+            console.log("Mirroring request to:", process.env.MIRROR_API_URL);
+            Request.mirrorRequest(req.body, process.env.MIRROR_API_URL).catch((err) =>
+              logger.error("Mirror request failed (non-blocking):", err.message),
+            );
+          }
+
+          return res.status(200).json({
+            response: 200,
+            message: "Data inserted and negotiation window updated successfully",
+          });
         });
       });
     });
