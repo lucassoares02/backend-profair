@@ -28,6 +28,7 @@ const ExportPdf = require("@controller/ExportPdf");
 const NoticeInteractions = require("@controller/NoticeInteractions");
 const Integration = require("@controller/Integration");
 const Stand = require("@controller/Stand");
+const Cnpj = require("@controller/Cnpj");
 
 // === Mapa do evento / Stands ===
 router.get("/stands/:codOrg", Stand.getStands);
@@ -56,6 +57,10 @@ router.get("/allacesso", Client.allAccess);
 router.get("/allclient", Client.getAllClient);
 router.get("/client/:codacesso", Client.getOneClient);
 router.get("/clientconsult/:codconsultor", Client.getClientConsult);
+
+// === Cidade do associado via CNPJ (API opencnpj) ===
+router.get("/associados/atualizar-cidades", Cnpj.updateAllCitiesByCnpj);
+router.get("/associado/:codAssociado/cidade-cnpj", Cnpj.updateCityByCnpj);
 
 router.get("/checkcodeuser/:code", Client.checkCodeUser);
 router.post("/insertperson", Client.postInsertPerson);

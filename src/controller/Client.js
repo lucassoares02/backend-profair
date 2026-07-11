@@ -114,7 +114,14 @@ const Client = {
         supplier_id,
         client_id,
         start_at
-      ) VALUES (${consultant_id}, ${supplier_id}, ${user}, NOW());
+      )
+      SELECT ${consultant_id}, ${supplier_id}, ${user}, NOW()
+      WHERE NOT EXISTS (
+        SELECT 1
+        FROM negotiation_windows
+        WHERE supplier_id = ${supplier_id}
+          AND client_id = ${user}
+      );
     `;
 
     console.log(insertNegotiation);
