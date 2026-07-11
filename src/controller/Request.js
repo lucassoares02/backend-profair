@@ -43,18 +43,28 @@ const Request = {
     logger.info("GET ORDER OBSERVATION");
 
     const { codAssociado, codFornecedor, codConsultVendedor, codConsultComprador } = req.params;
+    const conditions = ["codAssociado = ?", "codFornecedor = ?"];
+    const params = [codAssociado, codFornecedor];
+
+    if (Number(codConsultVendedor) > 0) {
+      conditions.push("codConsultVendedor = ?");
+      params.push(codConsultVendedor);
+    }
+
+    if (Number(codConsultComprador) > 0) {
+      conditions.push("codConsultComprador = ?");
+      params.push(codConsultComprador);
+    }
 
     const query = `SELECT observacao
       FROM pedido_observacao
-      WHERE codAssociado = ?
-        AND codFornecedor = ?
-        AND codConsultVendedor = ?
-        AND codConsultComprador = ?
+      WHERE ${conditions.join(" AND ")}
+      ORDER BY atualizadoEm DESC, codPedidoObservacao DESC
       LIMIT 1`;
 
     connection.query(
       query,
-      [codAssociado, codFornecedor, codConsultVendedor, codConsultComprador],
+      params,
       (error, results) => {
         if (error) {
           logger.error(error);
