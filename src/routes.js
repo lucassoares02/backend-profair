@@ -190,6 +190,10 @@ router.get("/clientpurchasedetails/:codassoc/:codprovider", Request.getClientPur
 router.get("/requestsnegotiationclientororg/:client/:provider", Request.getRequestsClientsOrOrg);
 
 router.get("/requestsclients/:codconsult", Request.getRequestsClients);
+router.get(
+  "/requestobservation/:codAssociado/:codFornecedor/:codConsultVendedor/:codConsultComprador",
+  Request.getOrderObservation,
+);
 router.post("/insertrequest", Request.postInsertRequest);
 
 // router.post("/insertrequestnew", Log.InsertLog, Backup.InsertSell, Request.postInserRequestNew);

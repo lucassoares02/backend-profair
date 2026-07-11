@@ -10,10 +10,21 @@ const { URL } = require("url");
 
 const insertOrderObservation = (body, callback) => {
   const { codAssociado, codFornecedor, codComprador, codeConsult, observacao } = body;
+  if (!Object.prototype.hasOwnProperty.call(body, "observacao")) {
+    callback(null);
+    return;
+  }
+
   const observation = String(observacao ?? "").trim();
 
   if (!observation) {
-    callback(null);
+    const query = `DELETE FROM pedido_observacao
+      WHERE codAssociado = ?
+        AND codFornecedor = ?
+        AND codConsultVendedor = ?
+        AND codConsultComprador = ?`;
+
+    connection.query(query, [codAssociado, codFornecedor, codeConsult, codComprador], callback);
     return;
   }
 
@@ -28,6 +39,39 @@ const insertOrderObservation = (body, callback) => {
 };
 
 const Request = {
+  async getOrderObservation(req, res) {
+    logger.info("GET ORDER OBSERVATION");
+
+    const { codAssociado, codFornecedor, codConsultVendedor, codConsultComprador } = req.params;
+
+    const query = `SELECT observacao
+      FROM pedido_observacao
+      WHERE codAssociado = ?
+        AND codFornecedor = ?
+        AND codConsultVendedor = ?
+        AND codConsultComprador = ?
+      LIMIT 1`;
+
+    connection.query(
+      query,
+      [codAssociado, codFornecedor, codConsultVendedor, codConsultComprador],
+      (error, results) => {
+        if (error) {
+          logger.error(error);
+          return res.status(400).json({
+            response: 400,
+            message: "Failed to find order observation",
+            error: error.message,
+          });
+        }
+
+        return res.status(200).json({
+          observacao: results.length > 0 ? results[0].observacao : "",
+        });
+      },
+    );
+  },
+
   async getRequestProviderClient(req, res) {
     logger.info("Get Associate Supliers Orders");
 
