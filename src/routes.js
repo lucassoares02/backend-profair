@@ -242,6 +242,7 @@ router.get("/wedding/desconfirm", Wedding.disconfirm);
 router.get("/wedding/getallguests", Wedding.getAllGuests);
 
 router.get("/getwindownegotiations/:client", WindowNegotiation.getWindowNegotiationByClient);
+router.get("/getwindownegotiationdetailsbyclient/:client/:associate", WindowNegotiation.getWindowNegotiationDetailsByClient);
 router.get("/getwindownegotiations", WindowNegotiation.getWindowNegotiations);
 router.get("/getwindownegotiationsbyprovider/:provider", WindowNegotiation.getWindowNegotiationsByProvider);
 router.get("/getwindownegotiationsbyproviderandclient/:provider/:client", WindowNegotiation.getWindowNegotiationsByProviderAndClient);

@@ -21,6 +21,48 @@ const WindowNegotiation = {
     });
   },
 
+  async getWindowNegotiationDetailsByClient(req, res) {
+    logger.info("Get WindowNegotiation Details By Client");
+
+    const { client, associate } = req.params;
+
+    const query = `SELECT DISTINCT
+          nw.client_id as codClient,
+          buyer.nomeConsult as nomeClient,
+          nw.consultant_id as codConsult,
+          seller.nomeConsult as nomeConsult,
+          nw.supplier_id as codForn,
+          f.nomeForn,
+          DATE_FORMAT(DATE_SUB(nw.start_at, INTERVAL 3 HOUR), '%d/%m/%Y %H:%i') AS start_at,
+          DATE_FORMAT(DATE_SUB(nw.end_at, INTERVAL 3 HOUR), '%d/%m/%Y %H:%i') AS end_at,
+          TIME(DATE_SUB(nw.start_at, INTERVAL 3 HOUR)) AS start_time,
+          TIME(DATE_SUB(nw.end_at, INTERVAL 3 HOUR)) AS end_time,
+          IF(
+              nw.end_at IS NULL,
+              'EM ANDAMENTO',
+              SEC_TO_TIME(TIMESTAMPDIFF(SECOND, nw.start_at, nw.end_at))
+          ) AS duration,
+          TIMESTAMPDIFF(SECOND, nw.start_at, IFNULL(nw.end_at, NOW())) AS duration_seconds,
+          IF(nw.end_at IS NULL, 1, 0) AS is_open
+      FROM negotiation_windows nw
+      JOIN consultor buyer ON buyer.codConsult = nw.client_id
+      JOIN consultor seller ON seller.codConsult = nw.consultant_id
+      JOIN fornecedor f ON f.codForn = nw.supplier_id
+      LEFT JOIN relaciona r ON r.codAssocRelaciona = nw.client_id
+      WHERE (? > 0 AND nw.client_id = ?)
+        OR (? > 0 AND r.codConsultRelaciona = ?)
+      ORDER BY nw.end_at IS NULL DESC, nw.start_at DESC;`;
+
+    connection.query(query, [client, client, associate, associate], (error, results) => {
+      if (error) {
+        console.log("Error Get WindowNegotiation Details By Client: ", error);
+        return res.status(400).send(`message: ${error}`);
+      } else {
+        return res.json(results);
+      }
+    });
+  },
+
   async getWindowNegotiations(req, res) {
     logger.info("Get WindowNegotiation");
 
