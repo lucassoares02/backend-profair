@@ -8,6 +8,19 @@ const query = util.promisify(connection.query).bind(connection);
 // Limite de duração dos vídeos do FAQ (5 minutos).
 const MAX_DURATION_SECONDS = 300;
 
+// Extensões de vídeo aceitas e o Content-Type usado ao salvar no MinIO.
+const VIDEO_CONTENT_TYPES = {
+  mp4: "video/mp4",
+  m4v: "video/x-m4v",
+  mov: "video/quicktime",
+  webm: "video/webm",
+  ogg: "video/ogg",
+  ogv: "video/ogg",
+  "3gp": "video/3gpp",
+  mkv: "video/x-matroska",
+  avi: "video/x-msvideo",
+};
+
 /**
  * Extrai a chave do objeto no bucket a partir da URL pública do MinIO.
  * Ex.: https://files.profair.click/profair/faq/videos/123.mp4 -> faq/videos/123.mp4
@@ -229,14 +242,21 @@ const Faq = {
       return res.status(400).json({ message: "O vídeo excede o limite de 5 minutos" });
     }
 
-    if (req.file.mimetype && !req.file.mimetype.startsWith("video/")) {
+    const ext = (req.file.originalname.split(".").pop() || "").toLowerCase();
+    const mime = req.file.mimetype || "";
+    // Aceita se o Content-Type indicar vídeo OU se a extensão for de vídeo
+    // conhecida (alguns navegadores enviam "application/octet-stream").
+    const isVideo = mime.startsWith("video/") || Object.prototype.hasOwnProperty.call(VIDEO_CONTENT_TYPES, ext);
+    if (!isVideo) {
       return res.status(400).json({ message: "O arquivo enviado não é um vídeo" });
     }
 
     try {
-      const ext = (req.file.originalname.split(".").pop() || "mp4").toLowerCase();
-      const fileName = `faq/videos/${Date.now()}.${ext}`;
-      const { url } = await uploadFile(req.file.buffer, fileName, req.file.mimetype || "video/mp4");
+      const finalExt = VIDEO_CONTENT_TYPES[ext] ? ext : "mp4";
+      // Prioriza um Content-Type de vídeo válido para garantir a reprodução.
+      const contentType = mime.startsWith("video/") ? mime : VIDEO_CONTENT_TYPES[ext] || "video/mp4";
+      const fileName = `faq/videos/${Date.now()}.${finalExt}`;
+      const { url } = await uploadFile(req.file.buffer, fileName, contentType);
       return res.status(200).json({ url, object: fileName });
     } catch (error) {
       logger.error(`Erro no upload do vídeo FAQ: ${error.message}`);
