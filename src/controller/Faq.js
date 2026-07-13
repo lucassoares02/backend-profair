@@ -208,6 +208,25 @@ const Faq = {
     }
   },
 
+  // Salva a nova ordem dos itens. Recebe { items: [{ id, position }, ...] }.
+  async reorder(req, res) {
+    logger.info("Reorder Faq");
+    const items = req.body && req.body.items;
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).send({ message: "Lista de itens inválida" });
+    }
+    try {
+      for (const item of items) {
+        if (item == null || item.id == null) continue;
+        await query("UPDATE faq SET position = ? WHERE id = ?", [Number(item.position) || 0, item.id]);
+      }
+      return res.status(200).send({ message: "Ordem atualizada com sucesso" });
+    } catch (error) {
+      logger.error(`Erro ao reordenar FAQ: ${error.message}`);
+      return res.status(400).send(error);
+    }
+  },
+
   async deleteFaq(req, res) {
     logger.info("Delete Faq");
     const { id } = req.params;

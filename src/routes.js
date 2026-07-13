@@ -61,6 +61,7 @@ router.get("/clientconsult/:codconsultor", Client.getClientConsult);
 
 // === FAQ (central de ajuda em vídeo) ===
 router.get("/faq/public", Faq.getPublicFaq);
+router.post("/faq/reorder", Faq.reorder);
 router.get("/faq", Faq.getAllFaq);
 router.get("/faq/:id", Faq.getFaqById);
 router.post("/faq", Faq.insertFaq);
