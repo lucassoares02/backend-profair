@@ -29,6 +29,7 @@ const NoticeInteractions = require("@controller/NoticeInteractions");
 const Integration = require("@controller/Integration");
 const Stand = require("@controller/Stand");
 const Cnpj = require("@controller/Cnpj");
+const Faq = require("@controller/Faq");
 
 // === Mapa do evento / Stands ===
 router.get("/stands/:codOrg", Stand.getStands);
@@ -57,6 +58,17 @@ router.get("/allacesso", Client.allAccess);
 router.get("/allclient", Client.getAllClient);
 router.get("/client/:codacesso", Client.getOneClient);
 router.get("/clientconsult/:codconsultor", Client.getClientConsult);
+
+// === FAQ (central de ajuda em vídeo) ===
+router.get("/faq/public", Faq.getPublicFaq);
+router.get("/faq", Faq.getAllFaq);
+router.get("/faq/:id", Faq.getFaqById);
+router.post("/faq", Faq.insertFaq);
+router.patch("/faq/:id", Faq.updateFaq);
+router.delete("/faq/:id", Faq.deleteFaq);
+router.post("/faq/:id/view", Faq.incrementView);
+router.post("/faq/upload/video", upload.single("file"), Faq.uploadVideo);
+router.post("/faq/upload/thumbnail", upload.single("file"), Faq.uploadThumbnail);
 
 // === Cidade do associado via CNPJ (API opencnpj) ===
 router.get("/associados/atualizar-cidades", Cnpj.updateAllCitiesByCnpj);
