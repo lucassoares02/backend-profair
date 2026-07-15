@@ -3,6 +3,31 @@ const logger = require("@logger");
 const Select = require("@select");
 const Insert = require("@insert");
 
+// Resolve o tipo de acesso (direcAcesso) a partir do codAcesso enviado no
+// header `user-id`. 1 = Fornecedor, 2 = Associado, 3 = Organização.
+function getDirecAcesso(codacesso) {
+  return new Promise((resolve) => {
+    if (!codacesso) return resolve(null);
+    connection.query(`select direcAcesso from acesso where codAcesso = ${codacesso}`, (err, rows) => {
+      if (err || !rows || rows.length === 0) return resolve(null);
+      resolve(rows[0].direcAcesso);
+    });
+  });
+}
+
+// Cláusula que restringe os pedidos aos associados vinculados ao consultor do
+// codAcesso informado (mesma cadeia acesso -> consultor -> relaciona ->
+// associado usada em User.getUserDoubleCompany).
+function associateOrdersFilter(column, codacesso) {
+  return `${column} IN (
+    SELECT r.codConsultRelaciona
+    FROM acesso a
+    JOIN consultor c ON c.codConsult = a.codUsuario
+    JOIN relaciona r ON r.codAssocRelaciona = c.codConsult
+    WHERE a.codAcesso = ${codacesso}
+  )`;
+}
+
 const Client = {
   async allAccess(req, res) {
     logger.info("Get All Clients");
@@ -708,8 +733,25 @@ const Client = {
   async getAllStoresGraph(req, res) {
     logger.info("Get All Stores Graphs");
 
-    const queryConsult = `
-    SET sql_mode = ''; select 
+    const codacesso = parseInt(req.headers["user-id"], 10) || 0;
+    const role = await getDirecAcesso(codacesso);
+
+    // Associado (2): compras agrupadas por loja (associado) do próprio usuário.
+    const queryConsult = role == 2
+      ? `
+    SET sql_mode = ''; select
+    associado.razaoAssociado as razao,
+    sum(pedido.quantMercPedido * mercadoria.precoMercadoria) as 'valorTotal'
+    from pedido
+    join associado on pedido.codAssocPedido = associado.codAssociado
+    join mercadoria on pedido.codMercPedido = mercadoria.codMercadoria
+    where ${associateOrdersFilter("pedido.codAssocPedido", codacesso)}
+    group by associado.codAssociado
+    order by valorTotal
+    desc limit 10
+    `
+      : `
+    SET sql_mode = ''; select
     pedido.codPedido ,
     associado.cnpjAssociado ,
     associado.codAssociado ,
@@ -717,13 +759,13 @@ const Client = {
     pedido.codFornPedido,
     associado.razaoAssociado as razao,
     sum(pedido.quantMercPedido * mercadoria.precoMercadoria) as 'valorTotal',
-    TIME_FORMAT(SUBTIME(pedido.dataPedido, '03:00:00'),'%H:%i') as 'horas' 
-    from consultor 
-    join pedido on consultor.codConsult = pedido.codComprPedido 
-    join associado on pedido.codAssocPedido = associado.codAssociado 
+    TIME_FORMAT(SUBTIME(pedido.dataPedido, '03:00:00'),'%H:%i') as 'horas'
+    from consultor
+    join pedido on consultor.codConsult = pedido.codComprPedido
+    join associado on pedido.codAssocPedido = associado.codAssociado
     join mercadoria on pedido.codMercPedido = mercadoria.codMercadoria
-    group by associado.codAssociado 
-    order by valorTotal 
+    group by associado.codAssociado
+    order by valorTotal
     desc limit 10
     `;
 
@@ -779,8 +821,26 @@ const Client = {
   async getAllProvidersGraph(req, res) {
     logger.info("Get All Providers Graphs");
 
-    const queryConsult = `
-    SET sql_mode = ''; select 
+    const codacesso = parseInt(req.headers["user-id"], 10) || 0;
+    const role = await getDirecAcesso(codacesso);
+
+    // Associado (2): compras agrupadas por fornecedor, restritas aos pedidos
+    // do próprio associado.
+    const queryConsult = role == 2
+      ? `
+    SET sql_mode = ''; select
+    fornecedor.razaoForn as 'razao',
+    sum(pedido.quantMercPedido * mercadoria.precoMercadoria) as 'valorTotal'
+    from pedido
+    join fornecedor on pedido.codFornPedido = fornecedor.codForn
+    join mercadoria on pedido.codMercPedido = mercadoria.codMercadoria
+    where ${associateOrdersFilter("pedido.codAssocPedido", codacesso)}
+    group by fornecedor.codForn
+    order by valorTotal
+    desc limit 10
+    `
+      : `
+    SET sql_mode = ''; select
     pedido.codPedido ,
     fornecedor.cnpjForn as 'cnpjAssociado' ,
     fornecedor.codForn as 'codAssociado',
@@ -788,13 +848,13 @@ const Client = {
     pedido.codFornPedido,
     fornecedor.razaoForn as 'razao',
     sum(pedido.quantMercPedido * mercadoria.precoMercadoria) as 'valorTotal',
-    TIME_FORMAT(SUBTIME(pedido.dataPedido, '03:00:00'),'%H:%i') as 'horas' 
-    from consultor 
-    join pedido on consultor.codConsult = pedido.codComprPedido 
-    join fornecedor on pedido.codFornPedido = fornecedor.codForn 
+    TIME_FORMAT(SUBTIME(pedido.dataPedido, '03:00:00'),'%H:%i') as 'horas'
+    from consultor
+    join pedido on consultor.codConsult = pedido.codComprPedido
+    join fornecedor on pedido.codFornPedido = fornecedor.codForn
     join mercadoria on pedido.codMercPedido = mercadoria.codMercadoria
     group by fornecedor.codForn
-    order by valorTotal 
+    order by valorTotal
     desc limit 10
     `;
 
@@ -833,11 +893,18 @@ const Client = {
   async getAllStoresGraphHour(req, res) {
     logger.info("Get All Stores Graphs");
 
-    const queryConsult = `SET sql_mode = ''; select 
+    const codacesso = parseInt(req.headers["user-id"], 10) || 0;
+    const role = await getDirecAcesso(codacesso);
+
+    // Associado (2): valor negociado por período restrito aos próprios pedidos.
+    const whereClause = role == 2 ? `where ${associateOrdersFilter("p.codAssocPedido", codacesso)}` : "";
+
+    const queryConsult = `SET sql_mode = ''; select
     date_format(SUBTIME(dataPedido, '03:00:00'), '%Y-%m-%d %H:%i')  as hour,
     SUM(p.quantMercPedido * m.precoMercadoria) as value
     from pedido p
-    join mercadoria m on m.codMercadoria = p.codMercPedido 
+    join mercadoria m on m.codMercadoria = p.codMercPedido
+    ${whereClause}
     group by hour
     order by hour`;
 
@@ -854,13 +921,20 @@ const Client = {
   async getAllStoresGraphEvolution(req, res) {
     logger.info("Get All Stores Graphs");
 
-    const queryConsult = `SET sql_mode = ''; 
+    const codacesso = parseInt(req.headers["user-id"], 10) || 0;
+    const role = await getDirecAcesso(codacesso);
+
+    // Associado (2): evolução acumulada restrita aos próprios pedidos.
+    const whereClause = role == 2 ? `WHERE ${associateOrdersFilter("p.codAssocPedido", codacesso)}` : "";
+
+    const queryConsult = `SET sql_mode = '';
       WITH time_intervals AS (
-          SELECT 
+          SELECT
               date_format(SUBTIME(dataPedido, '03:00:00'), '%Y-%m-%d %H:%i') as hour,
               SUM(p.quantMercPedido * m.precoMercadoria) as value
           FROM pedido p
           JOIN mercadoria m ON m.codMercadoria = p.codMercPedido
+          ${whereClause}
           GROUP BY hour
       )
       SELECT 

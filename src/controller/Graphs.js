@@ -3,6 +3,29 @@ const logger = require("@logger");
 const Select = require("@select");
 const Insert = require("@insert");
 
+// Resolve o tipo de acesso (direcAcesso) a partir do codAcesso do header
+// `user-id`. 1 = Fornecedor, 2 = Associado, 3 = Organização.
+function getDirecAcesso(codacesso) {
+  return new Promise((resolve) => {
+    if (!codacesso) return resolve(null);
+    connection.query(`select direcAcesso from acesso where codAcesso = ${codacesso}`, (err, rows) => {
+      if (err || !rows || rows.length === 0) return resolve(null);
+      resolve(rows[0].direcAcesso);
+    });
+  });
+}
+
+// Restringe os pedidos aos associados vinculados ao consultor do codAcesso.
+function associateOrdersFilter(column, codacesso) {
+  return `${column} IN (
+    SELECT r.codConsultRelaciona
+    FROM acesso a
+    JOIN consultor c ON c.codConsult = a.codUsuario
+    JOIN relaciona r ON r.codAssocRelaciona = c.codConsult
+    WHERE a.codAcesso = ${codacesso}
+  )`;
+}
+
 const fs = require("fs");
 const PDFDocument = require("pdfkit-table");
 const path = require("path");
@@ -772,11 +795,37 @@ const Graphs = {
   async getTotalInformations(req, res) {
     logger.info("Get Total Informations");
 
-    const queryConsult = `SET sql_mode = ''; select
+    const codacesso = parseInt(req.headers["user-id"], 10) || 0;
+    const role = await getDirecAcesso(codacesso);
+
+    // Associado (2): KPIs restritos aos próprios pedidos —
+    // [Total negociado, Fornecedores, Lojas, Mercadorias].
+    const associateFilter = associateOrdersFilter("pedido.codAssocPedido", codacesso);
+    const queryAssociate = `SET sql_mode = '';
+      select sum(pedido.quantMercPedido * mercadoria.precoMercadoria) as total
+        from pedido
+        join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido
+        where ${associateFilter}
+      union all
+      select count(distinct pedido.codFornPedido) as total
+        from pedido
+        where ${associateFilter}
+      union all
+      select count(distinct r.codConsultRelaciona) as total
+        from acesso a
+        join consultor c on c.codConsult = a.codUsuario
+        join relaciona r on r.codAssocRelaciona = c.codConsult
+        where a.codAcesso = ${codacesso}
+      union all
+      select count(distinct pedido.codMercPedido) as total
+        from pedido
+        where ${associateFilter};`;
+
+    const queryOrganization = `SET sql_mode = ''; select
       sum(pedido.quantMercPedido * mercadoria.precoMercadoria) as total
-      from pedido 
-      join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido 
-      union 
+      from pedido
+      join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido
+      union
       SELECT COUNT(*) AS total
 FROM (
   SELECT asd.codAssociado
@@ -788,13 +837,15 @@ FROM (
   GROUP BY asd.codAssociado
 ) AS resultado
       union
-      select 
+      select
       count(fornecedor.codForn) as fornecedores
       from fornecedor
       union
-      select 
+      select
       count(mercadoria.codMercadoria) as mercadorias
       from mercadoria;`;
+
+    const queryConsult = role == 2 ? queryAssociate : queryOrganization;
     // const queryConsult = `SET sql_mode = ''; select
     //   sum(pedido.quantMercPedido * mercadoria.precoMercadoria) as total
     //   from pedido
@@ -817,7 +868,9 @@ FROM (
         console.log("Error Select Total Informations: ", error);
       } else {
         let data = [];
-        const titles = ["Total negociado", "Associados", "Fonecedores", "Mercadorias"];
+        const titles = role == 2
+          ? ["Total negociado", "Fornecedores", "Lojas", "Mercadorias"]
+          : ["Total negociado", "Associados", "Fonecedores", "Mercadorias"];
 
         i = 0;
         for (i = 0; i < results[1].length; i++) {
