@@ -1177,9 +1177,9 @@ const Notice = {
     const data = [
       {
         codNotice: 4,
-        title: "Adega Show - Multishow",
-        description: "O Adega Show foi criado com o objetivo de impulsionar os negócios no setor de vinhos e áreas correlatas.",
-        image: "https://multishowsupermercados.com.br/wp-content/uploads/2023/08/IMG_2793-1630x860.jpg",
+        title: "5º Feira de negócios Multishow",
+        description: "Seja bem-vindo a mais uma feira de negócios, momentos para fazer bons negócios e fortalecer vínculos.",
+        image: "https://files.profair.click/profair/providers/4/image.png",
         action: "https://multishowsupermercados.com.br/eventos/",
         priority: 0,
         primaryColor: "0XFFFFDE31",
