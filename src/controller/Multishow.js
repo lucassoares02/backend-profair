@@ -1184,7 +1184,7 @@ const Notice = {
         priority: 0,
         primaryColor: "0XFFFFDE31",
         secondaryColor: "0XFFB33229",
-        stamp: "11/04/2026",
+        stamp: "18/07/2026",
         type: 0,
       },
     ];
