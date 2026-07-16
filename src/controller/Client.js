@@ -264,7 +264,8 @@ const Client = {
     mercadoria.embMercadoria,
     associado.razaoAssociado as razao,
     associado.codAssociado,
-    mercadoria.precoMercadoria as precoMercadoria, 
+    associado.cidade as cidade,
+    mercadoria.precoMercadoria as precoMercadoria,
     IFNULL(SUM(pedido.quantMercPedido), 0) as fatorMerc,
     IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido),0) as 'valorTotal'
     from mercadoria 
@@ -298,7 +299,8 @@ const Client = {
     mercadoria.embMercadoria,
     associado.razaoAssociado as razao,
     associado.codAssociado,
-    mercadoria.precoMercadoria as precoMercadoria, 
+    associado.cidade as cidade,
+    mercadoria.precoMercadoria as precoMercadoria,
     IFNULL(SUM(pedido.quantMercPedido), 0) as fatorMerc,
     IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido),0) as 'valorTotal'
     from mercadoria 
@@ -364,10 +366,11 @@ const Client = {
     SET sql_mode = ''; select
     associado.codAssociado,
     associado.razaoAssociado as razao,
-    associado.cnpjAssociado, 
+    associado.cnpjAssociado,
+    associado.cidade as cidade,
     IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0) as 'valorTotal',
-    IFNULL(sum(pedido.quantMercPedido), 0) as 'volumeTotal' 
-    from associado  
+    IFNULL(sum(pedido.quantMercPedido), 0) as 'volumeTotal'
+    from associado
     left join pedido on pedido.codAssocPedido = associado.codAssociado
     left join mercadoria on codMercadoria = pedido.codMercPedido   
     group by associado.codAssociado
@@ -550,10 +553,11 @@ const Client = {
     a.codAssociado ,
     a.razaoAssociado  as razao,
     a.cnpjAssociado ,
+    a.cidade as cidade,
     sum(IFNULL(p.quantMercPedido * m.precoMercadoria, 0)) as 'valorTotal',
     sum(IFNULL(p.quantMercPedido, 0)) as 'volumeTotal'
     from associado a
-    left join pedido p on p.codAssocPedido = a.codAssociado 
+    left join pedido p on p.codAssocPedido = a.codAssociado
     left join mercadoria m  on m.codMercadoria = p.codMercPedido
     and p.codFornPedido = ${codprovider}
     group by a.codAssociado 
