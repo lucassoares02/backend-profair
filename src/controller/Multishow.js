@@ -641,7 +641,8 @@ const Notice = {
         telForn: element["id_fornecedor"],
         codCategoria: 1,
         codComprFornecedor: comprador,
-        image: "https://static.vecteezy.com/system/resources/previews/012/986/755/non_2x/abstract-circle-logo-icon-free-png.png",
+        // image: "https://static.vecteezy.com/system/resources/previews/012/986/755/non_2x/abstract-circle-logo-icon-free-png.png",
+        image: `https://files.profair.click/profair/providers/${element["id_erp"]}/image.png`,
         color: "0XFF0763F7",
       });
     }
