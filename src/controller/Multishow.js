@@ -1226,7 +1226,7 @@ const Notice = {
     try {
       connectionMultishow.query(queryMerchandises, (error, merchandises, fields) => {
         if (error) {
-          logger.error(`Error Connection Multishow Merchandises: ${error}`);
+          console.log(`Error Connection Multishow Merchandises: ${error}`);
           return res.status;
         } else {
           console.log(merchandises);
