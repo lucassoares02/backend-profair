@@ -42,9 +42,9 @@ router.post("/faceline-user", Faceline.insert);
 router.post("/faceline-user-update", Faceline.update);
 
 // Router with the headers
-router.post("/getuser", Log.InsertLog, User.getUser);
-router.post("/getusermore", Log.InsertLog, User.getUserDoubleCompany);
-router.post("/getuserweb", Log.InsertLog, User.getUserWeb);
+router.post("/getuser", User.getUser);
+router.post("/getusermore", User.getUserDoubleCompany);
+router.post("/getuserweb", User.getUserWeb);
 
 router.get("/getallusersorg", User.getAllUsersOrg);
 router.get("/getallusersprovider", User.getAllUsersProvider);
@@ -208,10 +208,7 @@ router.get("/clientpurchasedetails/:codassoc/:codprovider", Request.getClientPur
 router.get("/requestsnegotiationclientororg/:client/:provider", Request.getRequestsClientsOrOrg);
 
 router.get("/requestsclients/:codconsult", Request.getRequestsClients);
-router.get(
-  "/requestobservation/:codAssociado/:codFornecedor/:codConsultVendedor/:codConsultComprador",
-  Request.getOrderObservation,
-);
+router.get("/requestobservation/:codAssociado/:codFornecedor/:codConsultVendedor/:codConsultComprador", Request.getOrderObservation);
 router.post("/insertrequest", Request.postInsertRequest);
 
 // router.post("/insertrequestnew", Log.InsertLog, Backup.InsertSell, Request.postInserRequestNew);
