@@ -29,6 +29,7 @@ const Delete = {
     delete from relacionafornecedor;
     delete from schedule;
     delete from stand;
+    delete from organizador;
     delete from notifications;
     delete from pedido_observacao;
     `;
