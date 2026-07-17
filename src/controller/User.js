@@ -417,7 +417,33 @@ const User = {
   async getAllUsersProvider(req, res) {
     logger.info("Get All Users Fair");
 
-    const queryConsult = `SET sql_mode = ''; select acesso.is_present as present, acesso.codAcesso, acesso.direcAcesso, fornecedor.nomeForn, fornecedor.cnpjForn, acesso.codUsuario, fornecedor.codForn, consultor.nomeConsult, consultor.telConsult as 'phone', consultor.emailConsult as 'email', consultor.cpfConsult from acesso join consultor on acesso.codUsuario = consultor.codConsult join relacionafornecedor on consultor.codConsult = relacionafornecedor.codConsultor	join fornecedor on relacionafornecedor.codFornecedor = fornecedor.codForn left join pedido on pedido.codFornPedido = fornecedor.codForn left join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido group by consultor.codConsult order by present desc`;
+    // A) Consultores com fornecedor válido (comportamento original).
+    // B) Consultores EXPOSITOR (cpfConsult = 'EXPOSITOR') que NÃO possuem um
+    //    fornecedor válido — seja porque não têm nenhuma relação em
+    //    relacionafornecedor, seja porque o codFornecedor da relação não existe
+    //    na tabela fornecedor. Vêm marcados com semFornecedor = 1.
+    const queryConsult = `SET sql_mode = '';
+    SELECT acesso.is_present as present, acesso.codAcesso, acesso.direcAcesso, fornecedor.nomeForn, fornecedor.cnpjForn, acesso.codUsuario, fornecedor.codForn, consultor.nomeConsult, consultor.telConsult as 'phone', consultor.emailConsult as 'email', consultor.cpfConsult, 0 as semFornecedor
+    from acesso
+    join consultor on acesso.codUsuario = consultor.codConsult
+    join relacionafornecedor on consultor.codConsult = relacionafornecedor.codConsultor
+    join fornecedor on relacionafornecedor.codFornecedor = fornecedor.codForn
+    left join pedido on pedido.codFornPedido = fornecedor.codForn
+    left join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido
+    group by consultor.codConsult
+    UNION ALL
+    SELECT acesso.is_present as present, acesso.codAcesso, acesso.direcAcesso, NULL as nomeForn, NULL as cnpjForn, acesso.codUsuario, NULL as codForn, consultor.nomeConsult, consultor.telConsult as 'phone', consultor.emailConsult as 'email', consultor.cpfConsult, 1 as semFornecedor
+    from acesso
+    join consultor on acesso.codUsuario = consultor.codConsult
+    where consultor.cpfConsult = 'EXPOSITOR'
+    and acesso.direcAcesso = 1
+    and not exists (
+      select 1 from relacionafornecedor rf
+      join fornecedor f on f.codForn = rf.codFornecedor
+      where rf.codConsultor = consultor.codConsult
+    )
+    group by consultor.codConsult
+    order by semFornecedor asc, present desc`;
 
     connection.query({ sql: queryConsult, timeout: 15000 }, (error, results, fields) => {
       if (error) {
