@@ -223,7 +223,8 @@ router.get("/percentageclientsorganization", Graphs.getPercentageClientsOrganiza
 router.get("/percentageprovidersorganization", Graphs.getPercentageProvidersOrganization);
 router.get("/totalvalueclients/:codprovider", Graphs.getTotalValueClients);
 router.get("/information", Graphs.getTotalInformations);
-router.get("/exportpdf/:supplier/:negotiation/:client", ExportPdf.getExportPdf);
+// router.get("/exportpdf/:supplier/:negotiation/:client", ExportPdf.getExportPdf);
+router.get("/exportpdf/:supplier/:negotiation/:client", ExportPdf.getExportPdfBySupplierClient);
 router.get("/exportpdfgpt/:supplier/:negotiation/:client", Graphs.getExportPdfTesteLayoutGpt);
 router.get("/exportpdfdeep/:supplier/:negotiation/:client", Graphs.getExportPdfTesteLayoutDeep);
 
