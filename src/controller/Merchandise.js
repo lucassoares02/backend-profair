@@ -222,16 +222,16 @@ const Merchandise = {
     const { codprovider } = req.params;
 
     const queryConsult = `
-    SET sql_mode = ''; select fornecedor.codForn, 
-    fornecedor.nomeForn, 
-    mercadoria.codMercadoria, 
+    SET sql_mode = ''; select fornecedor.codForn,
+    fornecedor.nomeForn,
+    mercadoria.codMercadoria,
     mercadoria.nomeMercadoria,
-    mercadoria.embMercadoria, 
-    mercadoria.marca, 
+    mercadoria.embMercadoria,
+    mercadoria.marca,
     mercadoria.erpcode,
     mercadoria.barcode,
-    mercadoria.nego,                                      
-    mercadoria.codMercadoria_ext,                                      
+    mercadoria.nego,
+    mercadoria.codMercadoria_ext,
     mercadoria.complemento,
     mercadoria.fatorMerc,
     mercadoria.highlight,
@@ -244,13 +244,35 @@ const Merchandise = {
     join fornecedor on mercadoria.codFornMerc = fornecedor.codForn
     left join pedido on pedido.codMercPedido = mercadoria.codMercadoria
     where fornecedor.codForn = ${codprovider}
-    group by mercadoria.codMercadoria
+    group by mercadoria.codMercadoria_ext
     order by mercadoria.nomeMercadoria
-    asc
-`;
-    // order by valorTotal
-    // desc
-    // `;
+    asc`;
+    // const queryConsult = `
+    // SET sql_mode = ''; select fornecedor.codForn,
+    // fornecedor.nomeForn,
+    // mercadoria.codMercadoria,
+    // mercadoria.nomeMercadoria,
+    // mercadoria.embMercadoria,
+    // mercadoria.marca,
+    // mercadoria.erpcode,
+    // mercadoria.barcode,
+    // mercadoria.nego,
+    // mercadoria.codMercadoria_ext,
+    // mercadoria.complemento,
+    // mercadoria.fatorMerc,
+    // mercadoria.highlight,
+    // mercadoria.tag,
+    // mercadoria.precoMercadoria as precoMercadoria,
+    // mercadoria.precoUnit as precoUnit,
+    // IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido), 0) as 'valorTotal',
+    // IFNULL(sum(pedido.quantMercPedido),0) as 'volumeTotal'
+    // from mercadoria
+    // join fornecedor on mercadoria.codFornMerc = fornecedor.codForn
+    // left join pedido on pedido.codMercPedido = mercadoria.codMercadoria
+    // where fornecedor.codForn = ${codprovider}
+    // group by mercadoria.codMercadoria
+    // order by mercadoria.nomeMercadoria
+    // asc`;
 
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {

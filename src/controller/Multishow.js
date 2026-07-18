@@ -712,6 +712,105 @@ const Notice = {
     }
   },
 
+  getLocalNegotiations() {
+    const queryConsult = `SELECT codNegociacao FROM negociacao`;
+
+    return new Promise((resolve, reject) => {
+      connection.query(queryConsult, (error, results) => {
+        if (error) {
+          logger.error(`Error Get Local Negotiations: ${error}`);
+          reject(error);
+        } else {
+          resolve(results);
+        }
+      });
+    });
+  },
+
+  getEncarteStart(id_negociacao) {
+    const queryConsult = `SELECT data_inicio_encarte FROM multishow_b2b.negociacoes WHERE id_negociacao = ${id_negociacao} LIMIT 1`;
+
+    return new Promise((resolve, reject) => {
+      connectionMultishow.query(queryConsult, (error, results) => {
+        if (error) {
+          logger.error(`Error Get Encarte Start Multishow: ${error}`);
+          reject(error);
+        } else {
+          resolve(results);
+        }
+      });
+    });
+  },
+
+  updatePrazoNegotiation(id_negociacao, prazo) {
+    const queryUpdate = `UPDATE negociacao SET prazo = ? WHERE codNegociacao = ?`;
+
+    return new Promise((resolve, reject) => {
+      connection.query(queryUpdate, [prazo, id_negociacao], (error, results) => {
+        if (error) {
+          logger.error(`Error Update Prazo Negotiation: ${error}`);
+          reject(error);
+        } else {
+          resolve(results);
+        }
+      });
+    });
+  },
+
+  async updateNegotiationPrazo(req, res) {
+    logger.info("Update Negotiation Prazo");
+
+    const updated = [];
+    const skipped = [];
+
+    try {
+      const negotiations = await Notice.getLocalNegotiations();
+
+      for (let index = 0; index < negotiations.length; index++) {
+        const codNegociacao = negotiations[index]["codNegociacao"];
+
+        try {
+          const encarte = await Notice.getEncarteStart(codNegociacao);
+
+          if (encarte.length === 0 || !encarte[0]["data_inicio_encarte"]) {
+            skipped.push({ codNegociacao, reason: "Sem data_inicio_encarte" });
+            continue;
+          }
+
+          const rawDate = encarte[0]["data_inicio_encarte"];
+
+          if (String(rawDate).includes("Sat Dec 30 1899")) {
+            skipped.push({ codNegociacao, reason: "data_inicio_encarte inválida" });
+            continue;
+          }
+
+          const date = new Date(rawDate);
+          const prazo = format(date, "yyyy-MM-dd HH:mm:ss.SSSSSS");
+
+          await Notice.updatePrazoNegotiation(codNegociacao, prazo);
+          updated.push({ codNegociacao, prazo });
+
+          console.log(`${index} - ${codNegociacao} - prazo atualizado para ${prazo}`);
+        } catch (error) {
+          console.log(`Error Update Prazo (${codNegociacao}): ${error}`);
+          skipped.push({ codNegociacao, reason: String(error) });
+        }
+      }
+
+      return res.json({
+        message: "Atualização de prazo concluída",
+        total: negotiations.length,
+        updatedCount: updated.length,
+        skippedCount: skipped.length,
+        updated,
+        skipped,
+      });
+    } catch (error) {
+      console.log(`Error Update Negotiation Prazo: ${error}`);
+      return res.status(400).send(error);
+    }
+  },
+
   getBuyers() {
     console.log("Get Buyers");
     const queryMerchandises = `select * from multishow_b2b.compradores;`;
