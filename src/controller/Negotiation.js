@@ -368,6 +368,71 @@ const Negotiation = {
     // connection.end();
   },
 
+  // Exporta, numa única planilha, TODOS os itens vendidos do fornecedor para
+  // TODOS os associados. Cada linha inicia com o cliente (razão + código) e a
+  // negociação, seguido de todos os detalhes da mercadoria, quantidade comprada
+  // e valor total. Usado pelo módulo "Exportar Itens Vendidos" (fornecedor).
+  async ExportAllItemsSoldPerProvider(req, res) {
+    logger.info("Get Export All Items Sold Per Provider");
+
+    const { provider } = req.params;
+
+    const queryConsult = `
+      SET sql_mode = '';
+      SELECT
+        n.codNegoErp                                              AS negociacao,
+        a.codAssociado                                           AS codLoja,
+        a.razaoAssociado                                         AS razaoSocial,
+        m.codMercadoria_ext                                      AS id,
+        m.nomeMercadoria                                         AS mercadoria,
+        m.barcode                                                AS codigo,
+        m.complemento                                            AS complemento,
+        FORMAT(IFNULL(m.precoUnit, 0), 2, 'de_DE')               AS valorUn,
+        FORMAT(m.precoMercadoria, 2, 'de_DE')                    AS valor,
+        CONCAT(m.embMercadoria, ' | ', m.fatorMerc)              AS tipoEmb,
+        p.quantMercPedido                                        AS quantidade,
+        FORMAT(m.precoMercadoria * p.quantMercPedido, 2, 'de_DE') AS total,
+        f.razaoForn                                              AS fornecedor
+      FROM pedido p
+      JOIN mercadoria m ON m.codMercadoria = p.codMercPedido
+                       AND m.nego          = p.codNegoPedido
+      JOIN associado  a ON a.codAssociado  = p.codAssocPedido
+      JOIN negociacao n ON n.codNegociacao = p.codNegoPedido
+      JOIN fornecedor f ON f.codForn       = p.codFornPedido
+      WHERE p.codFornPedido = ${provider}
+      ORDER BY p.codNegoPedido, a.razaoAssociado, m.nomeMercadoria`;
+
+    connection.query(queryConsult, (error, results, fields) => {
+      try {
+        if (error) {
+          console.log("Error Export All Items Sold : ", error);
+          return res.send({ Mensagem: "Erro ao exportar os itens vendidos." });
+        }
+
+        const rows = results[1];
+        if (rows && rows.length > 0) {
+          let csvData = `Negociação;Cód. Loja;Razão Social;ID;Mercadoria;Código;Complemento;Valor un;Valor;Tipo Emb;Quantidade;Total\n`;
+
+          csvData += rows
+            .map((row) => {
+              return `"${row.negociacao ?? ""}";${row.codLoja};"${row.razaoSocial}";${row.id ?? ""};"${row.mercadoria}";"${row.codigo ?? ""}";"${row.complemento ?? ""}";"${row.valorUn}";"${row.valor}";"${row.tipoEmb ?? ""}";${row.quantidade};"${row.total}"`;
+            })
+            .join("\n");
+
+          res.setHeader("Content-Disposition", `attachment; filename=${rows[0].fornecedor.replaceAll(" ", "_").toLowerCase()}_itens_vendidos.csv`);
+          res.setHeader("Content-Type", "text/csv");
+
+          return res.send(csvData);
+        }
+
+        return res.send({ Message: "Sem pedidos" });
+      } catch (error) {
+        return res.send({ Mensagem: "Este fornecedor não possui pedidos para exportar!" });
+      }
+    });
+    // connection.end();
+  },
+
   async GetExportNegotiationPerProvider(req, res) {
     logger.info("Get Export Negotiation GetExportNegotiationPerProvider");
 

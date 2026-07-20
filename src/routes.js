@@ -161,6 +161,8 @@ router.get("/exportnegotiationperprovider/:codeclient/:codenegotiation", Negotia
 
 router.get("/ExportNegotiationsPerProvider/:provider", Negotiation.ExportNegotiationsPerProvider);
 
+router.get("/exportallitemssoldprovider/:provider", Negotiation.ExportAllItemsSoldPerProvider);
+
 router.get("/exportproductnegotiationperprovider/:provider", Negotiation.exportProductsPerNegotiationPerProvider);
 
 router.get("/buyersclient/:codconsultorclient", Buyer.getBuyersClient);
