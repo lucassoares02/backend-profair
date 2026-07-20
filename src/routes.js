@@ -107,6 +107,8 @@ router.get("/groupspresent", Client.getGroupsPresent);
 router.get("/categoriesconsult/:codconsult", Category.getCategoryConsult);
 
 router.get("/notices", Notice.getAllNotice);
+router.get("/notices/all", Notice.getAllNoticeAdmin);
+router.get("/notices/:id/interactions", NoticeInteractions.GetNoticeInteractions);
 router.get("/schedule", Notice.getAllSchedule);
 router.post("/insertnotice", Notice.insertNotice);
 router.get("/notice/:id", Notice.getNoticeById);
