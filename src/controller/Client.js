@@ -28,6 +28,19 @@ function associateOrdersFilter(column, codacesso) {
   )`;
 }
 
+// Cláusula que restringe os pedidos aos fornecedores vinculados ao consultor do
+// codAcesso informado (mesma cadeia acesso -> consultor -> relacionafornecedor ->
+// fornecedor usada em User.getUserDoubleCompany para direcAcesso == 1).
+function providerOrdersFilter(column, codacesso) {
+  return `${column} IN (
+    SELECT rf.codFornecedor
+    FROM acesso a
+    JOIN consultor c ON c.codConsult = a.codUsuario
+    JOIN relacionafornecedor rf ON rf.codConsultor = c.codConsult
+    WHERE a.codAcesso = ${codacesso}
+  )`;
+}
+
 const Client = {
   async allAccess(req, res) {
     logger.info("Get All Clients");
@@ -741,6 +754,7 @@ const Client = {
     const role = await getDirecAcesso(codacesso);
 
     // Associado (2): compras agrupadas por loja (associado) do próprio usuário.
+    // Fornecedor (1): vendas agrupadas pelas lojas (associados) que compraram.
     const queryConsult = role == 2
       ? `
     SET sql_mode = ''; select
@@ -750,6 +764,19 @@ const Client = {
     join associado on pedido.codAssocPedido = associado.codAssociado
     join mercadoria on pedido.codMercPedido = mercadoria.codMercadoria
     where ${associateOrdersFilter("pedido.codAssocPedido", codacesso)}
+    group by associado.codAssociado
+    order by valorTotal
+    desc limit 10
+    `
+      : role == 1
+      ? `
+    SET sql_mode = ''; select
+    associado.razaoAssociado as razao,
+    sum(pedido.quantMercPedido * mercadoria.precoMercadoria) as 'valorTotal'
+    from pedido
+    join associado on pedido.codAssocPedido = associado.codAssociado
+    join mercadoria on pedido.codMercPedido = mercadoria.codMercadoria
+    where ${providerOrdersFilter("pedido.codFornPedido", codacesso)}
     group by associado.codAssociado
     order by valorTotal
     desc limit 10
@@ -830,6 +857,7 @@ const Client = {
 
     // Associado (2): compras agrupadas por fornecedor, restritas aos pedidos
     // do próprio associado.
+    // Fornecedor (1): vendas agrupadas por produto (mercadoria) do fornecedor.
     const queryConsult = role == 2
       ? `
     SET sql_mode = ''; select
@@ -840,6 +868,18 @@ const Client = {
     join mercadoria on pedido.codMercPedido = mercadoria.codMercadoria
     where ${associateOrdersFilter("pedido.codAssocPedido", codacesso)}
     group by fornecedor.codForn
+    order by valorTotal
+    desc limit 10
+    `
+      : role == 1
+      ? `
+    SET sql_mode = ''; select
+    mercadoria.nomeMercadoria as 'razao',
+    sum(pedido.quantMercPedido * mercadoria.precoMercadoria) as 'valorTotal'
+    from pedido
+    join mercadoria on pedido.codMercPedido = mercadoria.codMercadoria
+    where ${providerOrdersFilter("pedido.codFornPedido", codacesso)}
+    group by mercadoria.nomeMercadoria
     order by valorTotal
     desc limit 10
     `
@@ -901,7 +941,10 @@ const Client = {
     const role = await getDirecAcesso(codacesso);
 
     // Associado (2): valor negociado por período restrito aos próprios pedidos.
-    const whereClause = role == 2 ? `where ${associateOrdersFilter("p.codAssocPedido", codacesso)}` : "";
+    // Fornecedor (1): valor vendido por período restrito aos próprios pedidos.
+    let whereClause = "";
+    if (role == 2) whereClause = `where ${associateOrdersFilter("p.codAssocPedido", codacesso)}`;
+    else if (role == 1) whereClause = `where ${providerOrdersFilter("p.codFornPedido", codacesso)}`;
 
     const queryConsult = `SET sql_mode = ''; select
     date_format(SUBTIME(dataPedido, '03:00:00'), '%Y-%m-%d %H:%i')  as hour,
@@ -929,7 +972,10 @@ const Client = {
     const role = await getDirecAcesso(codacesso);
 
     // Associado (2): evolução acumulada restrita aos próprios pedidos.
-    const whereClause = role == 2 ? `WHERE ${associateOrdersFilter("p.codAssocPedido", codacesso)}` : "";
+    // Fornecedor (1): evolução acumulada das vendas do próprio fornecedor.
+    let whereClause = "";
+    if (role == 2) whereClause = `WHERE ${associateOrdersFilter("p.codAssocPedido", codacesso)}`;
+    else if (role == 1) whereClause = `WHERE ${providerOrdersFilter("p.codFornPedido", codacesso)}`;
 
     const queryConsult = `SET sql_mode = '';
       WITH time_intervals AS (

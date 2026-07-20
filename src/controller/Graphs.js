@@ -26,6 +26,18 @@ function associateOrdersFilter(column, codacesso) {
   )`;
 }
 
+// Restringe os pedidos aos fornecedores vinculados ao consultor do codAcesso
+// (acesso -> consultor -> relacionafornecedor -> fornecedor, direcAcesso == 1).
+function providerOrdersFilter(column, codacesso) {
+  return `${column} IN (
+    SELECT rf.codFornecedor
+    FROM acesso a
+    JOIN consultor c ON c.codConsult = a.codUsuario
+    JOIN relacionafornecedor rf ON rf.codConsultor = c.codConsult
+    WHERE a.codAcesso = ${codacesso}
+  )`;
+}
+
 const fs = require("fs");
 const PDFDocument = require("pdfkit-table");
 const path = require("path");
@@ -845,7 +857,28 @@ FROM (
       count(mercadoria.codMercadoria) as mercadorias
       from mercadoria;`;
 
-    const queryConsult = role == 2 ? queryAssociate : queryOrganization;
+    // Fornecedor (1): KPIs das próprias vendas —
+    // [Total vendido, Compradores, Negociações, Produtos].
+    const providerFilter = providerOrdersFilter("pedido.codFornPedido", codacesso);
+    const queryProvider = `SET sql_mode = '';
+      select sum(pedido.quantMercPedido * mercadoria.precoMercadoria) as total
+        from pedido
+        join mercadoria on mercadoria.codMercadoria = pedido.codMercPedido
+        where ${providerFilter}
+      union all
+      select count(distinct pedido.codAssocPedido) as total
+        from pedido
+        where ${providerFilter}
+      union all
+      select count(distinct pedido.codNegoPedido) as total
+        from pedido
+        where ${providerFilter}
+      union all
+      select count(distinct pedido.codMercPedido) as total
+        from pedido
+        where ${providerFilter};`;
+
+    const queryConsult = role == 2 ? queryAssociate : role == 1 ? queryProvider : queryOrganization;
     // const queryConsult = `SET sql_mode = ''; select
     //   sum(pedido.quantMercPedido * mercadoria.precoMercadoria) as total
     //   from pedido
@@ -870,6 +903,8 @@ FROM (
         let data = [];
         const titles = role == 2
           ? ["Total negociado", "Fornecedores", "Lojas", "Mercadorias"]
+          : role == 1
+          ? ["Total vendido", "Compradores", "Negociações", "Produtos"]
           : ["Total negociado", "Associados", "Fonecedores", "Mercadorias"];
 
         i = 0;
