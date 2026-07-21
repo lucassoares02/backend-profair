@@ -285,7 +285,16 @@ const Client = {
     from mercadoria 
     join pedido on mercadoria.codMercadoria = pedido.codMercPedido
     join associado on associado.codAssociado = pedido.codAssocPedido
-    where mercadoria.codMercadoria = ${codmercadoria} 
+    where (
+      mercadoria.codMercadoria = ${codmercadoria}
+      OR mercadoria.codMercadoria_ext = ${codmercadoria}
+      OR mercadoria.codMercadoria_ext = (
+        SELECT mercadoria_ref.codMercadoria_ext
+        FROM mercadoria mercadoria_ref
+        WHERE mercadoria_ref.codMercadoria = ${codmercadoria}
+        LIMIT 1
+      )
+    )
     group by pedido.codAssocPedido
     order by IFNULL(SUM(pedido.quantMercPedido), 0) desc, associado.razaoAssociado asc`;
 
@@ -320,7 +329,16 @@ const Client = {
     from mercadoria 
     join pedido on mercadoria.codMercadoria = pedido.codMercPedido
     join associado on associado.codAssociado = pedido.codAssocPedido
-    where mercadoria.codMercadoria = ${codmercadoria} 
+    where (
+      mercadoria.codMercadoria = ${codmercadoria}
+      OR mercadoria.codMercadoria_ext = ${codmercadoria}
+      OR mercadoria.codMercadoria_ext = (
+        SELECT mercadoria_ref.codMercadoria_ext
+        FROM mercadoria mercadoria_ref
+        WHERE mercadoria_ref.codMercadoria = ${codmercadoria}
+        LIMIT 1
+      )
+    )
     and pedido.codNegoPedido = ${codnegotiation}
     group by pedido.codAssocPedido
     order by IFNULL(SUM(pedido.quantMercPedido), 0) desc, associado.razaoAssociado asc`;
