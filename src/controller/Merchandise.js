@@ -245,8 +245,7 @@ const Merchandise = {
     left join pedido on pedido.codMercPedido = mercadoria.codMercadoria
     where fornecedor.codForn = ${codprovider}
     group by mercadoria.codMercadoria_ext
-    order by mercadoria.nomeMercadoria
-    asc`;
+    order by valorTotal desc, mercadoria.nomeMercadoria asc`;
     // const queryConsult = `
     // SET sql_mode = ''; select fornecedor.codForn,
     // fornecedor.nomeForn,

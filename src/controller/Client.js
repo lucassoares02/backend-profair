@@ -280,14 +280,14 @@ const Client = {
     associado.cidade as cidade,
     mercadoria.precoMercadoria as precoMercadoria,
     IFNULL(SUM(pedido.quantMercPedido), 0) as fatorMerc,
-    IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido),0) as 'valorTotal'
+    IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido),0) as 'valorTotal',
+    TIME_FORMAT(SUBTIME(MAX(pedido.dataPedido), '03:00:00'),'%H:%i') as 'horas'
     from mercadoria 
-    left outer join pedido on mercadoria.codMercadoria = pedido.codMercPedido 
-    left join associado on associado.codAssociado = pedido.codAssocPedido
+    join pedido on mercadoria.codMercadoria = pedido.codMercPedido
+    join associado on associado.codAssociado = pedido.codAssocPedido
     where mercadoria.codMercadoria = ${codmercadoria} 
     group by pedido.codAssocPedido
-    order by sum(mercadoria.precoMercadoria*pedido.quantMercPedido) 
-    desc`;
+    order by IFNULL(SUM(pedido.quantMercPedido), 0) desc, associado.razaoAssociado asc`;
 
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {
@@ -315,15 +315,15 @@ const Client = {
     associado.cidade as cidade,
     mercadoria.precoMercadoria as precoMercadoria,
     IFNULL(SUM(pedido.quantMercPedido), 0) as fatorMerc,
-    IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido),0) as 'valorTotal'
+    IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido),0) as 'valorTotal',
+    TIME_FORMAT(SUBTIME(MAX(pedido.dataPedido), '03:00:00'),'%H:%i') as 'horas'
     from mercadoria 
-    left outer join pedido on mercadoria.codMercadoria = pedido.codMercPedido 
-    left join associado on associado.codAssociado = pedido.codAssocPedido
+    join pedido on mercadoria.codMercadoria = pedido.codMercPedido
+    join associado on associado.codAssociado = pedido.codAssocPedido
     where mercadoria.codMercadoria = ${codmercadoria} 
     and pedido.codNegoPedido = ${codnegotiation}
     group by pedido.codAssocPedido
-    order by sum(mercadoria.precoMercadoria*pedido.quantMercPedido) 
-    desc`;
+    order by IFNULL(SUM(pedido.quantMercPedido), 0) desc, associado.razaoAssociado asc`;
 
     connection.query(queryConsult, (error, results, fields) => {
       if (error) {
