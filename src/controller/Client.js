@@ -278,6 +278,8 @@ const Client = {
     associado.razaoAssociado as razao,
     associado.codAssociado,
     associado.cidade as cidade,
+    associado.id_grupo as codGrupo,
+    grupos_empresariais.descricao as descGrupo,
     mercadoria.precoMercadoria as precoMercadoria,
     IFNULL(SUM(pedido.quantMercPedido), 0) as fatorMerc,
     IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido),0) as 'valorTotal',
@@ -285,6 +287,7 @@ const Client = {
     from mercadoria 
     join pedido on mercadoria.codMercadoria = pedido.codMercPedido
     join associado on associado.codAssociado = pedido.codAssocPedido
+    left join grupos_empresariais on grupos_empresariais.id = associado.id_grupo
     where (
       mercadoria.codMercadoria = ${codmercadoria}
       OR mercadoria.codMercadoria_ext = ${codmercadoria}
@@ -322,6 +325,8 @@ const Client = {
     associado.razaoAssociado as razao,
     associado.codAssociado,
     associado.cidade as cidade,
+    associado.id_grupo as codGrupo,
+    grupos_empresariais.descricao as descGrupo,
     mercadoria.precoMercadoria as precoMercadoria,
     IFNULL(SUM(pedido.quantMercPedido), 0) as fatorMerc,
     IFNULL(sum(mercadoria.precoMercadoria*pedido.quantMercPedido),0) as 'valorTotal',
@@ -329,6 +334,7 @@ const Client = {
     from mercadoria 
     join pedido on mercadoria.codMercadoria = pedido.codMercPedido
     join associado on associado.codAssociado = pedido.codAssocPedido
+    left join grupos_empresariais on grupos_empresariais.id = associado.id_grupo
     where (
       mercadoria.codMercadoria = ${codmercadoria}
       OR mercadoria.codMercadoria_ext = ${codmercadoria}
